@@ -1,0 +1,27 @@
+/* Payments — history by date (shell from dash.css) */
+.pay-datebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.pay-datebar label{font-family:var(--font-caps);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--maroon);font-weight:600}
+.pay-date{font-family:var(--font-body);font-size:14px;padding:10px 12px;border:1px solid var(--line-gold);border-radius:9px;background:#fff;color:var(--ink)}
+.pay-date:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px #8c1c1c1a}
+
+.pay-stats{display:grid;gap:14px;grid-template-columns:repeat(2,1fr);margin-bottom:18px}
+@media(min-width:760px){.pay-stats{grid-template-columns:repeat(4,1fr)}}
+.pay-stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:0 8px 22px -18px #5e111340}
+.pay-stat .l{font-family:var(--font-caps);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pay-stat .v{font-family:var(--font-body);font-weight:800;font-size:24px;color:var(--ink);margin-top:6px}
+.pay-stat.big .v{color:var(--oxblood)}
+
+.pay-list .head,.pay-list .r{display:grid;grid-template-columns:150px 1fr 130px 110px;gap:12px;align-items:center;padding:12px 18px}
+.pay-list .head{background:var(--parch-hi);border-bottom:1px solid var(--line);font-family:var(--font-caps);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pay-list .r{border-bottom:1px solid var(--line-2)}
+.pay-list .r:last-child{border-bottom:none}
+.pay-list .r:hover{background:var(--parch-hi)}
+@media(max-width:760px){.pay-list .head{display:none}.pay-list .r{grid-template-columns:1fr auto;gap:6px}.pay-list .r .pay-time{display:none}}
+.pay-oid b{font-weight:800;font-size:14px;color:var(--ink)}
+.pay-oid span{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.pay-time{font-size:12.5px;color:var(--ink-2)}
+.pay-method{font-family:var(--font-caps);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;padding:4px 9px;border-radius:100px;width:fit-content}
+.pay-method.upi{color:#0d6b39;background:#D6EBD8}
+.pay-method.cash{color:#8a6a16;background:#F6E6BC}
+.pay-amt{font-weight:800;font-size:15px;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.pay-empty{padding:40px;text-align:center;color:var(--muted)}

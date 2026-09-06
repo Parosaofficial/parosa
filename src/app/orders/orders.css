@@ -1,0 +1,69 @@
+/* Orders & Bills (shell from dash.css) */
+.or-stats{display:grid;gap:14px;grid-template-columns:repeat(2,1fr);margin-bottom:18px}
+@media(min-width:760px){.or-stats{grid-template-columns:repeat(4,1fr)}}
+.or-stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 8px 22px -18px #5e111340}
+.or-stat .l{font-family:var(--font-caps);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.or-stat .v{font-family:var(--font-body);font-weight:800;font-size:24px;color:var(--ink);margin-top:6px}
+.or-stat .v.pos{color:var(--pos)}.or-stat .v.neg{color:var(--nonveg)}
+
+.or-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.or-tabs{display:flex;gap:6px;background:var(--parch-2);border:1px solid var(--line);border-radius:100px;padding:4px}
+.or-tabs button{border:none;background:transparent;font-family:var(--font-caps);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);padding:8px 14px;border-radius:100px;cursor:pointer}
+.or-tabs button.on{background:var(--oxblood);color:var(--gold-hi)}
+.or-search{position:relative}
+.or-search input{font-size:13px;padding:9px 12px 9px 32px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);width:220px;max-width:52vw;font-family:var(--font-body)}
+.or-search input:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px #8c1c1c1a}
+.or-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);width:15px;height:15px}
+
+.or-list{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px -22px #5e111340}
+.or-head,.or-row{display:grid;grid-template-columns:150px 1fr 100px 190px 96px;gap:12px;align-items:center;padding:12px 18px}
+.or-head{background:var(--parch-hi);border-bottom:1px solid var(--line);font-family:var(--font-caps);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.or-row{border-bottom:1px solid var(--line-2)}
+.or-row:last-child{border-bottom:none}
+.or-row:hover{background:var(--parch-hi)}
+@media(max-width:820px){.or-head{display:none}.or-row{grid-template-columns:1fr auto;gap:8px}.or-row .or-c-items,.or-row .or-c-amt{display:none}}
+.or-id b{font-family:var(--font-body);font-weight:800;font-size:14px;color:var(--ink)}
+.or-id span{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.or-c-items{font-size:12.5px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.or-c-amt{font-weight:800;font-size:15px;color:var(--ink)}
+.or-pills{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.or-pill{font-family:var(--font-caps);font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:100px;white-space:nowrap}
+.or-pill.served{color:#2E7D46;background:#D6EBD8}
+.or-pill.cooking{color:#C25A1E;background:#F7DCC5}
+.or-pill.new{color:#B07A16;background:#F6E6BC}
+.or-pay{font-size:9px;font-family:var(--font-caps);letter-spacing:.06em;text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:100px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.or-pay.paid{color:#2E7D46;background:#D6EBD8}
+.or-pay.unpaid{color:#B4231C;background:#F6DCD9}
+.or-view{border:1px solid var(--line-gold);background:var(--cream-card);color:var(--maroon);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.or-view:hover{background:var(--gold-soft)}
+
+/* ---- bill / invoice modal ---- */
+.or-backdrop{position:fixed;inset:0;background:#2a0708cc;z-index:200;display:none;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}
+.or-backdrop.show{display:flex}
+.or-bill{background:var(--parch);border:2px solid var(--gold);border-radius:14px;width:min(430px,100%);box-shadow:0 40px 80px -20px #000;overflow:hidden;margin:auto;position:relative}
+.or-bill::before{content:"";position:absolute;inset:0;background-image:var(--grain);background-size:150px;opacity:.08;mix-blend-mode:multiply;pointer-events:none}
+.or-bh{background:linear-gradient(180deg,#7A1A1C,#531012);color:var(--parch);padding:16px 22px 14px;text-align:center;border-bottom:2px solid var(--gold);position:relative}
+.or-bh .rn{font-family:var(--font-display);font-size:24px;color:var(--parch-hi);margin-top:5px;letter-spacing:.01em}
+.or-bh .meta{font-size:10.5px;color:var(--gold-soft);margin-top:3px;line-height:1.5}
+.or-bx{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:7px;border:1px solid var(--gold);background:#ffffff14;color:var(--parch);font-size:17px;cursor:pointer;z-index:2}
+.or-bbody{padding:15px 22px;position:relative}
+.or-brow{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);padding:3px 0}
+.or-brow b{color:var(--ink)}
+.or-bdiv{border-top:1px dashed var(--line-gold);margin:12px 0}
+.or-bitem{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:5px 0;color:var(--ink)}
+.or-bitem .q{color:var(--maroon);font-weight:700;margin-right:6px}
+.or-bitem .amt{font-variant-numeric:tabular-nums;font-weight:600}
+.or-btot{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2);padding:3px 0}
+.or-btot.grand{font-family:var(--font-display);font-size:22px;color:var(--oxblood);border-top:1px dashed var(--line-gold);margin-top:8px;padding-top:10px}
+.or-bstat{text-align:center;margin-top:12px;font-family:var(--font-caps);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:8px;border-radius:8px}
+.or-bstat.paid{color:#2E7D46;background:#D6EBD8}
+.or-bstat.unpaid{color:#B4231C;background:#F6DCD9}
+.or-bf{padding:12px 22px 16px;border-top:1px solid var(--line);background:var(--parch-hi);display:grid;gap:8px;position:relative}
+.or-payvia{display:flex;gap:8px}
+.or-payvia button{flex:1;border:1px solid var(--line-gold);background:var(--cream-card);color:var(--ink-2);border-radius:9px;padding:11px;font-weight:700;font-size:12.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.or-payvia button.on{background:var(--oxblood);color:var(--gold-hi);border-color:var(--oxblood)}
+.or-bf .rowb{display:flex;gap:9px}
+.or-bf button{flex:1;border-radius:9px;padding:12px;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line-gold);background:var(--cream-card);color:var(--maroon)}
+.or-bf button.wa{background:#128C4B;color:#fff;border-color:#128C4B}
+.or-bf button.pay{background:var(--oxblood);color:var(--gold-hi);border-color:var(--oxblood)}
+.or-bf button svg{width:16px;height:16px}
