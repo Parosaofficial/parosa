@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { Sidebar } from "@/components/Sidebar";
+import { AppLoading } from "@/components/AppLoading";
 import { addCategory, deleteDish, getMenu, setDishAvailable, upsertDish, uploadPhoto } from "@/lib/db";
-import type { Category, Dish, Restaurant } from "@/lib/types";
+import { useOwner } from "@/lib/useOwner";
+import type { Category, Dish } from "@/lib/types";
 import "../dash.css";
 import "./editor.css";
-
-const SLUG = "raj-darbar"; // TODO: from the signed-in owner once Auth is added
 
 type Form = { id: string | null; category_id: string; name: string; description: string; price: string; is_veg: boolean; tag: string; available: boolean; photo_url: string };
 const blank = (cat: string): Form => ({ id: null, category_id: cat, name: "", description: "", price: "", is_veg: true, tag: "", available: true, photo_url: "" });
@@ -17,7 +17,7 @@ function PhIcon() {
 }
 
 export default function MenuEditor() {
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const { restaurant, ready } = useOwner();
   const [cats, setCats] = useState<Category[]>([]);
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,12 +29,13 @@ export default function MenuEditor() {
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2000); };
 
-  const load = async () => {
-    const m = await getMenu(SLUG);
-    if (m) { setRestaurant(m.restaurant); setCats(m.categories); setDishes(m.dishes); setActive((a) => a || m.categories[0]?.id || ""); }
+  const load = useCallback(async () => {
+    if (!restaurant) return;
+    const m = await getMenu(restaurant.slug);
+    if (m) { setCats(m.categories); setDishes(m.dishes); setActive((a) => a || m.categories[0]?.id || ""); }
     setLoading(false);
-  };
-  useEffect(() => { load(); }, []);
+  }, [restaurant]);
+  useEffect(() => { load(); }, [load]);
 
   const catName = cats.find((c) => c.id === active);
   const items = useMemo(() => dishes.filter((d) => d.category_id === active), [dishes, active]);
@@ -80,13 +81,15 @@ export default function MenuEditor() {
     if (n && restaurant) { const c = await addCategory(restaurant.id, n, cats.length + 1); await load(); setActive(c.id); showToast("Category added"); }
   };
 
+  if (!ready || !restaurant) return <AppLoading label="Loading your menu…" />;
+
   return (
     <div className="db-app">
-      <Sidebar />
+      <Sidebar restaurant={restaurant} />
       <main className="db-main">
         <div className="db-topbar">
           <div><h1>Menu &amp; Dishes</h1><p>Add, edit and organise your dishes — changes go live on the menu instantly.</p></div>
-          <div className="db-acts"><button className="db-btn prime" disabled={!restaurant} onClick={() => setForm(blank(active))}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add dish</button></div>
+          <div className="db-acts"><button className="db-btn prime" onClick={() => { if (!cats.length) { showToast("Add a category first (e.g. Starters)"); return; } setForm(blank(active || cats[0].id)); }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add dish</button></div>
         </div>
         <div className="db-content">
           <div className="db-note">
@@ -120,8 +123,10 @@ export default function MenuEditor() {
                   <div className="ed-search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><path d="m20 20-3-3" /></svg><input placeholder="Search dishes…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
                 </div>
 
-                {shown.length === 0 ? (
-                  <div className="ed-empty"><div className="es">No dishes yet</div><div>Add your first dish to this category.</div></div>
+                {cats.length === 0 ? (
+                  <div className="ed-empty"><div className="es">Let&apos;s build your menu</div><div>Start by adding a category like &ldquo;Starters&rdquo; or &ldquo;Main Course&rdquo;, then add dishes to it.</div><button className="ed-addcat" style={{ maxWidth: 240, margin: "16px auto 0" }} onClick={addCat}>+ Add your first category</button></div>
+                ) : shown.length === 0 ? (
+                  <div className="ed-empty"><div className="es">No dishes yet</div><div>Add your first dish to &ldquo;{catName?.name}&rdquo;.</div></div>
                 ) : shown.map((d) => (
                   <div key={d.id} className={`ed-dish${d.available ? "" : " out"}`}>
                     <div className="ed-thumb" style={d.photo_url ? { backgroundImage: `url(${d.photo_url})` } : undefined}>{!d.photo_url && <PhIcon />}</div>

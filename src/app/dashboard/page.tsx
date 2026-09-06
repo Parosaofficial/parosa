@@ -3,16 +3,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
-import { getRestaurantBySlug, listOrdersWithItems, updateOrderStatus, type OrderWithItems } from "@/lib/db";
+import { AppLoading } from "@/components/AppLoading";
+import { listOrdersWithItems, updateOrderStatus, type OrderWithItems } from "@/lib/db";
+import { useOwner } from "@/lib/useOwner";
 import { supabase } from "@/lib/supabase";
-import type { OrderStatus, Restaurant } from "@/lib/types";
+import type { OrderStatus } from "@/lib/types";
 import "../dash.css";
 import "./dashboard.css";
 
 const NEXT: Record<OrderStatus, OrderStatus | null> = { new: "cooking", cooking: "ready", ready: "served", served: null };
 const LABEL: Record<OrderStatus, string> = { new: "New", cooking: "Cooking", ready: "Ready", served: "Served" };
 const BTN: Record<OrderStatus, string> = { new: "Start cooking →", cooking: "Mark ready →", ready: "Mark served →", served: "Completed" };
-const SLUG = "raj-darbar";
 
 const ago = (iso: string) => {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -27,19 +28,12 @@ function Spark() {
 }
 
 export default function Dashboard() {
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const { restaurant, ready } = useOwner();
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
 
   const loadOrders = useCallback(async (rid: string) => { setOrders(await listOrdersWithItems(rid)); }, []);
 
-  useEffect(() => {
-    let rid = "";
-    (async () => {
-      const r = await getRestaurantBySlug(SLUG);
-      setRestaurant(r);
-      if (r) { rid = r.id; await loadOrders(r.id); }
-    })();
-  }, [loadOrders]);
+  useEffect(() => { if (restaurant) loadOrders(restaurant.id); }, [restaurant, loadOrders]);
 
   // realtime: any order change → refresh
   useEffect(() => {
@@ -76,13 +70,15 @@ export default function Dashboard() {
     return arr.map(([name, c]) => ({ name, c, w: Math.round((c / max) * 100) }));
   }, [orders]);
 
+  if (!ready || !restaurant) return <AppLoading label="Loading your dashboard…" />;
+
   return (
     <div className="db-app">
-      <Sidebar />
+      <Sidebar restaurant={restaurant} />
       <main className="db-main">
         <div className="db-topbar">
           <div>
-            <h1>नमस्ते, {restaurant?.name ?? "…"} 👋</h1>
+            <h1>नमस्ते, {restaurant.name} 👋</h1>
             <p>Here&apos;s how your restaurant is doing today.</p>
           </div>
           <div className="db-topright">
@@ -93,7 +89,7 @@ export default function Dashboard() {
             </div>
             <div className="db-acts">
               <Link className="db-btn" href="/menu-editor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add dish</Link>
-              <Link className="db-btn prime" href="/raj-darbar/menu/1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 3h6v6M21 3l-9 9M10 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" /></svg> View live menu</Link>
+              <Link className="db-btn prime" href={`/${restaurant.slug}/menu/1`} target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 3h6v6M21 3l-9 9M10 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" /></svg> View live menu</Link>
             </div>
           </div>
         </div>

@@ -55,6 +55,9 @@
 .lg-prime{width:100%;background:var(--oxblood);color:var(--gold-hi);border:none;border-radius:12px;padding:15px;font-family:var(--font-caps);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:14px;cursor:pointer;margin-top:6px;box-shadow:0 12px 26px -12px #4a0c0d;transition:filter .15s}
 .lg-prime:hover{filter:brightness(1.06)}
 .lg-prime:active{transform:scale(.99)}
+.lg-prime:disabled{opacity:.6;cursor:progress;filter:none}
+.lg-back:disabled{opacity:.5;cursor:default}
+.lg-err{margin-top:14px;background:#fdecec;border:1px solid #f0b9b6;color:#a3221c;font-size:13px;font-weight:600;padding:10px 12px;border-radius:9px;line-height:1.45}
 
 .lg-alt{font-size:13.5px;color:var(--ink-2);margin-top:20px}
 .lg-alt a{color:var(--maroon);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}

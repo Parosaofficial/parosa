@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
+import { AppLoading } from "@/components/AppLoading";
+import { updateRestaurant } from "@/lib/db";
+import { useOwner } from "@/lib/useOwner";
 import "../dash.css";
 import "./templates.css";
 
@@ -20,19 +23,32 @@ const T: Tpl[] = [
 ];
 
 export default function Templates() {
+  const { restaurant, ready, reload } = useOwner();
   const [current, setCurrent] = useState("virasat");
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2000); };
 
+  useEffect(() => { if (restaurant?.template) setCurrent(restaurant.template); }, [restaurant]);
+
+  const apply = async (id: string, label: string) => {
+    if (!restaurant) return;
+    setCurrent(id);
+    await updateRestaurant(restaurant.id, { template: id });
+    await reload();
+    showToast(`Template set to “${label}”`);
+  };
+
+  if (!ready || !restaurant) return <AppLoading label="Loading templates…" />;
+
   return (
     <div className="db-app">
-      <Sidebar />
+      <Sidebar restaurant={restaurant} />
       <main className="db-main">
-        <div className="db-topbar"><div><h1>Templates</h1><p>Pick the look your diners see. Your brand is Virasat — switch any time, free.</p></div></div>
+        <div className="db-topbar"><div><h1>Templates</h1><p>Pick the look your diners see. Switch any time, free.</p></div></div>
         <div className="db-content">
           <div className="db-note">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
-            <span><b>Your USP</b> — 20+ designed templates, not 4. Click <b>Apply</b> to switch instantly; your menu &amp; prices never change, only the look.</span>
+            <span><b>Virasat is live now</b> — the heritage look your diners see today. More themes are rolling out; your saved choice applies automatically as each one goes live. Your menu &amp; prices never change, only the look.</span>
           </div>
           <div className="tp-grid">
             {T.map((t) => {
@@ -51,7 +67,7 @@ export default function Templates() {
                     <div className="tp-dots">{t.dots.map((d, i) => <span key={i} className="tp-dot" style={{ background: d }} />)}</div>
                     <div className="tp-row">
                       <button onClick={() => showToast(`Opening “${t.name}” preview…`)}>Preview</button>
-                      <button className="apply" onClick={() => { setCurrent(t.id); showToast(`Template switched to “${t.name}” — menu is live`); }}>{on ? "Applied" : "Apply"}</button>
+                      <button className="apply" onClick={() => apply(t.id, t.name)}>{on ? "Applied" : "Apply"}</button>
                     </div>
                   </div>
                 </div>

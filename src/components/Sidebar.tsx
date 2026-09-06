@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Seal } from "@/components/Logo";
+import { signOutOwner } from "@/lib/auth";
+import type { Restaurant } from "@/lib/types";
 import type { ReactNode } from "react";
 
 const items: { label: string; href: string; group?: string; icon: ReactNode }[] = [
@@ -16,8 +18,25 @@ const items: { label: string; href: string; group?: string; icon: ReactNode }[] 
   { label: "Settings", href: "/settings", icon: <><circle cx="12" cy="12" r="3.2" /><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" /></> },
 ];
 
-export function Sidebar() {
+function initials(name?: string | null) {
+  if (!name) return "प";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return name.trim().slice(0, 2).toUpperCase();
+}
+
+export function Sidebar({ restaurant }: { restaurant?: Restaurant | null }) {
   const path = usePathname();
+  const router = useRouter();
+
+  const logout = async () => {
+    await signOutOwner();
+    router.replace("/login");
+  };
+
+  const name = restaurant?.name ?? "Your Restaurant";
+  const tables = restaurant?.tables_count ?? 0;
+
   return (
     <aside className="db-side">
       <Link href="/dashboard" className="db-brand">
@@ -37,11 +56,14 @@ export function Sidebar() {
       </nav>
       <div className="db-foot">
         <div className="db-rest">
-          <div className="db-rc">रा</div>
-          <div style={{ flex: 1, minWidth: 0 }}><div className="db-rn">राज दरबार</div><div className="db-rp">Parosa Free · 12 tables</div></div>
-          <Link href="/login" className="db-logout" title="Log out" aria-label="Log out">
+          <div className="db-rc">{initials(name)}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="db-rn">{name}</div>
+            <div className="db-rp">Parosa Free · {tables} {tables === 1 ? "table" : "tables"}</div>
+          </div>
+          <button onClick={logout} className="db-logout" title="Log out" aria-label="Log out">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
-          </Link>
+          </button>
         </div>
       </div>
       <div className="db-scan">Scan · Serve · Savour</div>

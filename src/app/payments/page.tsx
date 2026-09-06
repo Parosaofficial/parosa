@@ -2,27 +2,27 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
-import { getRestaurantBySlug, listOrders } from "@/lib/db";
+import { AppLoading } from "@/components/AppLoading";
+import { listOrders } from "@/lib/db";
+import { useOwner } from "@/lib/useOwner";
 import type { Order } from "@/lib/types";
 import "../dash.css";
 import "./payments.css";
 
-const SLUG = "raj-darbar";
 const localDate = (iso: string) => new Date(iso).toLocaleDateString("en-CA"); // YYYY-MM-DD
 const time = (iso: string) => new Date(iso).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true });
 
 export default function Payments() {
+  const { restaurant, ready } = useOwner();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [date, setDate] = useState(new Date().toLocaleDateString("en-CA"));
 
   useEffect(() => {
     (async () => {
-      const r = await getRestaurantBySlug(SLUG);
-      if (r) setOrders(await listOrders(r.id));
-      setLoading(false);
+      if (restaurant) { setOrders(await listOrders(restaurant.id)); setLoading(false); }
     })();
-  }, []);
+  }, [restaurant]);
 
   const rows = useMemo(
     () => orders.filter((o) => o.payment_status === "paid" && localDate(o.created_at) === date),
@@ -37,9 +37,11 @@ export default function Payments() {
 
   const pretty = new Date(date + "T00:00:00").toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
 
+  if (!ready || !restaurant) return <AppLoading label="Loading payments…" />;
+
   return (
     <div className="db-app">
-      <Sidebar />
+      <Sidebar restaurant={restaurant} />
       <main className="db-main">
         <div className="db-topbar"><div><h1>Payments</h1><p>Your collection history — pick any date to see its bills.</p></div></div>
         <div className="db-content">

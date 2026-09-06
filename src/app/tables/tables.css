@@ -23,3 +23,8 @@
 .tb-add{border:1.5px dashed var(--line-gold);border-radius:12px;display:grid;place-items:center;min-height:150px;color:var(--maroon);background:transparent;font-weight:700;font-size:14px;cursor:pointer}
 .tb-add .in{display:flex;flex-direction:column;align-items:center;gap:6px}
 .tb-plus{width:38px;height:38px;border-radius:50%;background:var(--oxblood);color:var(--gold-hi);display:grid;place-items:center;font-size:22px}
+.tb-empty{background:var(--cream-card);border:1.5px dashed var(--line-gold);border-radius:14px;padding:44px 24px;text-align:center;box-shadow:0 10px 26px -20px #5e111340}
+.tb-emptyicon{width:64px;height:64px;margin:0 auto 16px;border-radius:16px;background:var(--parch-hi);border:1px solid var(--line-gold);display:grid;place-items:center;color:var(--oxblood)}
+.tb-emptyicon svg{width:32px;height:32px}
+.tb-empty h3{font-family:var(--font-display);font-size:24px;color:var(--maroon-deep);margin:0 0 6px}
+.tb-empty p{font-size:13.5px;color:var(--ink-2);max-width:400px;margin:0 auto 20px;line-height:1.55}

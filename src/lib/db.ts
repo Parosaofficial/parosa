@@ -12,6 +12,89 @@ export async function getRestaurantBySlug(slug: string): Promise<Restaurant | nu
   return data as Restaurant | null;
 }
 
+/* ---------------- Restaurant (owner account) ---------------- */
+
+/** The restaurant belonging to a signed-in owner. */
+export async function getRestaurantByOwner(ownerId: string): Promise<Restaurant | null> {
+  const { data } = await supabase.from("restaurants").select("*").eq("owner_id", ownerId).maybeSingle();
+  return data as Restaurant | null;
+}
+
+function slugify(s: string): string {
+  return (
+    s.toLowerCase().trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "") || "restaurant"
+  );
+}
+
+/** A URL-safe slug from the restaurant name that isn't already taken. */
+export async function generateUniqueSlug(name: string): Promise<string> {
+  const base = slugify(name);
+  const { data } = await supabase.from("restaurants").select("slug").ilike("slug", `${base}%`);
+  const taken = new Set((data ?? []).map((r) => (r as { slug: string }).slug));
+  if (!taken.has(base)) return base;
+  let i = 2;
+  while (taken.has(`${base}-${i}`)) i++;
+  return `${base}-${i}`;
+}
+
+export async function createRestaurant(input: {
+  ownerId: string;
+  slug: string;
+  name: string;
+  ownerName?: string;
+  ownerEmail?: string;
+  phone?: string;
+  type?: string;
+  visitors?: string;
+  logoUrl?: string | null;
+  gstin?: string;
+  gstinUrl?: string | null;
+  fssai?: string;
+  fssaiUrl?: string | null;
+  notes?: string;
+}): Promise<Restaurant> {
+  const { data, error } = await supabase
+    .from("restaurants")
+    .insert({
+      owner_id: input.ownerId,
+      slug: input.slug,
+      name: input.name,
+      owner_name: input.ownerName || null,
+      owner_email: input.ownerEmail || null,
+      phone: input.phone || null,
+      whatsapp: input.phone || null,
+      type: input.type || null,
+      visitors: input.visitors || null,
+      logo_url: input.logoUrl || null,
+      gstin: input.gstin || null,
+      gstin_url: input.gstinUrl || null,
+      fssai: input.fssai || null,
+      fssai_url: input.fssaiUrl || null,
+      description: input.notes || null,
+      template: "virasat",
+      tables_count: 0,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as Restaurant;
+}
+
+export async function updateRestaurant(id: string, patch: Partial<Restaurant>) {
+  const { error } = await supabase.from("restaurants").update(patch).eq("id", id);
+  if (error) throw error;
+}
+
+/** Permanently delete a restaurant (categories, dishes and orders cascade). */
+export async function deleteRestaurant(id: string) {
+  const { error } = await supabase.from("restaurants").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function getMenu(
   slug: string
 ): Promise<{ restaurant: Restaurant; categories: Category[]; dishes: Dish[] } | null> {
@@ -35,26 +118,46 @@ export async function createOrder(input: {
   total: number;
   phone?: string;
 }): Promise<Order> {
+  // We generate the id and order number on the client so a customer (anon)
+  // only ever needs INSERT permission — never SELECT — under RLS.
+  const id =
+    typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const orderNo = "A-" + Math.floor(200 + Math.random() * 799);
-  const { data: order, error } = await supabase
-    .from("orders")
-    .insert({
-      restaurant_id: input.restaurantId,
-      table_number: input.table,
-      order_no: orderNo,
-      subtotal: input.subtotal,
-      gst: input.gst,
-      total: input.total,
-      status: "new",
-      payment_status: "unpaid",
-      customer_phone: input.phone ?? null,
-    })
-    .select()
-    .single();
-  if (error || !order) throw error ?? new Error("Order failed");
+  const created_at = new Date().toISOString();
+
+  const order: Order = {
+    id,
+    restaurant_id: input.restaurantId,
+    table_number: input.table,
+    order_no: orderNo,
+    subtotal: input.subtotal,
+    gst: input.gst,
+    total: input.total,
+    status: "new",
+    payment_status: "unpaid",
+    payment_method: null,
+    customer_phone: input.phone ?? null,
+    created_at,
+  };
+
+  const { error } = await supabase.from("orders").insert({
+    id,
+    restaurant_id: input.restaurantId,
+    table_number: input.table,
+    order_no: orderNo,
+    subtotal: input.subtotal,
+    gst: input.gst,
+    total: input.total,
+    status: "new",
+    payment_status: "unpaid",
+    customer_phone: input.phone ?? null,
+  });
+  if (error) throw error;
 
   const rows = input.items.map((i) => ({
-    order_id: order.id,
+    order_id: id,
     dish_id: i.dish_id,
     name: i.name,
     qty: i.qty,
@@ -63,7 +166,7 @@ export async function createOrder(input: {
   const { error: itemErr } = await supabase.from("order_items").insert(rows);
   if (itemErr) throw itemErr;
 
-  return order as Order;
+  return order;
 }
 
 export async function listOrders(restaurantId: string): Promise<Order[]> {
@@ -119,6 +222,12 @@ export async function setDishAvailable(dishId: string, available: boolean) {
 
 export async function deleteDish(dishId: string) {
   await supabase.from("dishes").delete().eq("id", dishId);
+}
+
+/* ---------------- Tables ---------------- */
+
+export async function setTablesCount(restaurantId: string, count: number) {
+  await supabase.from("restaurants").update({ tables_count: count }).eq("id", restaurantId);
 }
 
 /* ---------------- Photo storage ---------------- */

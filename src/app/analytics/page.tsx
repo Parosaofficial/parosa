@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
+import { AppLoading } from "@/components/AppLoading";
+import { useOwner } from "@/lib/useOwner";
 import "../dash.css";
 import "./analytics.css";
 
@@ -50,12 +52,15 @@ const HOURS: [string, number, boolean][] = [
 ];
 
 export default function Analytics() {
+  const { restaurant, ready } = useOwner();
   const [range, setRange] = useState<"week" | "month">("week");
   const d = range === "week" ? WEEK : { ...WEEK, ...MONTH };
 
+  if (!ready || !restaurant) return <AppLoading label="Loading analytics…" />;
+
   return (
     <div className="db-app">
-      <Sidebar />
+      <Sidebar restaurant={restaurant} />
       <main className="db-main">
         <div className="db-topbar">
           <div><h1>Analytics</h1><p>What&apos;s selling, when you&apos;re busy, and what to do next.</p></div>
@@ -68,6 +73,10 @@ export default function Analytics() {
         </div>
 
         <div className="db-content">
+          <div className="db-note" style={{ marginBottom: 16 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
+            <span><b>Sample analytics.</b> These charts show what your trends will look like — your real numbers appear here as orders come in. Live totals are already on your <b>Overview</b>.</span>
+          </div>
           {/* KPIs */}
           <div className="db-kpis">
             <div className="db-kpi">

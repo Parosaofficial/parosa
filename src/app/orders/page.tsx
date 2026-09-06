@@ -3,17 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Seal } from "@/components/Logo";
-import { getRestaurantBySlug, listOrdersWithItems, markOrderPaid, type OrderWithItems } from "@/lib/db";
-import type { Restaurant } from "@/lib/types";
+import { AppLoading } from "@/components/AppLoading";
+import { listOrdersWithItems, markOrderPaid, type OrderWithItems } from "@/lib/db";
+import { useOwner } from "@/lib/useOwner";
 import "../dash.css";
 import "./orders.css";
 
-const SLUG = "raj-darbar";
 const time = (iso: string) => new Date(iso).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true });
 const dateStr = (iso: string) => new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
 export default function Orders() {
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const { restaurant, ready } = useOwner();
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"upcoming" | "completed" | "all">("upcoming");
@@ -23,13 +23,11 @@ export default function Orders() {
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2000); };
 
-  const load = async () => {
-    const r = await getRestaurantBySlug(SLUG);
-    setRestaurant(r);
-    if (r) setOrders(await listOrdersWithItems(r.id));
-    setLoading(false);
-  };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    (async () => {
+      if (restaurant) { setOrders(await listOrdersWithItems(restaurant.id)); setLoading(false); }
+    })();
+  }, [restaurant]);
 
   const stats = useMemo(() => {
     const paid = orders.filter((o) => o.payment_status === "paid");
@@ -50,9 +48,11 @@ export default function Orders() {
     showToast(`Bill marked as paid · ${method} ✓`);
   };
 
+  if (!ready || !restaurant) return <AppLoading label="Loading orders…" />;
+
   return (
     <div className="db-app">
-      <Sidebar />
+      <Sidebar restaurant={restaurant} />
       <main className="db-main">
         <div className="db-topbar"><div><h1>Orders &amp; Bills</h1><p>Every order and its bill — status, payment and history.</p></div></div>
 
@@ -105,8 +105,8 @@ export default function Orders() {
             <button className="or-bx" onClick={() => setBill(null)}>×</button>
             <div className="or-bh">
               <Seal size={40} />
-              <div className="rn">{restaurant?.name ?? "Raj Darbar"}</div>
-              <div className="meta">{restaurant?.address ?? ""}<br />GSTIN {restaurant?.gstin ?? "—"} · FSSAI {restaurant?.fssai ?? "—"}</div>
+              <div className="rn">{restaurant.name}</div>
+              <div className="meta">{restaurant.address ?? ""}<br />GSTIN {restaurant.gstin ?? "—"} · FSSAI {restaurant.fssai ?? "—"}</div>
             </div>
             <div className="or-bbody">
               <div className="or-brow"><span>Bill No.</span><b>#{bill.order_no}</b></div>
