@@ -66,8 +66,11 @@ export default function Orders() {
     return { total: orders.length, paid: paid.length, unpaid: unpaid.length, revenue: paid.reduce((a, o) => a + o.total, 0) };
   }, [orders]);
 
+  // An order is only "completed" once it's served AND paid. A served-but-unpaid
+  // bill still needs collecting, so it stays under Upcoming (it must not vanish).
+  const isSettled = (o: OrderWithItems) => o.status === "served" && o.payment_status === "paid";
   const shown = orders.filter((o) => {
-    const st = filter === "all" ? true : filter === "completed" ? o.status === "served" : o.status !== "served";
+    const st = filter === "all" ? true : filter === "completed" ? isSettled(o) : !isSettled(o);
     return st && (!q || `${o.order_no} ${o.table_number}`.toLowerCase().includes(q.toLowerCase()));
   });
 
