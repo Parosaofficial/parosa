@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Seal } from "@/components/Logo";
 import { signOutOwner } from "@/lib/auth";
+import { planById } from "@/lib/plans";
 import type { Restaurant } from "@/lib/types";
 import type { ReactNode } from "react";
 
@@ -36,6 +37,7 @@ export function Sidebar({ restaurant }: { restaurant?: Restaurant | null }) {
 
   const name = restaurant?.name ?? "Your Restaurant";
   const tables = restaurant?.tables_count ?? 0;
+  const planName = planById(restaurant?.plan).name;
 
   return (
     <aside className="db-side">
@@ -59,7 +61,7 @@ export function Sidebar({ restaurant }: { restaurant?: Restaurant | null }) {
           <div className="db-rc">{initials(name)}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="db-rn">{name}</div>
-            <div className="db-rp">Parosa Free · {tables} {tables === 1 ? "table" : "tables"}</div>
+            <div className="db-rp">Parosa {planName} · {tables} {tables === 1 ? "table" : "tables"}</div>
           </div>
           <button onClick={logout} className="db-logout" title="Log out" aria-label="Log out">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>

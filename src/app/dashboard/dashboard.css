@@ -70,3 +70,18 @@
 .db-qi{width:38px;height:38px;border-radius:8px;background:var(--oxblood) var(--paisley);background-size:60px;color:var(--gold-hi);display:grid;place-items:center}
 .db-qlink h4{font-family:var(--font-body);font-weight:700;font-size:14px;color:var(--maroon)}
 .db-qlink p{font-size:11.5px;color:var(--ink-2)}
+
+/* ---- live order alert ---- */
+.db-alert{display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,#6e1618,#8c1c1c);color:var(--gold-soft);border-radius:12px;padding:14px 16px;margin-bottom:16px;box-shadow:0 16px 34px -18px #6e1618cc;animation:dbalertin .4s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes dbalertin{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
+.db-alert-ping{width:12px;height:12px;border-radius:50%;background:var(--gold-hi);flex:none;box-shadow:0 0 0 0 rgba(203,162,78,.7);animation:dbping 1.2s infinite}
+@keyframes dbping{0%{box-shadow:0 0 0 0 rgba(203,162,78,.6)}70%{box-shadow:0 0 0 12px rgba(203,162,78,0)}100%{box-shadow:0 0 0 0 rgba(203,162,78,0)}}
+.db-alert-tx{flex:1;line-height:1.3}
+.db-alert-tx b{display:block;font-family:var(--font-display);font-size:19px;color:#fff}
+.db-alert-tx span{font-size:12.5px;color:var(--gold-soft)}
+.db-alert-btn{background:var(--gold-hi);color:#4a0c0d;border:none;border-radius:8px;padding:9px 16px;font-family:var(--font-caps);font-weight:700;font-size:12.5px;letter-spacing:.04em;cursor:pointer;white-space:nowrap}
+.db-alert-btn:hover{filter:brightness(1.05)}
+.db-icobtn.on{background:var(--oxblood);color:var(--gold-hi);border-color:var(--line-gold)}
+.db-badge{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--gold-hi);color:#4a0c0d;font-size:10.5px;font-weight:800;display:grid;place-items:center;line-height:1}
+.db-soundnudge{cursor:pointer;transition:border-color .15s}
+.db-soundnudge:hover{border-color:var(--line-gold)}

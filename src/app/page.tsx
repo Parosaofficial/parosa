@@ -1,26 +1,39 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { Seal } from "@/components/Logo";
+import { PLANS } from "@/lib/plans";
 import "./landing.css";
 
 const FEATURES = [
-  { t: "Bilingual menu", d: "Every dish in Hindi and English — your regulars and first-timers both read it their way.", i: "M3 5h12M9 3v2m0 0c0 5-2 8-6 10m4-4c1.5 2 3.5 3.5 6 4M14 21l4-9 4 9m-7-3h6" },
-  { t: "QR per table", d: "Print a unique code for every table. Scan → menu opens with the table already filled in.", i: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h-3zM20 14v6M17 20h3" },
-  { t: "Live order board", d: "Orders land on your screen the second a guest taps Order — new, cooking, ready, served.", i: "M4 6h16M4 12h16M4 18h10" },
-  { t: "WhatsApp bill", d: "One tap sends a clean, itemised bill to the guest's WhatsApp. No printer, no paper.", i: "M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z" },
-  { t: "Menu you control", d: "Add dishes, change prices, mark sold-out — updates the moment you save. No reprints.", i: "M12 20h9M4 20l1-4 10-10 3 3-10 10z" },
-  { t: "Payments & insights", d: "See the day's collection, UPI vs cash, and your bestsellers — all in one place.", i: "M4 19V5m4 14v-8m4 8V9m4 10v-6m4 6V7" },
+  { t: "Bilingual menu", d: "Every dish in Hindi and English — your regulars and first-timers both read it their way.", i: "M4 5h9M4 5c0 6-1.5 9-2 10m4-6c1.5 3 3.5 4.5 5 5M13 19l4-9 4 9m-6.5-3h5" },
+  { t: "A QR for every table", d: "Print a unique code per table. Scan → your menu opens with the table already filled in.", i: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h3v3h-3zM20 14v6M17 20h3" },
+  { t: "Live order board + sound", d: "Orders land on your screen and ring a bell the second a guest taps Order. Nothing gets missed.", i: "M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" },
+  { t: "WhatsApp bills", d: "One tap sends a clean, itemised bill to the guest's WhatsApp. No printer, no paper.", i: "M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z" },
+  { t: "0% commission", d: "Unlike the aggregators, we never take a cut of your order. You keep every rupee your guests pay.", i: "M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
+  { t: "Insights that pay off", d: "See the day's collection, UPI vs cash, and your bestsellers — know exactly what to push.", i: "M4 19V5m4 14v-8m4 8V9m4 10v-6m4 6V7" },
 ];
 
 const STEPS = [
-  { n: "1", t: "Create your account", d: "Add your restaurant name, type and details. Takes two minutes — no card needed." },
+  { n: "1", t: "Create your account", d: "Add your restaurant, address and details. Two minutes, no card needed." },
   { n: "2", t: "Build your menu", d: "Add categories and dishes with prices and photos. Change anything, anytime." },
-  { n: "3", t: "Add tables & print QR", d: "Parosa makes a unique QR for each table. Print them and place one on every table." },
-  { n: "4", t: "Start serving", d: "Guests scan, browse and order. You get the order live and send the bill on WhatsApp." },
+  { n: "3", t: "Print your QR codes", d: "Parosa makes a unique QR per table. Print them and place one on every table." },
+  { n: "4", t: "Start serving", d: "Guests scan and order, you hear the bell, and the bill goes out on WhatsApp." },
 ];
 
-const AUDIENCE = ["Restaurants", "Dhabas", "Food trucks", "Cafés", "Cloud kitchens", "Family diners"];
+const FAQ = [
+  ["Do my customers need to download an app?", "No — never. Guests scan your QR with any phone camera and your menu opens in the browser. Nothing to install."],
+  ["Is it really 0% commission?", "Yes. Parosa charges a flat monthly plan and takes nothing from your orders. Every rupee your guest pays is yours."],
+  ["Is the menu in Hindi and English?", "Both, side by side. Your regulars and first-time guests each read it the way they're comfortable."],
+  ["What do I need to get started?", "Just your menu. You can build it in a couple of minutes and print your first table QR the same day — no special hardware."],
+  ["How do payments work?", "Your guests pay you directly by UPI or cash and Parosa tracks every bill. Online plan billing via Razorpay is coming soon; you're in free early access until then."],
+  ["Can I change how my menu looks?", "Yes. Pick from designed templates any time — your dishes and prices stay exactly the same, only the look changes."],
+];
 
 export default function Landing() {
+  const [yearly, setYearly] = useState(false);
+
   return (
     <div className="ld">
       {/* NAV */}
@@ -28,20 +41,17 @@ export default function Landing() {
         <div className="ld-wrap ld-navrow">
           <Link href="/" className="ld-brand">
             <Seal size={38} />
-            <span className="ld-brandtx">
-              <b>परोसा</b>
-              <i>PAROSA</i>
-            </span>
+            <span className="ld-brandtx"><b>परोसा</b><i>PAROSA</i></span>
           </Link>
           <nav className="ld-navlinks">
             <a href="#features">Features</a>
             <a href="#how">How it works</a>
-            <a href="#who">Who it&apos;s for</a>
             <a href="#pricing">Pricing</a>
+            <a href="#faq">FAQ</a>
           </nav>
           <div className="ld-navcta">
             <Link href="/login" className="ld-btn ghost">Login</Link>
-            <Link href="/login?mode=create" className="ld-btn solid">Sign up free</Link>
+            <Link href="/login?mode=create" className="ld-btn solid">Get started</Link>
           </div>
         </div>
       </header>
@@ -49,35 +59,33 @@ export default function Landing() {
       {/* HERO */}
       <section className="ld-hero">
         <div aria-hidden className="ld-paisley" />
+        <div aria-hidden className="ld-heroglow" />
         <div className="ld-wrap ld-herogrid">
           <div className="ld-heroL">
-            <span className="ld-pill">✦ The QR menu made for India</span>
-            <h1 className="emboss-ink">
-              Your menu, <span className="hl">served</span> in a scan.
-            </h1>
+            <span className="ld-pill"><span className="dot" /> The QR menu made for India</span>
+            <h1>Your menu,<br /><span className="hl">served</span> in a scan.</h1>
             <p className="ld-sub">
               Parosa turns every table into a self-order counter. Guests scan a QR, browse your
-              bilingual menu, and order — you get it live and send the bill on WhatsApp. No app to
-              download, no expensive hardware.
+              bilingual menu and order — you hear the bell instantly and send the bill on WhatsApp.
+              No app for guests, no expensive hardware, <b>0% commission</b>.
             </p>
             <div className="ld-herobtns">
-              <Link href="/login?mode=create" className="ld-btn solid lg">Start free — build your menu</Link>
-              <Link href="/login" className="ld-btn ghost lg">I already have an account</Link>
+              <Link href="/login?mode=create" className="ld-btn solid lg">Start your restaurant</Link>
+              <a href="#pricing" className="ld-btn ghost lg">See pricing</a>
             </div>
             <div className="ld-trust">
-              <span>● No card required</span>
-              <span>● Hindi + English</span>
-              <span>● Live in minutes</span>
+              <span>✦ From ₹99/mo</span>
+              <span>✦ Hindi + English</span>
+              <span>✦ Live in minutes</span>
             </div>
           </div>
 
-          {/* phone mock */}
           <div className="ld-heroR" aria-hidden>
             <div className="ld-phone">
               <div className="ld-phscreen">
                 <div className="ld-phtop"><Seal size={26} /><div className="ld-phname">Raj Darbar</div><div className="ld-phtag">Table 7 · Scan &amp; order</div></div>
                 <div className="ld-phcat">Tandoori Starters</div>
-                {[["Paneer Tikka", "₹220", "🧀"], ["Tandoori Chaap", "₹240", "🍢"], ["Hara Bhara Kebab", "₹190", "🥬"]].map(([n, p]) => (
+                {[["Paneer Tikka", "₹220"], ["Tandoori Chaap", "₹240"], ["Hara Bhara Kebab", "₹190"]].map(([n, p]) => (
                   <div key={n} className="ld-phdish">
                     <div className="ld-phdot" />
                     <div className="ld-phdinfo"><b>{n}</b><span>{p}</span></div>
@@ -86,6 +94,10 @@ export default function Landing() {
                 ))}
                 <div className="ld-phbar"><span>3 items</span><div className="ld-phorder">Order · ₹650</div></div>
               </div>
+            </div>
+            <div className="ld-floatorder">
+              <span className="ld-fo-ping" />
+              <div><b>New order · Table 7</b><span>₹650 · just now</span></div>
             </div>
             <div className="ld-qrfloat">
               <div className="ld-qrgrid" />
@@ -98,7 +110,7 @@ export default function Landing() {
       {/* STRIP */}
       <div className="ld-strip">
         <div className="ld-wrap ld-stripwrap">
-          {["Scan", "❖", "Serve", "❖", "Savour", "❖", "Repeat"].map((s, i) => (
+          {["0% commission", "❖", "No app for guests", "❖", "हिंदी + English", "❖", "Made in India"].map((s, i) => (
             <span key={i} className={s === "❖" ? "d" : ""}>{s}</span>
           ))}
         </div>
@@ -115,7 +127,7 @@ export default function Landing() {
           <div className="ld-fgrid">
             {FEATURES.map((f) => (
               <div key={f.t} className="ld-fcard">
-                <div className="ld-ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={f.i} /></svg></div>
+                <div className="ld-ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d={f.i} /></svg></div>
                 <h3>{f.t}</h3>
                 <p>{f.d}</p>
               </div>
@@ -144,55 +156,51 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* WHO */}
-      <section id="who" className="ld-sec">
-        <div className="ld-wrap ld-whowrap">
-          <div>
-            <span className="ld-kicker">Built for every kitchen</span>
-            <h2>From highway dhabas to city cafés</h2>
-            <p className="ld-whotx">Whether you serve fifty plates a day or five hundred, Parosa fits. No POS to rip out, no monthly hardware bill — just a QR on the table and a screen in your hand.</p>
-            <div className="ld-chips">
-              {AUDIENCE.map((a) => <span key={a} className="ld-chip">{a}</span>)}
-            </div>
+      {/* PRICING */}
+      <section id="pricing" className="ld-sec">
+        <div className="ld-wrap">
+          <div className="ld-head">
+            <span className="ld-kicker">Simple, honest pricing</span>
+            <h2>One flat plan. Zero commission.</h2>
+            <p>No setup fee, no per-QR charge, no cut of your orders — ever. Pick a plan and change it whenever you like.</p>
           </div>
-          <div className="ld-statcard">
-            {[["₹0", "to start — free forever plan"], ["2 min", "to build your first menu"], ["0", "apps for your guests to install"], ["100%", "Hindi + English, side by side"]].map(([a, b]) => (
-              <div key={b} className="ld-stat"><b>{a}</b><span>{b}</span></div>
+          <div className="ld-bill">
+            <button className={!yearly ? "on" : ""} onClick={() => setYearly(false)}>Monthly</button>
+            <button className={yearly ? "on" : ""} onClick={() => setYearly(true)}>Yearly <em>save 17%</em></button>
+          </div>
+          <div className="ld-pricewrap">
+            {PLANS.map((p) => (
+              <div key={p.id} className={`ld-price${p.popular ? " feat" : ""}`}>
+                {p.popular && <div className="ld-pricebadge">Most popular</div>}
+                <div className="ld-pricehd">
+                  <h3>{p.name}</h3>
+                  <div className="ld-amt">₹{yearly ? Math.round(p.yearly / 12) : p.price}<small>/mo</small></div>
+                  <div className="ld-amtsub">{yearly ? `billed ₹${p.yearly}/year` : "billed monthly"}</div>
+                </div>
+                <p className="ld-priceblurb">{p.blurb}</p>
+                <ul>{p.featured.map((f) => <li key={f}>{f}</li>)}</ul>
+                <Link href="/login?mode=create" className={`ld-btn ${p.popular ? "solid" : "ghost"} full`}>Choose {p.name}</Link>
+              </div>
             ))}
           </div>
+          <p className="ld-pricenote">Free during early access — you won&apos;t be charged until online billing goes live.</p>
         </div>
       </section>
 
-      {/* PRICING */}
-      <section id="pricing" className="ld-sec alt">
-        <div className="ld-wrap">
+      {/* FAQ */}
+      <section id="faq" className="ld-sec alt">
+        <div className="ld-wrap ld-faqwrap">
           <div className="ld-head">
-            <span className="ld-kicker">Honest pricing</span>
-            <h2>Start free. Grow when you&apos;re ready.</h2>
-            <p>No setup fee, no per-QR charge, no surprises. Every table, every scan — included.</p>
+            <span className="ld-kicker">Good questions</span>
+            <h2>Everything you&apos;re wondering</h2>
           </div>
-          <div className="ld-pricewrap">
-            <div className="ld-price">
-              <div className="ld-pricehd"><h3>Starter</h3><div className="ld-amt">₹0<small>/forever</small></div></div>
-              <ul>
-                <li>One restaurant, unlimited tables</li>
-                <li>Bilingual menu &amp; QR codes</li>
-                <li>Live orders &amp; WhatsApp bills</li>
-                <li>Payments &amp; basic insights</li>
-              </ul>
-              <Link href="/login?mode=create" className="ld-btn ghost full">Get started</Link>
-            </div>
-            <div className="ld-price feat">
-              <div className="ld-pricebadge">Coming soon</div>
-              <div className="ld-pricehd"><h3>Pro</h3><div className="ld-amt">₹499<small>/month</small></div></div>
-              <ul>
-                <li>Everything in Starter</li>
-                <li>Multiple outlets &amp; staff logins</li>
-                <li>Menu templates &amp; branding</li>
-                <li>Deep analytics &amp; exports</li>
-              </ul>
-              <Link href="/login?mode=create" className="ld-btn solid full">Start free today</Link>
-            </div>
+          <div className="ld-faq">
+            {FAQ.map(([q, a]) => (
+              <details key={q} className="ld-faqitem">
+                <summary>{q}<span className="ld-faqx">+</span></summary>
+                <p>{a}</p>
+              </details>
+            ))}
           </div>
         </div>
       </section>
@@ -203,27 +211,39 @@ export default function Landing() {
         <div className="ld-wrap ld-finalin">
           <Seal size={72} />
           <h2 className="emboss">परोसा</h2>
-          <p>Give your tables a smarter menu today. It&apos;s free to start — you could be taking your first QR order within the hour.</p>
-          <Link href="/login?mode=create" className="ld-btn gold lg">Create your free account</Link>
+          <p>Give your tables a smarter menu today. Set up in minutes, print your QR codes, and take your first scan-to-order this week.</p>
+          <Link href="/login?mode=create" className="ld-btn gold lg">Create your restaurant</Link>
         </div>
       </section>
 
       {/* FOOTER */}
       <footer className="ld-foot">
-        <div className="ld-wrap ld-footrow">
-          <div className="ld-brand">
-            <Seal size={34} />
-            <span className="ld-brandtx dark"><b>परोसा</b><i>PAROSA</i></span>
+        <div className="ld-wrap ld-footgrid">
+          <div className="ld-footbrand">
+            <div className="ld-brand"><Seal size={34} /><span className="ld-brandtx dark"><b>परोसा</b><i>PAROSA</i></span></div>
+            <p>The bilingual QR-menu &amp; ordering platform built for India&apos;s restaurants and dhabas.</p>
+            <p className="ld-footscan">Scan · Serve · Savour</p>
           </div>
-          <div className="ld-footlinks">
+          <div className="ld-footcol">
+            <h4>Product</h4>
             <a href="#features">Features</a>
             <a href="#how">How it works</a>
             <a href="#pricing">Pricing</a>
-            <Link href="/login">Login</Link>
-            <Link href="/login?mode=create">Sign up</Link>
+            <a href="#faq">FAQ</a>
           </div>
-          <p className="ld-copy">© {new Date().getFullYear()} Parosa · Scan · Serve · Savour</p>
+          <div className="ld-footcol">
+            <h4>Company</h4>
+            <Link href="/login?mode=create">Get started</Link>
+            <Link href="/login">Login</Link>
+            <a href="mailto:sahustartup@gmail.com">Contact</a>
+          </div>
+          <div className="ld-footcol">
+            <h4>Legal</h4>
+            <Link href="/terms">Terms of Service</Link>
+            <Link href="/privacy">Privacy Policy</Link>
+          </div>
         </div>
+        <div className="ld-wrap ld-footbar">© {new Date().getFullYear()} Parosa. All rights reserved.</div>
       </footer>
     </div>
   );

@@ -8,6 +8,7 @@ import { AppLoading } from "@/components/AppLoading";
 import { deleteRestaurant, updateRestaurant, uploadPhoto } from "@/lib/db";
 import { signOutOwner } from "@/lib/auth";
 import { useOwner } from "@/lib/useOwner";
+import { PLANS, planById } from "@/lib/plans";
 import type { Hours } from "@/lib/types";
 import "../dash.css";
 import "./settings.css";
@@ -72,6 +73,13 @@ export default function Settings() {
       showToast("Settings saved ✓");
     } catch { showToast("Could not save — try again"); }
     finally { setBusy(false); }
+  };
+
+  const changePlan = async (id: string) => {
+    if (id === (restaurant.plan ?? "basic")) return;
+    await updateRestaurant(restaurant.id, { plan: id });
+    await reload();
+    showToast(`Switched to Parosa ${planById(id).name}`);
   };
 
   const del = async () => {
@@ -150,10 +158,24 @@ export default function Settings() {
           </div>
 
           <div className="db-panel">
-            <div className="db-ph"><h3>Account</h3></div>
+            <div className="db-ph"><h3>Account &amp; plan</h3><span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600 }}>Currently on Parosa {planById(restaurant.plan).name}</span></div>
             <div className="db-pb">
               <div className="db-field"><label>Owner email</label><input type="text" value={restaurant.owner_email ?? ""} readOnly style={{ opacity: 0.75 }} /></div>
-              <div className="set-plan"><div className="pn"><b>Parosa Free</b><div>1 restaurant · unlimited tables · WhatsApp bills</div></div><button className="set-up" onClick={() => showToast("Upgrade coming soon")}>Upgrade ₹499/mo</button></div>
+              <div className="set-plans">
+                {PLANS.map((p) => {
+                  const on = (restaurant.plan ?? "basic") === p.id;
+                  return (
+                    <div key={p.id} className={`set-plancard${on ? " on" : ""}`}>
+                      {p.popular && <span className="set-planpop">Popular</span>}
+                      <div className="set-planname">{p.name}</div>
+                      <div className="set-planprice">₹{p.price}<small>/mo</small></div>
+                      <div className="set-planblurb">{p.blurb}</div>
+                      <button className={on ? "set-plancur" : "set-planbtn"} disabled={on} onClick={() => changePlan(p.id)}>{on ? "Current plan" : "Switch"}</button>
+                    </div>
+                  );
+                })}
+              </div>
+              <p style={{ fontSize: 12, color: "var(--muted)", margin: "12px 2px 0" }}>0% commission on every plan. Online billing (Razorpay) is coming soon — you&apos;re in free early access until then.</p>
             </div>
           </div>
 

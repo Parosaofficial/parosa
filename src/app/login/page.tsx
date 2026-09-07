@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Seal } from "@/components/Logo";
 import { authMessage, getCurrentUserId, signIn, signUpOwner } from "@/lib/auth";
 import { createRestaurant, generateUniqueSlug, getRestaurantByOwner, uploadPhoto } from "@/lib/db";
+import { PLANS } from "@/lib/plans";
 import "./login.css";
 
 function MailIcon() {
@@ -64,11 +65,17 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [pass, setPass] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [pincode, setPincode] = useState("");
   const [logo, setLogo] = useState(""); const [logoFile, setLogoFile] = useState<File | null>(null);
   // step 1
   const [rtype, setRtype] = useState("Restaurant");
   const [visitors, setVisitors] = useState("50–100");
-  // step 2
+  // step 2 — plan
+  const [plan, setPlan] = useState("growth");
+  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+  // step 3
   const [gst, setGst] = useState(""); const [gstFile, setGstFile] = useState<File | null>(null);
   const [gstImg, setGstImg] = useState("");
   const [fssai, setFssai] = useState(""); const [fssaiFile, setFssaiFile] = useState<File | null>(null);
@@ -113,6 +120,8 @@ export default function Login() {
     if (!ownerName.trim()) { setErr("Please add your name."); return; }
     if (!emailOk(email)) { setErr("Enter a valid email address."); return; }
     if (pass.length < 6) { setErr("Password must be at least 6 characters."); return; }
+    if (!address.trim()) { setErr("Add your restaurant address (it prints on the bill)."); return; }
+    if (!city.trim()) { setErr("Which city are you in?"); return; }
     setStep(1);
   };
 
@@ -140,7 +149,8 @@ export default function Login() {
       const slug = await generateUniqueSlug(name);
       await createRestaurant({
         ownerId: uid, slug, name: name.trim(), ownerName: ownerName.trim(), ownerEmail: email.trim().toLowerCase(),
-        phone: phone.trim(), type: rtype, visitors, logoUrl, gstin: gst.trim(), gstinUrl, fssai: fssai.trim(), fssaiUrl, notes: notes.trim(),
+        phone: phone.trim(), address: address.trim(), city: city.trim(), pincode: pincode.trim(),
+        type: rtype, visitors, plan, logoUrl, gstin: gst.trim(), gstinUrl, fssai: fssai.trim(), fssaiUrl, notes: notes.trim(),
       });
       setBusy(false);
       setStep(3);
@@ -195,12 +205,12 @@ export default function Login() {
             </>
           ) : (
             <>
-              {step < 3 && <div className="lg-steps">{[0, 1, 2].map((i) => <span key={i} className={`s${i <= step ? " on" : ""}`} />)}</div>}
+              {step < 4 && <div className="lg-steps">{[0, 1, 2, 3].map((i) => <span key={i} className={`s${i <= step ? " on" : ""}`} />)}</div>}
 
               {step === 0 && (
                 <>
                   <h2 className="lg-h2">Create your account</h2>
-                  <p className="lg-sub">Step 1 — you &amp; your restaurant</p>
+                  <p className="lg-sub">Step 1 of 4 — you &amp; your restaurant</p>
                   <div className="lg-field"><label>Restaurant name</label><input type="text" placeholder="Raj Darbar" value={name} onChange={(e) => setName(e.target.value)} /></div>
                   <div className="lg-field"><label>Owner name</label><input type="text" placeholder="Your full name" value={ownerName} onChange={(e) => setOwnerName(e.target.value)} /></div>
                   <div className="lg-frow two">
@@ -208,6 +218,11 @@ export default function Login() {
                     <div className="lg-field"><label>Phone number</label><input type="tel" placeholder="+91 98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
                   </div>
                   <div className="lg-field"><label>Password</label><div className="lg-inp"><LockIcon /><input type="password" autoComplete="new-password" placeholder="At least 6 characters" value={pass} onChange={(e) => setPass(e.target.value)} /></div></div>
+                  <div className="lg-field"><label>Restaurant address</label><input type="text" placeholder="Shop no, street, area" value={address} onChange={(e) => setAddress(e.target.value)} /></div>
+                  <div className="lg-frow two">
+                    <div className="lg-field"><label>City</label><input type="text" placeholder="Gurugram" value={city} onChange={(e) => setCity(e.target.value)} /></div>
+                    <div className="lg-field"><label>Pincode <span style={{ color: "var(--muted)", fontWeight: 400, letterSpacing: 0, textTransform: "none" }}>· optional</span></label><input type="text" inputMode="numeric" placeholder="122004" value={pincode} onChange={(e) => setPincode(e.target.value)} /></div>
+                  </div>
                   <Drop label="Logo" img={logo} onPick={pickImg(setLogo, setLogoFile)} onRemove={() => { setLogo(""); setLogoFile(null); }} />
                   {err && <div className="lg-err">{err}</div>}
                   <button className="lg-prime" onClick={step0Next}>Continue →</button>
@@ -218,7 +233,7 @@ export default function Login() {
               {step === 1 && (
                 <>
                   <h2 className="lg-h2">About your place</h2>
-                  <p className="lg-sub">Step 2 — help us set you up right</p>
+                  <p className="lg-sub">Step 2 of 4 — help us set you up right</p>
                   <div className="lg-field" style={{ marginTop: 16 }}>
                     <label>What type of place is it?</label>
                     <div className="lg-choices">{TYPES.map((t) => <button key={t} className={`lg-choice${rtype === t ? " on" : ""}`} onClick={() => setRtype(t)}>{t}</button>)}</div>
@@ -233,8 +248,33 @@ export default function Login() {
 
               {step === 2 && (
                 <>
+                  <h2 className="lg-h2">Choose your plan</h2>
+                  <p className="lg-sub">Step 3 of 4 — no card needed, you won&apos;t be charged during early access</p>
+                  <div className="lg-billing">
+                    <button className={billing === "monthly" ? "on" : ""} onClick={() => setBilling("monthly")}>Monthly</button>
+                    <button className={billing === "yearly" ? "on" : ""} onClick={() => setBilling("yearly")}>Yearly · save 17%</button>
+                  </div>
+                  <div className="lg-plans">
+                    {PLANS.map((p) => (
+                      <button key={p.id} type="button" className={`lg-plan${plan === p.id ? " on" : ""}`} onClick={() => setPlan(p.id)}>
+                        {p.popular && <span className="pop-tag">Popular</span>}
+                        <span className="pn">{p.name}</span>
+                        <span className="pp">₹{billing === "monthly" ? p.price : Math.round(p.yearly / 12)}<small>/mo</small></span>
+                        <span className="py">{billing === "yearly" ? `billed ₹${p.yearly}/yr` : "billed monthly"}</span>
+                        <span className="pb">{p.blurb}</span>
+                        <span className="pcheck" aria-hidden>{plan === p.id ? "●" : "○"}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="lg-planfoot">0% commission on every plan. Cancel anytime.</p>
+                  <div className="lg-stepnav"><button className="lg-back" onClick={() => setStep(1)}>Back</button><button className="lg-prime" onClick={() => setStep(3)}>Continue →</button></div>
+                </>
+              )}
+
+              {step === 3 && (
+                <>
                   <h2 className="lg-h2">Licences</h2>
-                  <p className="lg-sub">Step 3 — GSTIN &amp; FSSAI <span style={{ color: "var(--muted)", textTransform: "none", letterSpacing: 0 }}>· optional, add later in Settings</span></p>
+                  <p className="lg-sub">Step 4 of 4 — GSTIN &amp; FSSAI <span style={{ color: "var(--muted)", textTransform: "none", letterSpacing: 0 }}>· optional, add later in Settings</span></p>
                   <div style={{ marginTop: 16 }}>
                     <div className="lg-field"><label>GSTIN <span style={{ color: "var(--muted)", fontWeight: 400, letterSpacing: 0, textTransform: "none" }}>· optional</span></label><input type="text" placeholder="06ABCDE1234F1Z5" value={gst} onChange={(e) => setGst(e.target.value)} /></div>
                     <Drop label="GSTIN certificate" img={gstImg} onPick={pickImg(setGstImg, setGstFile)} onRemove={() => { setGstImg(""); setGstFile(null); }} />
@@ -243,11 +283,11 @@ export default function Login() {
                     <div className="lg-field"><label>Anything else? <span style={{ color: "var(--muted)", fontWeight: 400, letterSpacing: 0, textTransform: "none" }}>· optional</span></label><textarea placeholder="Opening hours, special notes…" value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
                   </div>
                   {err && <div className="lg-err">{err}</div>}
-                  <div className="lg-stepnav"><button className="lg-back" onClick={() => setStep(1)} disabled={busy}>Back</button><button className="lg-prime" onClick={submit} disabled={busy}>{busy ? "Creating…" : "Submit & create →"}</button></div>
+                  <div className="lg-stepnav"><button className="lg-back" onClick={() => setStep(2)} disabled={busy}>Back</button><button className="lg-prime" onClick={submit} disabled={busy}>{busy ? "Creating…" : "Create my restaurant →"}</button></div>
                 </>
               )}
 
-              {step === 3 && (
+              {step === 4 && (
                 <div className="lg-done">
                   <h2>स्वागत है! 🎉</h2>
                   <p><b>{name}</b> is ready on Parosa.<br />Your account is set up — let&apos;s build your menu.</p>
@@ -258,7 +298,7 @@ export default function Login() {
           )}
         </div>
 
-        <p className="lg-terms">By continuing you agree to Parosa&apos;s <a>Terms &amp; Privacy.</a></p>
+        <p className="lg-terms">By continuing you agree to Parosa&apos;s <a href="/terms" target="_blank">Terms</a> &amp; <a href="/privacy" target="_blank">Privacy</a>.</p>
       </div>
     </div>
   );

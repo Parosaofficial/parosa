@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
 import { AppLoading } from "@/components/AppLoading";
 import { listOrdersWithItems, updateOrderStatus, type OrderWithItems } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
 import { supabase } from "@/lib/supabase";
-import type { OrderStatus } from "@/lib/types";
+import { playChime, primeAudio } from "@/lib/chime";
+import type { Order, OrderStatus } from "@/lib/types";
 import "../dash.css";
 import "./dashboard.css";
 
@@ -31,23 +32,82 @@ export default function Dashboard() {
   const { restaurant, ready } = useOwner();
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
 
+  // ---- live order alerts (sound + banner + browser notification) ----
+  const [soundOn, setSoundOn] = useState(false);
+  const [alert, setAlert] = useState<{ table: string; total: number; order_no: string } | null>(null);
+  const [newCount, setNewCount] = useState(0);
+  const soundRef = useRef(false);
+  const seen = useRef<Set<string>>(new Set());
+  const ring = useRef<{ interval?: ReturnType<typeof setInterval>; stop?: ReturnType<typeof setTimeout> }>({});
+  const firstLoad = useRef(true);
+
+  useEffect(() => {
+    try { const s = localStorage.getItem("parosa-sound") === "1"; setSoundOn(s); soundRef.current = s; } catch {}
+  }, []);
+
+  const stopRinging = useCallback(() => {
+    if (ring.current.interval) clearInterval(ring.current.interval);
+    if (ring.current.stop) clearTimeout(ring.current.stop);
+    ring.current = {};
+  }, []);
+
+  const acknowledge = useCallback(() => { stopRinging(); setAlert(null); setNewCount(0); }, [stopRinging]);
+
+  const toggleSound = () => {
+    const next = !soundRef.current;
+    soundRef.current = next;
+    setSoundOn(next);
+    try { localStorage.setItem("parosa-sound", next ? "1" : "0"); } catch {}
+    if (next) {
+      primeAudio();
+      playChime(); // confirm it's working
+      if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
+    } else {
+      stopRinging();
+    }
+  };
+
+  const alertNewOrder = useCallback((o: Order) => {
+    setAlert({ table: o.table_number ?? "—", total: o.total, order_no: o.order_no ?? "" });
+    setNewCount((c) => c + 1);
+    if (soundRef.current) {
+      playChime();
+      stopRinging();
+      ring.current.interval = setInterval(playChime, 2600);
+      ring.current.stop = setTimeout(() => { if (ring.current.interval) clearInterval(ring.current.interval); }, 30000);
+      if ("Notification" in window && Notification.permission === "granted") {
+        try { new Notification("New order · Table " + (o.table_number ?? "—"), { body: `₹${o.total} — tap to view on Parosa` }); } catch {}
+      }
+    }
+  }, [stopRinging]);
+
   const loadOrders = useCallback(async (rid: string) => { setOrders(await listOrdersWithItems(rid)); }, []);
 
   useEffect(() => { if (restaurant) loadOrders(restaurant.id); }, [restaurant, loadOrders]);
 
-  // realtime: any order change → refresh
+  // realtime: a brand-new order rings the bell; any other change just refreshes.
   useEffect(() => {
     if (!restaurant) return;
     const ch = supabase
       .channel(`orders-${restaurant.id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: `restaurant_id=eq.${restaurant.id}` }, () => loadOrders(restaurant.id))
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders", filter: `restaurant_id=eq.${restaurant.id}` }, (payload) => {
+        const o = payload.new as Order;
+        if (seen.current.has(o.id)) return;
+        seen.current.add(o.id);
+        loadOrders(restaurant.id);
+        if (!firstLoad.current) alertNewOrder(o);
+      })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders", filter: `restaurant_id=eq.${restaurant.id}` }, () => loadOrders(restaurant.id))
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, [restaurant, loadOrders]);
+    // after mount, allow alerts (so existing orders loaded on open don't ring)
+    const t = setTimeout(() => { firstLoad.current = false; }, 1500);
+    return () => { clearTimeout(t); supabase.removeChannel(ch); stopRinging(); };
+  }, [restaurant, loadOrders, alertNewOrder, stopRinging]);
 
   const advance = async (id: string, status: OrderStatus) => {
     const nx = NEXT[status];
     if (!nx) return;
+    if (status === "new") acknowledge(); // starting to cook = seen it
     setOrders((os) => os.map((o) => (o.id === id ? { ...o, status: nx } : o)));
     await updateOrderStatus(id, nx);
   };
@@ -84,8 +144,15 @@ export default function Dashboard() {
           <div className="db-topright">
             <div className="db-toprow">
               <span className="db-date">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
-              <button className="db-icobtn" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg><span className="db-dot" /></button>
-              <button className="db-user"><span className="av">R</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="m6 9 6 6 6-6" /></svg></button>
+              <button className={`db-icobtn${soundOn ? " on" : ""}`} onClick={toggleSound} aria-label={soundOn ? "Order sound on" : "Order sound off"} title={soundOn ? "Order sound on — click to mute" : "Turn on order sound"}>
+                {soundOn ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><path d="M11 5 6 9H2v6h4l5 4V5z" /><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14" /></svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><path d="M11 5 6 9H2v6h4l5 4V5z" /><path d="m23 9-6 6M17 9l6 6" /></svg>
+                )}
+                {newCount > 0 && <span className="db-badge">{newCount}</span>}
+              </button>
+              <button className="db-user"><span className="av">{(restaurant.name || "प").trim().slice(0, 1).toUpperCase()}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="m6 9 6 6 6-6" /></svg></button>
             </div>
             <div className="db-acts">
               <Link className="db-btn" href="/menu-editor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add dish</Link>
@@ -95,6 +162,19 @@ export default function Dashboard() {
         </div>
 
         <div className="db-content">
+          {alert && (
+            <div className="db-alert" role="alert">
+              <span className="db-alert-ping" />
+              <div className="db-alert-tx"><b>New order · Table {alert.table}</b><span>#{alert.order_no} · ₹{alert.total} — a customer just ordered</span></div>
+              <button className="db-alert-btn" onClick={acknowledge}>Got it ✓</button>
+            </div>
+          )}
+          {!soundOn && (
+            <div className="db-note db-soundnudge" onClick={toggleSound} role="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" strokeWidth="2"><path d="M11 5 6 9H2v6h4l5 4V5z" /><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14" /></svg>
+              <span><b>Turn on order sound</b> — click here so Parosa rings a bell the moment a customer places an order. (Your browser needs one click to allow sound.)</span>
+            </div>
+          )}
           <div className="db-kpis">
             <div className="db-kpi"><div className="db-ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 2l1.5 3h9L18 2M4 7h16l-1.5 13a2 2 0 0 1-2 1.8H7.5a2 2 0 0 1-2-1.8Z" /></svg></div><div className="db-kl">Today&apos;s Orders</div><div className="db-kv">{kpis.orders}</div><div className="db-kd up">▲ live</div><Spark /></div>
             <div className="db-kpi"><div className="db-ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg></div><div className="db-kl">Collected</div><div className="db-kv">₹{kpis.revenue.toLocaleString("en-IN")}</div><div className="db-kd up">▲ paid bills</div><Spark /></div>

@@ -48,8 +48,12 @@ export async function createRestaurant(input: {
   ownerName?: string;
   ownerEmail?: string;
   phone?: string;
+  address?: string;
+  city?: string;
+  pincode?: string;
   type?: string;
   visitors?: string;
+  plan?: string;
   logoUrl?: string | null;
   gstin?: string;
   gstinUrl?: string | null;
@@ -67,8 +71,12 @@ export async function createRestaurant(input: {
       owner_email: input.ownerEmail || null,
       phone: input.phone || null,
       whatsapp: input.phone || null,
+      address: input.address || null,
+      city: input.city || null,
+      pincode: input.pincode || null,
       type: input.type || null,
       visitors: input.visitors || null,
+      plan: input.plan || "basic",
       logo_url: input.logoUrl || null,
       gstin: input.gstin || null,
       gstin_url: input.gstinUrl || null,

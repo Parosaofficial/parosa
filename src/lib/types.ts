@@ -28,9 +28,11 @@ export type Restaurant = {
   fssai_url: string | null;
   address: string | null;
   city: string | null;
+  pincode: string | null;
   tagline: string | null;
   description: string | null;
   template: string | null;
+  plan: string | null; // 'basic' | 'growth' | 'business'
   upi_id: string | null;
   hours: Hours | null;
   tables_count: number;
