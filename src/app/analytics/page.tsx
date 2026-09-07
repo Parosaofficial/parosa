@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
 import { AppLoading } from "@/components/AppLoading";
+import { getMenu, getOrderItems, listOrders } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
+import type { Category, Dish, Order } from "@/lib/types";
 import "../dash.css";
 import "./analytics.css";
 
 type Seg = { n: string; pct: number; color: string };
+type Item = { order_id: string; dish_id: string | null; name: string; qty: number; price: number };
 
 function Donut({ data, size = 148, thickness = 22, top, bottom }: { data: Seg[]; size?: number; thickness?: number; top: string; bottom: string }) {
   const R = (size - thickness) / 2;
@@ -29,34 +33,128 @@ function Donut({ data, size = 148, thickness = 22, top, bottom }: { data: Seg[];
   );
 }
 
-const CATS: Seg[] = [
-  { n: "Tandoor", pct: 28, color: "#8C2A28" },
-  { n: "Curries", pct: 24, color: "#C25A1E" },
-  { n: "Biryani", pct: 20, color: "#C9821B" },
-  { n: "Chinese", pct: 14, color: "#0FA39A" },
-  { n: "Sweets", pct: 8, color: "#F0468A" },
-  { n: "Drinks", pct: 6, color: "#7C55D6" },
-];
-const PAY: Seg[] = [{ n: "UPI", pct: 62, color: "#0d6b39" }, { n: "Cash", pct: 38, color: "#B07A16" }];
-
-const WEEK = {
-  rev: "₹1,08,600", orders: 312, aov: "₹388", repeat: "41%",
-  bars: [["Mon", 62, "₹11.2k"], ["Tue", 55, "₹9.8k"], ["Wed", 70, "₹12.4k"], ["Thu", 78, "₹13.9k"], ["Fri", 84, "₹15.1k"], ["Sat", 94, "₹16.8k"], ["Sun", 100, "₹18.2k"]] as const,
-  top: [["Butter Chicken", 38, 100], ["Hyderabadi Biryani", 31, 82], ["Paneer Tikka", 27, 71], ["Butter Naan", 24, 63], ["Dal Makhani", 19, 50], ["Chilli Paneer", 16, 42]] as const,
-};
-const MONTH = { rev: "₹4,42,300", orders: 1284, aov: "₹344", repeat: "47%" };
-
-const HOURS: [string, number, boolean][] = [
-  ["12p", 42, false], ["1p", 58, false], ["2p", 46, false], ["3p", 22, false], ["4p", 16, false], ["5p", 28, false],
-  ["6p", 52, false], ["7p", 74, false], ["8p", 100, true], ["9p", 92, true], ["10p", 58, false], ["11p", 34, false],
-];
+const PALETTE = ["#8C2A28", "#C25A1E", "#C9821B", "#0FA39A", "#F0468A", "#7C55D6"];
+const inr = (n: number) => "₹" + n.toLocaleString("en-IN");
+const kfmt = (n: number) => (n >= 1000 ? `₹${(n / 1000).toFixed(1)}k` : `₹${n}`);
+const fmtHour = (h: number) => (h === 12 ? "12p" : h > 12 ? `${h - 12}p` : `${h}a`);
+const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 
 export default function Analytics() {
   const { restaurant, ready } = useOwner();
   const [range, setRange] = useState<"week" | "month">("week");
-  const d = range === "week" ? WEEK : { ...WEEK, ...MONTH };
+  const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
+  const [cats, setCats] = useState<Category[]>([]);
+  const [dishes, setDishes] = useState<Dish[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      if (!restaurant) return;
+      const os = await listOrders(restaurant.id);
+      const [its, menu] = await Promise.all([getOrderItems(os.map((o) => o.id)), getMenu(restaurant.slug)]);
+      setOrders(os);
+      setItems(its);
+      setCats(menu?.categories ?? []);
+      setDishes(menu?.dishes ?? []);
+      setLoading(false);
+    })();
+  }, [restaurant]);
+
+  const A = useMemo(() => {
+    const now = new Date();
+    const days = range === "week" ? 7 : 30;
+    const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (days - 1)).getTime();
+    const prevCutoff = cutoff - days * 86400000;
+
+    const inRange = orders.filter((o) => new Date(o.created_at).getTime() >= cutoff);
+    const prevRange = orders.filter((o) => { const t = new Date(o.created_at).getTime(); return t >= prevCutoff && t < cutoff; });
+    const ids = new Set(inRange.map((o) => o.id));
+    const rItems = items.filter((it) => ids.has(it.order_id));
+
+    const paid = inRange.filter((o) => o.payment_status === "paid");
+    const revenue = paid.reduce((a, o) => a + o.total, 0);
+    const prevRevenue = prevRange.filter((o) => o.payment_status === "paid").reduce((a, o) => a + o.total, 0);
+    const aov = paid.length ? Math.round(revenue / paid.length) : 0;
+
+    const pct = (cur: number, prev: number) => (prev > 0 ? Math.round(((cur - prev) / prev) * 100) : null);
+    const revDelta = pct(revenue, prevRevenue);
+    const ordDelta = pct(inRange.length, prevRange.length);
+
+    // repeat guests
+    const phoneCounts: Record<string, number> = {};
+    inRange.forEach((o) => { if (o.customer_phone) phoneCounts[o.customer_phone] = (phoneCounts[o.customer_phone] || 0) + 1; });
+    const distinct = Object.keys(phoneCounts).length;
+    const repeat = distinct ? Math.round((Object.values(phoneCounts).filter((c) => c > 1).length / distinct) * 100) : 0;
+
+    // revenue trend (paid, by day)
+    const dayRev: Record<string, number> = {};
+    paid.forEach((o) => { const k = dayKey(new Date(o.created_at)); dayRev[k] = (dayRev[k] || 0) + o.total; });
+    const rawBars = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const v = dayRev[dayKey(d)] || 0;
+      const showLabel = days <= 7 || i % 5 === 0;
+      rawBars.push({ label: showLabel ? (days <= 7 ? d.toLocaleDateString("en-IN", { weekday: "short" }) : String(d.getDate())) : "", v });
+    }
+    const maxRev = Math.max(1, ...rawBars.map((b) => b.v));
+    const trend = rawBars.map((b) => ({ label: b.label, v: b.v, h: Math.round((b.v / maxRev) * 100), tip: kfmt(b.v) }));
+
+    // category split by revenue
+    const dishById: Record<string, Dish> = Object.fromEntries(dishes.map((d) => [d.id, d]));
+    const catById: Record<string, Category> = Object.fromEntries(cats.map((c) => [c.id, c]));
+    const catRev: Record<string, number> = {};
+    rItems.forEach((it) => {
+      const d = it.dish_id ? dishById[it.dish_id] : null;
+      const cname = d ? catById[d.category_id]?.name || "Other" : "Other";
+      catRev[cname] = (catRev[cname] || 0) + it.qty * it.price;
+    });
+    const catTotal = Object.values(catRev).reduce((a, b) => a + b, 0) || 1;
+    const catSegs: Seg[] = Object.entries(catRev).sort((a, b) => b[1] - a[1]).slice(0, 6)
+      .map(([n, v], i) => ({ n, pct: Math.round((v / catTotal) * 100), color: PALETTE[i % PALETTE.length] }));
+
+    // top dishes by qty
+    const dishQty: Record<string, number> = {};
+    const dishRev: Record<string, number> = {};
+    rItems.forEach((it) => { dishQty[it.name] = (dishQty[it.name] || 0) + it.qty; dishRev[it.name] = (dishRev[it.name] || 0) + it.qty * it.price; });
+    const topArr = Object.entries(dishQty).sort((a, b) => b[1] - a[1]);
+    const topMax = topArr[0]?.[1] || 1;
+    const top = topArr.slice(0, 6).map(([name, c]) => ({ name, c, w: Math.round((c / topMax) * 100) }));
+
+    // payment split
+    const payRev = { UPI: 0, Cash: 0, Other: 0 };
+    paid.forEach((o) => { const m = (o.payment_method || "").toLowerCase(); if (m.includes("upi")) payRev.UPI += o.total; else if (m.includes("cash")) payRev.Cash += o.total; else payRev.Other += o.total; });
+    const payTotal = payRev.UPI + payRev.Cash + payRev.Other || 1;
+    const paySegs: Seg[] = ([["UPI", payRev.UPI, "#0d6b39"], ["Cash", payRev.Cash, "#B07A16"], ["Other", payRev.Other, "#9a7c55"]] as const)
+      .filter(([, v]) => v > 0).map(([n, v, color]) => ({ n, pct: Math.round((v / payTotal) * 100), color }));
+    const upiPct = Math.round((payRev.UPI / payTotal) * 100);
+
+    // busiest hours (11am–11pm)
+    const hourCount: Record<number, number> = {};
+    inRange.forEach((o) => { const h = new Date(o.created_at).getHours(); hourCount[h] = (hourCount[h] || 0) + 1; });
+    const hoursRaw = []; for (let h = 11; h <= 23; h++) hoursRaw.push({ h, c: hourCount[h] || 0 });
+    const hrMax = Math.max(1, ...hoursRaw.map((x) => x.c));
+    const peak = hoursRaw.reduce((a, b) => (b.c > a.c ? b : a), { h: -1, c: -1 });
+    const hours = hoursRaw.map((x) => ({ label: fmtHour(x.h), h: Math.round((x.c / hrMax) * 100), hi: x.h === peak.h && peak.c > 0 }));
+
+    const star = topArr[0] ? { name: topArr[0][0], qty: topArr[0][1], rev: dishRev[topArr[0][0]] || 0 } : null;
+    // slow mover: an available dish that sold least (or not at all)
+    const soldSet = new Set(rItems.map((it) => it.name));
+    const slow = dishes.filter((d) => d.available).map((d) => ({ name: d.name, qty: dishQty[d.name] || 0 }))
+      .sort((a, b) => a.qty - b.qty)[0] || null;
+
+    return {
+      hasAny: orders.length > 0, hasRange: inRange.length > 0,
+      revenue, orders: inRange.length, aov, repeat, revDelta, ordDelta,
+      trend, catSegs, top, paySegs, upiPct, hours,
+      peakLabel: peak.c > 0 ? fmtHour(peak.h) : "—",
+      star, topCat: catSegs[0]?.n, slow, soldCount: soldSet.size,
+    };
+  }, [orders, items, cats, dishes, range]);
 
   if (!ready || !restaurant) return <AppLoading label="Loading analytics…" />;
+
+  const delta = (d: number | null) => (d === null ? <span className="db-kd flat">— new</span> : <span className={`db-kd ${d >= 0 ? "up" : "down"}`}>{d >= 0 ? "▲" : "▼"} {Math.abs(d)}% <span style={{ color: "var(--muted)", fontWeight: 500 }}>vs last {range}</span></span>);
 
   return (
     <div className="db-app">
@@ -73,130 +171,169 @@ export default function Analytics() {
         </div>
 
         <div className="db-content">
-          <div className="db-note" style={{ marginBottom: 16 }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
-            <span><b>Sample analytics.</b> These charts show what your trends will look like — your real numbers appear here as orders come in. Live totals are already on your <b>Overview</b>.</span>
-          </div>
-          {/* KPIs */}
-          <div className="db-kpis">
-            <div className="db-kpi">
-              <div className="db-ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg></div>
-              <div className="db-kl">Total Revenue</div><div className="db-kv">{d.rev}</div><div className="db-kd up">▲ 14% <span style={{ color: "var(--muted)", fontWeight: 500 }}>vs last {range}</span></div>
+          {loading ? (
+            <div style={{ padding: 60, textAlign: "center", color: "var(--muted)" }}>Crunching your numbers…</div>
+          ) : !A.hasAny ? (
+            <div className="an-empty">
+              <div className="an-emptyicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 3v18h18" /><path d="M7 14l3-4 4 3 4-6" /></svg></div>
+              <h3>No data yet</h3>
+              <p>Your revenue trends, bestsellers, busy hours and smart suggestions all appear here automatically as customers place orders.</p>
+              <Link href="/tables" className="db-btn prime">Set up your tables &amp; QR →</Link>
             </div>
-            <div className="db-kpi">
-              <div className="db-ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 2l1.5 3h9L18 2M4 7h16l-1.5 13a2 2 0 0 1-2 1.8H7.5a2 2 0 0 1-2-1.8Z" /></svg></div>
-              <div className="db-kl">Total Orders</div><div className="db-kv">{d.orders}</div><div className="db-kd up">▲ 9%</div>
-            </div>
-            <div className="db-kpi">
-              <div className="db-ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 3v18h18" /><path d="M7 14l3-4 4 3 4-6" /></svg></div>
-              <div className="db-kl">Avg Order Value</div><div className="db-kv">{d.aov}</div><div className="db-kd up">▲ 5%</div>
-            </div>
-            <div className="db-kpi">
-              <div className="db-ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.9" /></svg></div>
-              <div className="db-kl">Repeat Guests</div><div className="db-kv">{d.repeat}</div><div className="db-kd up">▲ 3%</div>
-            </div>
-          </div>
-
-          {/* Revenue trend + Category pie */}
-          <div className="an-two">
-            <div className="db-panel">
-              <div className="db-ph"><h3>Revenue trend</h3><span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600 }}>{d.rev} total</span></div>
-              <div className="db-pb">
-                <div className="an-bars">
-                  {d.bars.map(([lab, h, v]) => (
-                    <div key={lab} className={`an-col${lab === "Sun" ? " hi" : ""}`}><div className="an-bk" style={{ height: `${h}%` }}><span className="v">{v}</span></div><span className="an-dl">{lab}</span></div>
-                  ))}
+          ) : (
+            <>
+              {/* KPIs */}
+              <div className="db-kpis">
+                <div className="db-kpi">
+                  <div className="db-ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg></div>
+                  <div className="db-kl">Revenue (paid)</div><div className="db-kv">{inr(A.revenue)}</div>{delta(A.revDelta)}
+                </div>
+                <div className="db-kpi">
+                  <div className="db-ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 2l1.5 3h9L18 2M4 7h16l-1.5 13a2 2 0 0 1-2 1.8H7.5a2 2 0 0 1-2-1.8Z" /></svg></div>
+                  <div className="db-kl">Orders</div><div className="db-kv">{A.orders}</div>{delta(A.ordDelta)}
+                </div>
+                <div className="db-kpi">
+                  <div className="db-ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 3v18h18" /><path d="M7 14l3-4 4 3 4-6" /></svg></div>
+                  <div className="db-kl">Avg Order Value</div><div className="db-kv">{inr(A.aov)}</div><div className="db-kd flat">per paid bill</div>
+                </div>
+                <div className="db-kpi">
+                  <div className="db-ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.9" /></svg></div>
+                  <div className="db-kl">Repeat Guests</div><div className="db-kv">{A.repeat}%</div><div className="db-kd flat">by phone number</div>
                 </div>
               </div>
-            </div>
 
-            <div className="db-panel">
-              <div className="db-ph"><h3>Sales by category</h3></div>
-              <div className="db-pb">
-                <div className="an-donutwrap">
-                  <Donut data={CATS} top="Tandoor" bottom="Top category" />
-                  <div className="an-legend">
-                    {CATS.map((c) => (
-                      <div className="an-leg" key={c.n}><span className="dot" style={{ background: c.color }} /><span className="nm">{c.n}</span><span className="pct">{c.pct}%</span></div>
-                    ))}
-                  </div>
+              {!A.hasRange && (
+                <div className="db-note" style={{ marginTop: 16 }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
+                  <span>No orders in this {range} yet — you have earlier orders though. Switch the range or check back after today&apos;s service.</span>
                 </div>
-              </div>
-            </div>
-          </div>
+              )}
 
-          {/* Top items + Payment split */}
-          <div className="an-two">
-            <div className="db-panel">
-              <div className="db-ph"><h3>Top-selling dishes</h3><span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600 }}>by orders</span></div>
-              <div className="db-pb">
-                <div className="an-top">
-                  {d.top.map(([name, c, w], i) => (
-                    <div className="an-ti" key={name}>
-                      <span className="rk">{i + 1}</span>
-                      <div className="bd"><div className="bn"><span>{name}</span><span className="c">{c}</span></div><div className="bar"><span style={{ width: `${w}%` }} /></div></div>
+              {/* Revenue trend + Category */}
+              <div className="an-two">
+                <div className="db-panel">
+                  <div className="db-ph"><h3>Revenue trend</h3><span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600 }}>{inr(A.revenue)} total</span></div>
+                  <div className="db-pb">
+                    <div className="an-bars">
+                      {A.trend.map((b, i) => (
+                        <div key={i} className={`an-col${b.v > 0 && b.h >= 100 ? " hi" : ""}`}><div className="an-bk" style={{ height: `${Math.max(b.h, 2)}%` }}>{b.v > 0 && <span className="v">{b.tip}</span>}</div><span className="an-dl">{b.label}</span></div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="db-panel">
-              <div className="db-ph"><h3>How guests pay</h3></div>
-              <div className="db-pb">
-                <div className="an-donutwrap">
-                  <Donut data={PAY} top="62%" bottom="via UPI" />
-                  <div className="an-legend">
-                    {PAY.map((c) => (
-                      <div className="an-leg" key={c.n}><span className="dot" style={{ background: c.color }} /><span className="nm">{c.n}</span><span className="pct">{c.pct}%</span></div>
-                    ))}
-                    <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>Most guests prefer UPI — keep your QR pay-link on the bill.</p>
+                <div className="db-panel">
+                  <div className="db-ph"><h3>Sales by category</h3></div>
+                  <div className="db-pb">
+                    {A.catSegs.length === 0 ? (
+                      <div style={{ padding: "24px 4px", color: "var(--muted)", fontSize: 13 }}>No sales in this period yet.</div>
+                    ) : (
+                      <div className="an-donutwrap">
+                        <Donut data={A.catSegs} top={A.topCat ?? "—"} bottom="Top category" />
+                        <div className="an-legend">
+                          {A.catSegs.map((c) => (
+                            <div className="an-leg" key={c.n}><span className="dot" style={{ background: c.color }} /><span className="nm">{c.n}</span><span className="pct">{c.pct}%</span></div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Busiest hours */}
-          <div className="db-panel">
-            <div className="db-ph"><h3>Busiest hours</h3><span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600 }}>Peak 8–9 PM</span></div>
-            <div className="db-pb">
-              <div className="an-bars">
-                {HOURS.map(([lab, h, hi]) => (
-                  <div key={lab} className={`an-col${hi ? " hi" : ""}`}><div className="an-bk" style={{ height: `${h}%` }} /><span className="an-dl">{lab}</span></div>
-                ))}
+              {/* Top items + Payment split */}
+              <div className="an-two">
+                <div className="db-panel">
+                  <div className="db-ph"><h3>Top-selling dishes</h3><span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600 }}>by quantity</span></div>
+                  <div className="db-pb">
+                    {A.top.length === 0 ? (
+                      <div style={{ padding: "24px 4px", color: "var(--muted)", fontSize: 13 }}>No dishes sold in this period yet.</div>
+                    ) : (
+                      <div className="an-top">
+                        {A.top.map((t, i) => (
+                          <div className="an-ti" key={t.name}>
+                            <span className="rk">{i + 1}</span>
+                            <div className="bd"><div className="bn"><span>{t.name}</span><span className="c">{t.c}</span></div><div className="bar"><span style={{ width: `${t.w}%` }} /></div></div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="db-panel">
+                  <div className="db-ph"><h3>How guests pay</h3></div>
+                  <div className="db-pb">
+                    {A.paySegs.length === 0 ? (
+                      <div style={{ padding: "24px 4px", color: "var(--muted)", fontSize: 13 }}>No paid bills in this period yet.</div>
+                    ) : (
+                      <div className="an-donutwrap">
+                        <Donut data={A.paySegs} top={`${A.upiPct}%`} bottom="via UPI" />
+                        <div className="an-legend">
+                          {A.paySegs.map((c) => (
+                            <div className="an-leg" key={c.n}><span className="dot" style={{ background: c.color }} /><span className="nm">{c.n}</span><span className="pct">{c.pct}%</span></div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Insights & suggestions */}
-          <div className="db-rule"><span className="t">Smart suggestions</span><span className="ln" /></div>
-          <div className="an-insights">
-            <div className="an-card star">
-              <span className="ic">⭐</span>
-              <div><h4>Star product — Butter Chicken</h4><p>38 orders this week, ₹12,920 revenue. It&apos;s your crowd-favourite — feature it at the top of the menu &amp; in a combo.</p><span className="tag">Do: pin to top</span></div>
-            </div>
-            <div className="an-card">
-              <span className="ic">📈</span>
-              <div><h4>Fast riser — Hyderabadi Biryani</h4><p>Up 22% vs last week. Consider a weekend biryani offer on WhatsApp to ride the momentum.</p><span className="tag">Do: promote</span></div>
-            </div>
-            <div className="an-card">
-              <span className="ic">🕐</span>
-              <div><h4>Rush at 8–9 PM</h4><p>Nearly a third of orders land in this window. Make sure the kitchen &amp; staff are fully stocked before 8.</p><span className="tag">Do: staff up</span></div>
-            </div>
-            <div className="an-card">
-              <span className="ic">🐢</span>
-              <div><h4>Slow mover — Malai Soya Chaap</h4><p>Only 4 orders this week. Bundle it into a starter combo, or rotate it out to keep the menu tight.</p><span className="tag">Do: combo or cut</span></div>
-            </div>
-            <div className="an-card">
-              <span className="ic">💡</span>
-              <div><h4>Add combo meals</h4><p>Your avg order is {d.aov}. Restaurants with combos see up to 20% higher order value — try &ldquo;Biryani + Lassi&rdquo;.</p><span className="tag">Do: create combos</span></div>
-            </div>
-            <div className="an-card">
-              <span className="ic">🍽️</span>
-              <div><h4>Tandoor drives sales</h4><p>28% of revenue comes from the Tandoor section. Add 1–2 new kebabs to grow your best category.</p><span className="tag">Do: expand menu</span></div>
-            </div>
-          </div>
+              {/* Busiest hours */}
+              <div className="db-panel">
+                <div className="db-ph"><h3>Busiest hours</h3><span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600 }}>Peak {A.peakLabel}</span></div>
+                <div className="db-pb">
+                  <div className="an-bars">
+                    {A.hours.map((x, i) => (
+                      <div key={i} className={`an-col${x.hi ? " hi" : ""}`}><div className="an-bk" style={{ height: `${Math.max(x.h, 2)}%` }} /><span className="an-dl">{x.label}</span></div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Smart suggestions (data-driven) */}
+              {(A.star || A.slow) && (
+                <>
+                  <div className="db-rule"><span className="t">Smart suggestions</span><span className="ln" /></div>
+                  <div className="an-insights">
+                    {A.star && (
+                      <div className="an-card star">
+                        <span className="ic">⭐</span>
+                        <div><h4>Star product — {A.star.name}</h4><p>{A.star.qty} sold this {range}, {inr(A.star.rev)} in revenue. Feature it at the top of your menu and build a combo around it.</p><span className="tag">Do: pin to top</span></div>
+                      </div>
+                    )}
+                    {A.peakLabel !== "—" && (
+                      <div className="an-card">
+                        <span className="ic">🕐</span>
+                        <div><h4>Rush around {A.peakLabel}</h4><p>This is your busiest hour. Make sure the kitchen and staff are fully stocked and ready before the rush hits.</p><span className="tag">Do: staff up</span></div>
+                      </div>
+                    )}
+                    {A.topCat && (
+                      <div className="an-card">
+                        <span className="ic">🍽️</span>
+                        <div><h4>{A.topCat} drives sales</h4><p>It&apos;s your top category by revenue this {range}. Add one or two new dishes here to grow your strongest section.</p><span className="tag">Do: expand menu</span></div>
+                      </div>
+                    )}
+                    {A.slow && A.slow.qty === 0 && (
+                      <div className="an-card">
+                        <span className="ic">🐢</span>
+                        <div><h4>Slow mover — {A.slow.name}</h4><p>No orders this {range}. Bundle it into a combo, improve its photo, or rotate it out to keep the menu tight.</p><span className="tag">Do: combo or cut</span></div>
+                      </div>
+                    )}
+                    <div className="an-card">
+                      <span className="ic">💡</span>
+                      <div><h4>Lift your order value</h4><p>Your average paid bill is {inr(A.aov)}. Restaurants with combo meals see up to 20% higher order value — try pairing a bestseller with a drink.</p><span className="tag">Do: create combos</span></div>
+                    </div>
+                    <div className="an-card">
+                      <span className="ic">📲</span>
+                      <div><h4>Turn bills into reviews</h4><p>Add your Google review QR from Tables &amp; QR to every bill — happy guests leave 5-star reviews that bring new customers.</p><span className="tag">Do: add review QR</span></div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </>
+          )}
           <div style={{ height: 30 }} />
         </div>
       </main>

@@ -198,6 +198,18 @@ export async function listOrdersWithItems(restaurantId: string): Promise<OrderWi
   return orders.map((o) => ({ ...o, items: byOrder[o.id] ?? [] }));
 }
 
+/** Order-item rows (with dish_id) for a set of orders — used by Analytics. */
+export async function getOrderItems(
+  orderIds: string[]
+): Promise<{ order_id: string; dish_id: string | null; name: string; qty: number; price: number }[]> {
+  if (!orderIds.length) return [];
+  const { data } = await supabase
+    .from("order_items")
+    .select("order_id,dish_id,name,qty,price")
+    .in("order_id", orderIds);
+  return (data as { order_id: string; dish_id: string | null; name: string; qty: number; price: number }[]) ?? [];
+}
+
 export async function updateOrderStatus(orderId: string, status: Order["status"]) {
   await supabase.from("orders").update({ status }).eq("id", orderId);
 }

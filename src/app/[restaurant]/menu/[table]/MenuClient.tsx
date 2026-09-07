@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Seal } from "@/components/Logo";
 import { createOrder } from "@/lib/db";
+import { templateStyle } from "@/lib/templates";
 import type { Category, Dish, Restaurant } from "@/lib/types";
 import "./menu.css";
 
@@ -19,11 +20,13 @@ export function MenuClient({
   categories,
   dishes,
   table,
+  template,
 }: {
   restaurant: Restaurant;
   categories: Category[];
   dishes: Dish[];
   table: string;
+  template?: string;
 }) {
   const [active, setActive] = useState(categories[0]?.id ?? "");
   const [vegOnly, setVegOnly] = useState(false);
@@ -80,7 +83,7 @@ export function MenuClient({
   const activeCat = categories.find((c) => c.id === active);
 
   return (
-    <div className="pm-app">
+    <div className="pm-app" style={templateStyle(template ?? restaurant.template)}>
       <div className="pm-top">
         <div className="pm-head">
           <div className="top">
