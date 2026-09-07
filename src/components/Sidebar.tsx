@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Seal } from "@/components/Logo";
 import { signOutOwner } from "@/lib/auth";
 import { planById } from "@/lib/plans";
+import { missingProfile } from "@/lib/profile";
 import type { Restaurant } from "@/lib/types";
 import type { ReactNode } from "react";
 
@@ -38,6 +39,7 @@ export function Sidebar({ restaurant }: { restaurant?: Restaurant | null }) {
   const name = restaurant?.name ?? "Your Restaurant";
   const tables = restaurant?.tables_count ?? 0;
   const planName = planById(restaurant?.plan).name;
+  const issues = restaurant ? missingProfile(restaurant).length : 0;
 
   return (
     <aside className="db-side">
@@ -52,6 +54,7 @@ export function Sidebar({ restaurant }: { restaurant?: Restaurant | null }) {
             <Link href={it.href} className={path === it.href ? "on" : ""}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">{it.icon}</svg>
               {it.label}
+              {it.href === "/settings" && issues > 0 && <span className="db-navwarn" title={`${issues} thing${issues > 1 ? "s" : ""} to complete`}>{issues}</span>}
             </Link>
           </span>
         ))}

@@ -218,6 +218,18 @@ export async function markOrderPaid(orderId: string, method: string) {
   await supabase.from("orders").update({ payment_status: "paid", payment_method: method }).eq("id", orderId);
 }
 
+/** Owner adds a dish to an existing order (insert-only) and recomputes the totals. */
+export async function addItemToOrder(
+  orderId: string,
+  dish: { id: string; name: string; price: number },
+  newTotals: { subtotal: number; gst: number; total: number }
+) {
+  const { error } = await supabase.from("order_items").insert({ order_id: orderId, dish_id: dish.id, name: dish.name, qty: 1, price: dish.price });
+  if (error) throw error;
+  const { error: e2 } = await supabase.from("orders").update(newTotals).eq("id", orderId);
+  if (e2) throw e2;
+}
+
 /* ---------------- Menu editing (owner side) ---------------- */
 
 export async function addCategory(restaurantId: string, name: string, sortOrder = 99): Promise<Category> {

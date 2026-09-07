@@ -1,7 +1,7 @@
-// Parosa — order alert chime (Web Audio, no asset file needed).
-// Browsers block audio until a user gesture, so call primeAudio() from a click first.
+// Parosa — order "ka-ching" (cash-register / Shopify-style sale sound).
+// Web Audio, no asset file. Browsers block audio until a user gesture,
+// so call primeAudio() from a click first.
 
-type Ctx = AudioContext & { webkitAudioContext?: never };
 let ctx: AudioContext | null = null;
 
 export function primeAudio(): AudioContext | null {
@@ -17,26 +17,28 @@ export function primeAudio(): AudioContext | null {
   }
 }
 
-/** A warm two-note "ding-dong" — the sound a new order makes. */
-export function playChime() {
-  const c = primeAudio();
-  if (!c) return;
-  const now = c.currentTime;
-  const notes = [880, 1174.7]; // A5 → D6
-  notes.forEach((f, i) => {
+// one bright bell hit (triangle + sine partial, fast attack, ringing decay)
+function ding(c: AudioContext, freq: number, t: number, gain = 0.5, dur = 0.42) {
+  [{ type: "triangle" as OscillatorType, g: gain }, { type: "sine" as OscillatorType, g: gain * 0.5, mul: 2.01 }].forEach((p) => {
     const o = c.createOscillator();
     const g = c.createGain();
-    o.type = "sine";
-    o.frequency.value = f;
+    o.type = p.type;
+    o.frequency.value = freq * (p.mul ?? 1);
     o.connect(g);
     g.connect(c.destination);
-    const t = now + i * 0.19;
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.5, t + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+    g.gain.linearRampToValueAtTime(p.g, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
     o.start(t);
-    o.stop(t + 0.65);
+    o.stop(t + dur + 0.02);
   });
 }
 
-export type { Ctx };
+/** The "ka-ching" — two quick bright notes rising, like a cash register ringing up a sale. */
+export function playChime() {
+  const c = primeAudio();
+  if (!c) return;
+  const t = c.currentTime;
+  ding(c, 1046.5, t, 0.45, 0.16);       // C6 — short "ka"
+  ding(c, 1568.0, t + 0.085, 0.5, 0.5); // G6 — ringing "ching"
+}

@@ -3,12 +3,12 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
-import { Seal } from "@/components/Logo";
 import { AppLoading } from "@/components/AppLoading";
 import { deleteRestaurant, updateRestaurant, uploadPhoto } from "@/lib/db";
 import { signOutOwner } from "@/lib/auth";
 import { useOwner } from "@/lib/useOwner";
 import { PLANS, planById } from "@/lib/plans";
+import { missingProfile } from "@/lib/profile";
 import { Dialog } from "@/components/Dialog";
 import type { Hours } from "@/lib/types";
 import "../dash.css";
@@ -32,6 +32,7 @@ export default function Settings() {
   const [busy, setBusy] = useState(false);
   const [delOpen, setDelOpen] = useState(false);
   const [delBusy, setDelBusy] = useState(false);
+  const [warnOpen, setWarnOpen] = useState(false);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2200); };
 
@@ -50,6 +51,7 @@ export default function Settings() {
 
   if (!ready || !restaurant || !f) return <AppLoading label="Loading settings…" />;
 
+  const issues = missingProfile(restaurant);
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setF((p) => (p ? { ...p, [k]: v } : p));
   const setHours = (patch: Partial<Hours>) => setF((p) => (p ? { ...p, hours: { ...p.hours, ...patch } } : p));
   const toggleDay = (i: number) => setHours({ days: f.hours.days.map((v, k) => (k === i ? !v : v)) });
@@ -103,11 +105,27 @@ export default function Settings() {
           <div className="db-acts"><button className="db-btn prime" onClick={save} disabled={busy}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5" /></svg> {busy ? "Saving…" : "Save changes"}</button></div>
         </div>
         <div className="db-content">
+          {issues.length > 0 && (
+            <div className={`set-warn${warnOpen ? " open" : ""}`}>
+              <button className="set-warn-hd" onClick={() => setWarnOpen((v) => !v)}>
+                <span className="ic">!</span>
+                <span className="tx"><b>{issues.length} thing{issues.length > 1 ? "s" : ""} to finish setting up</b><span>Your profile isn&apos;t complete — click to see what&apos;s missing.</span></span>
+                <span className="chev">{warnOpen ? "▲" : "▼"}</span>
+              </button>
+              {warnOpen && (
+                <div className="set-warn-list">
+                  {issues.map((i) => (
+                    <div key={i.key} className="set-warn-item"><span className="dot" /><div><b>{i.label}</b><span>{i.hint}</span></div></div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           <div className="db-panel">
             <div className="db-ph"><h3>Restaurant profile</h3></div>
             <div className="db-pb">
               <div className="set-logo">
-                <div className="set-logoem">{logo ? <span style={{ width: 52, height: 52, borderRadius: 10, backgroundImage: `url(${logo})`, backgroundSize: "cover", backgroundPosition: "center", display: "block" }} /> : <Seal size={52} />}</div>
+                <div className="set-logoem">{logo ? <span style={{ width: 52, height: 52, borderRadius: 10, backgroundImage: `url(${logo})`, backgroundSize: "cover", backgroundPosition: "center", display: "block" }} /> : <span className="set-logoempty">No logo</span>}</div>
                 <div><div className="set-lu">Restaurant logo</div><div className="set-ls">PNG/JPG, square, max 1MB</div><label className="set-upl" style={{ cursor: "pointer" }}><input type="file" accept="image/*" hidden onChange={pickLogo} />{logo ? "Change logo" : "Upload logo"}</label></div>
               </div>
               <div className="db-frow two">

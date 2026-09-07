@@ -32,26 +32,31 @@ export default function Dashboard() {
   const { restaurant, ready } = useOwner();
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
 
-  // ---- live order alerts (sound + banner + browser notification) ----
+  // ---- live order alerts (bell dropdown + sound + banner) ----
   const [soundOn, setSoundOn] = useState(false);
   const [alert, setAlert] = useState<{ table: string; total: number; order_no: string } | null>(null);
-  const [newCount, setNewCount] = useState(0);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [unread, setUnread] = useState(0);
   const soundRef = useRef(false);
   const seen = useRef<Set<string>>(new Set());
-  const ring = useRef<{ interval?: ReturnType<typeof setInterval>; stop?: ReturnType<typeof setTimeout> }>({});
   const firstLoad = useRef(true);
+  const bellRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try { const s = localStorage.getItem("parosa-sound") === "1"; setSoundOn(s); soundRef.current = s; } catch {}
   }, []);
 
-  const stopRinging = useCallback(() => {
-    if (ring.current.interval) clearInterval(ring.current.interval);
-    if (ring.current.stop) clearTimeout(ring.current.stop);
-    ring.current = {};
-  }, []);
+  // close the notification dropdown when clicking outside it
+  useEffect(() => {
+    if (!notifOpen) return;
+    const onDoc = (e: MouseEvent) => { if (bellRef.current && !bellRef.current.contains(e.target as Node)) setNotifOpen(false); };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [notifOpen]);
 
-  const acknowledge = useCallback(() => { stopRinging(); setAlert(null); setNewCount(0); }, [stopRinging]);
+  const acknowledge = useCallback(() => { setAlert(null); }, []);
+
+  const openBell = () => { setNotifOpen((v) => !v); setUnread(0); };
 
   const toggleSound = () => {
     const next = !soundRef.current;
@@ -62,24 +67,20 @@ export default function Dashboard() {
       primeAudio();
       playChime(); // confirm it's working
       if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
-    } else {
-      stopRinging();
     }
   };
 
+  // fires once per new order (de-duped by `seen`)
   const alertNewOrder = useCallback((o: Order) => {
     setAlert({ table: o.table_number ?? "—", total: o.total, order_no: o.order_no ?? "" });
-    setNewCount((c) => c + 1);
+    setUnread((c) => c + 1);
     if (soundRef.current) {
       playChime();
-      stopRinging();
-      ring.current.interval = setInterval(playChime, 2600);
-      ring.current.stop = setTimeout(() => { if (ring.current.interval) clearInterval(ring.current.interval); }, 30000);
       if ("Notification" in window && Notification.permission === "granted") {
         try { new Notification("New order · Table " + (o.table_number ?? "—"), { body: `₹${o.total} — tap to view on Parosa` }); } catch {}
       }
     }
-  }, [stopRinging]);
+  }, []);
 
   const loadOrders = useCallback(async (rid: string) => { setOrders(await listOrdersWithItems(rid)); }, []);
 
@@ -101,8 +102,8 @@ export default function Dashboard() {
       .subscribe();
     // after mount, allow alerts (so existing orders loaded on open don't ring)
     const t = setTimeout(() => { firstLoad.current = false; }, 1500);
-    return () => { clearTimeout(t); supabase.removeChannel(ch); stopRinging(); };
-  }, [restaurant, loadOrders, alertNewOrder, stopRinging]);
+    return () => { clearTimeout(t); supabase.removeChannel(ch); };
+  }, [restaurant, loadOrders, alertNewOrder]);
 
   const advance = async (id: string, status: OrderStatus) => {
     const nx = NEXT[status];
@@ -144,14 +145,33 @@ export default function Dashboard() {
           <div className="db-topright">
             <div className="db-toprow">
               <span className="db-date">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
-              <button className={`db-icobtn${soundOn ? " on" : ""}`} onClick={toggleSound} aria-label={soundOn ? "Order sound on" : "Order sound off"} title={soundOn ? "Order sound on — click to mute" : "Turn on order sound"}>
-                {soundOn ? (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><path d="M11 5 6 9H2v6h4l5 4V5z" /><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14" /></svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><path d="M11 5 6 9H2v6h4l5 4V5z" /><path d="m23 9-6 6M17 9l6 6" /></svg>
+              <div className="db-bell" ref={bellRef}>
+                <button className={`db-icobtn${unread > 0 ? " on" : ""}`} onClick={openBell} aria-label="Notifications" title="Notifications">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+                  {unread > 0 && <span className="db-badge">{unread}</span>}
+                </button>
+                {notifOpen && (
+                  <div className="db-notif">
+                    <div className="db-notif-hd"><b>Notifications</b>{orders.length > 0 && <Link href="/orders" onClick={() => setNotifOpen(false)}>All orders →</Link>}</div>
+                    <div className="db-notif-list">
+                      {orders.length === 0 ? (
+                        <div className="db-notif-empty">No orders yet.<br />New scanned orders appear here instantly.</div>
+                      ) : orders.slice(0, 12).map((o) => (
+                        <div key={o.id} className="db-notif-item">
+                          <span className={`db-notif-dot ${o.status}`} />
+                          <div className="db-notif-tx"><b>Table {o.table_number} · ₹{o.total}</b><span>#{o.order_no} · {o.items.reduce((a, i) => a + i.qty, 0)} items · {ago(o.created_at)}</span></div>
+                          <span className={`db-pill ${o.status}`}>{LABEL[o.status]}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button className="db-notif-sound" onClick={toggleSound}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" width="16" height="16"><path d="M11 5 6 9H2v6h4l5 4V5z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /></svg>
+                      <span style={{ flex: 1, textAlign: "left" }}>{soundOn ? "Order sound is on" : "Turn on order sound"}</span>
+                      <span className={`db-mini-switch${soundOn ? " on" : ""}`} />
+                    </button>
+                  </div>
                 )}
-                {newCount > 0 && <span className="db-badge">{newCount}</span>}
-              </button>
+              </div>
               <button className="db-user"><span className="av">{(restaurant.name || "प").trim().slice(0, 1).toUpperCase()}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="m6 9 6 6 6-6" /></svg></button>
             </div>
             <div className="db-acts">

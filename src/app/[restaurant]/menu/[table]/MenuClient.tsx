@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Seal } from "@/components/Logo";
+import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { createOrder } from "@/lib/db";
 import { templateStyle } from "@/lib/templates";
 import type { Category, Dish, Restaurant } from "@/lib/types";
@@ -89,7 +90,7 @@ export function MenuClient({
       <div className="pm-top">
         <div className="pm-head">
           <div className="top">
-            <Seal size={40} />
+            <RestaurantLogo restaurant={restaurant} size={40} />
             <div className="rn">{restaurant.name}<small>मेज़ {table}</small></div>
             <div className="pm-veg">
               <span className="vl">शाकाहारी</span>
