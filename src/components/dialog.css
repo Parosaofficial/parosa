@@ -1,0 +1,40 @@
+/* Parosa — in-app dialog (replaces native prompt/confirm/alert) */
+.pd-scrim {
+  position: fixed; inset: 0; z-index: 200;
+  background: #2a0708aa; backdrop-filter: blur(2px);
+  display: grid; place-items: center; padding: 20px;
+  animation: pd-fade .16s ease;
+}
+@keyframes pd-fade { from { opacity: 0; } to { opacity: 1; } }
+.pd-modal {
+  width: 100%; max-width: 400px;
+  background: var(--parch, #efe6d1); border: 1px solid var(--line-gold, #c9a24b);
+  border-radius: 16px; padding: 24px 22px 20px;
+  box-shadow: 0 30px 70px -20px #2a0708cc;
+  animation: pd-pop .2s cubic-bezier(.2,.9,.3,1.15);
+}
+@keyframes pd-pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+.pd-modal h3 { font-family: var(--font-display, Georgia, serif); font-size: 23px; color: var(--oxblood, #6e1618); margin: 0 0 8px; line-height: 1.1; }
+.pd-modal h3.danger { color: var(--nonveg, #b4231c); }
+.pd-modal p { font-size: 13.5px; line-height: 1.55; color: var(--ink-2, #79302a); margin: 0 0 14px; }
+.pd-modal input {
+  width: 100%; font-family: var(--font-body), system-ui, sans-serif; font-size: 15px;
+  padding: 12px 14px; border: 1px solid var(--line, #d8c299); border-radius: 10px;
+  background: #fff; color: var(--ink, #3e1012); margin-bottom: 4px;
+}
+.pd-modal input:focus { outline: none; border-color: var(--maroon, #8c1c1c); box-shadow: 0 0 0 3px #8c1c1c1a; }
+.pd-acts { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+.pd-cancel {
+  background: transparent; border: 1px solid var(--line, #d8c299); color: var(--ink-2, #79302a);
+  border-radius: 10px; padding: 11px 18px; font-weight: 600; font-size: 13.5px; cursor: pointer;
+}
+.pd-cancel:hover { background: var(--parch-hi, #f5efdd); }
+.pd-ok {
+  background: var(--oxblood, #6e1618); color: var(--gold-hi, #cba24e); border: none;
+  border-radius: 10px; padding: 11px 20px; font-family: var(--font-caps, Georgia, serif);
+  font-weight: 700; letter-spacing: .04em; font-size: 13px; cursor: pointer;
+}
+.pd-ok:hover { filter: brightness(1.07); }
+.pd-ok.danger { background: var(--nonveg, #b4231c); color: #fff; }
+.pd-ok:disabled { opacity: .5; cursor: not-allowed; filter: none; }
+.pd-cancel:disabled { opacity: .5; cursor: not-allowed; }

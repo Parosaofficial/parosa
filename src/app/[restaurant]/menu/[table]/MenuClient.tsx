@@ -36,6 +36,7 @@ export function MenuClient({
   const [success, setSuccess] = useState(false);
   const [placing, setPlacing] = useState(false);
   const [orderNo, setOrderNo] = useState("");
+  const [err, setErr] = useState("");
 
   const byId = useMemo(() => Object.fromEntries(dishes.map((d) => [d.id, d])), [dishes]);
   const items = useMemo(
@@ -73,7 +74,8 @@ export function MenuClient({
       setCartOpen(false);
       setSuccess(true);
     } catch (e) {
-      alert("Sorry, could not place the order. Please try again.");
+      setErr("Sorry, we couldn't place your order. Please try again.");
+      setTimeout(() => setErr(""), 3500);
       console.error(e);
     } finally {
       setPlacing(false);
@@ -171,6 +173,8 @@ export function MenuClient({
         </div>
         <button className="go" onClick={() => setCartOpen(true)}>ऑर्डर देखें →</button>
       </div>
+
+      {err && <div className="pm-toast">{err}</div>}
 
       <div className={`pm-scrim${cartOpen || waOpen ? " show" : ""}`} onClick={() => { setCartOpen(false); setWaOpen(false); }} />
 

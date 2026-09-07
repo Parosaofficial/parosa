@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { AppLoading } from "@/components/AppLoading";
 import { addCategory, deleteDish, getMenu, setDishAvailable, upsertDish, uploadPhoto } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
+import { Dialog } from "@/components/Dialog";
 import type { Category, Dish } from "@/lib/types";
 import "../dash.css";
 import "./editor.css";
@@ -28,6 +29,10 @@ export default function MenuEditor() {
   const [uploading, setUploading] = useState(false);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2000); };
+  const [catOpen, setCatOpen] = useState(false);
+  const [catBusy, setCatBusy] = useState(false);
+  const [delDish, setDelDish] = useState<Dish | null>(null);
+  const [delBusy, setDelBusy] = useState(false);
 
   const load = useCallback(async () => {
     if (!restaurant) return;
@@ -54,7 +59,13 @@ export default function MenuEditor() {
     setDishes((ds) => ds.map((x) => (x.id === d.id ? { ...x, available: !x.available } : x)));
     await setDishAvailable(d.id, !d.available);
   };
-  const del = async (d: Dish) => { if (confirm(`Delete “${d.name}”?`)) { await deleteDish(d.id); await load(); showToast("Dish deleted"); } };
+  const confirmDelete = async () => {
+    if (!delDish) return;
+    setDelBusy(true);
+    try { await deleteDish(delDish.id); await load(); showToast("Dish deleted"); setDelDish(null); }
+    catch { showToast("Could not delete — try again"); }
+    finally { setDelBusy(false); }
+  };
 
   const save = async () => {
     if (!form || !restaurant) return;
@@ -76,9 +87,12 @@ export default function MenuEditor() {
     finally { setBusy(false); }
   };
 
-  const addCat = async () => {
-    const n = prompt("New category name:");
-    if (n && restaurant) { const c = await addCategory(restaurant.id, n, cats.length + 1); await load(); setActive(c.id); showToast("Category added"); }
+  const saveCat = async (name: string) => {
+    if (!name || !restaurant) return;
+    setCatBusy(true);
+    try { const c = await addCategory(restaurant.id, name, cats.length + 1); await load(); setActive(c.id); showToast("Category added"); setCatOpen(false); }
+    catch { showToast("Could not add category — try again"); }
+    finally { setCatBusy(false); }
   };
 
   if (!ready || !restaurant) return <AppLoading label="Loading your menu…" />;
@@ -114,7 +128,7 @@ export default function MenuEditor() {
                     );
                   })}
                 </div>
-                <button className="ed-addcat" onClick={addCat}>+ Add category</button>
+                <button className="ed-addcat" onClick={() => setCatOpen(true)}>+ Add category</button>
               </aside>
 
               <section>
@@ -124,7 +138,7 @@ export default function MenuEditor() {
                 </div>
 
                 {cats.length === 0 ? (
-                  <div className="ed-empty"><div className="es">Let&apos;s build your menu</div><div>Start by adding a category like &ldquo;Starters&rdquo; or &ldquo;Main Course&rdquo;, then add dishes to it.</div><button className="ed-addcat" style={{ maxWidth: 240, margin: "16px auto 0" }} onClick={addCat}>+ Add your first category</button></div>
+                  <div className="ed-empty"><div className="es">Let&apos;s build your menu</div><div>Start by adding a category like &ldquo;Starters&rdquo; or &ldquo;Main Course&rdquo;, then add dishes to it.</div><button className="ed-addcat" style={{ maxWidth: 240, margin: "16px auto 0" }} onClick={() => setCatOpen(true)}>+ Add your first category</button></div>
                 ) : shown.length === 0 ? (
                   <div className="ed-empty"><div className="es">No dishes yet</div><div>Add your first dish to &ldquo;{catName?.name}&rdquo;.</div></div>
                 ) : shown.map((d) => (
@@ -144,7 +158,7 @@ export default function MenuEditor() {
                       <div className="ed-switchrow"><span className="ed-sl">{d.available ? "" : "Sold out"}</span><button className={`db-switch${d.available ? " on" : ""}`} onClick={() => toggleAv(d)} /></div>
                       <div className="ed-ibs">
                         <button className="ed-ib" onClick={() => setForm({ id: d.id, category_id: d.category_id, name: d.name, description: d.description ?? "", price: String(d.price), is_veg: d.is_veg, tag: d.tag ?? "", available: d.available, photo_url: d.photo_url ?? "" })}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg></button>
-                        <button className="ed-ib del" onClick={() => del(d)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /></svg></button>
+                        <button className="ed-ib del" onClick={() => setDelDish(d)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /></svg></button>
                       </div>
                     </div>
                   </div>
@@ -190,6 +204,27 @@ export default function MenuEditor() {
           </div>
         )}
       </div>
+
+      <Dialog
+        open={catOpen}
+        title="New category"
+        message="Group your dishes — e.g. Starters, Main Course, Breads, Drinks."
+        input placeholder="Category name"
+        confirmLabel="Add category"
+        busy={catBusy}
+        onConfirm={saveCat}
+        onCancel={() => setCatOpen(false)}
+      />
+      <Dialog
+        open={!!delDish}
+        title="Delete dish?"
+        message={delDish ? `“${delDish.name}” will be removed from your menu. This can't be undone.` : ""}
+        confirmLabel="Delete"
+        danger
+        busy={delBusy}
+        onConfirm={confirmDelete}
+        onCancel={() => setDelDish(null)}
+      />
 
       <div className={`db-toast${toast ? " show" : ""}`}>{toast}</div>
     </div>

@@ -9,6 +9,7 @@ import { deleteRestaurant, updateRestaurant, uploadPhoto } from "@/lib/db";
 import { signOutOwner } from "@/lib/auth";
 import { useOwner } from "@/lib/useOwner";
 import { PLANS, planById } from "@/lib/plans";
+import { Dialog } from "@/components/Dialog";
 import type { Hours } from "@/lib/types";
 import "../dash.css";
 import "./settings.css";
@@ -29,6 +30,8 @@ export default function Settings() {
   const [logo, setLogo] = useState<string>("");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+  const [delOpen, setDelOpen] = useState(false);
+  const [delBusy, setDelBusy] = useState(false);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2200); };
 
@@ -82,15 +85,13 @@ export default function Settings() {
     showToast(`Switched to Parosa ${planById(id).name}`);
   };
 
-  const del = async () => {
-    const typed = prompt(`This permanently deletes "${restaurant.name}" — menu, tables, QRs and orders.\n\nType the restaurant name to confirm:`);
-    if (typed === null) return;
-    if (typed.trim() !== restaurant.name.trim()) { showToast("Name didn't match — not deleted"); return; }
+  const confirmDelete = async () => {
+    setDelBusy(true);
     try {
       await deleteRestaurant(restaurant.id);
       await signOutOwner();
       router.replace("/login?mode=create");
-    } catch { showToast("Could not delete — try again"); }
+    } catch { setDelBusy(false); setDelOpen(false); showToast("Could not delete — try again"); }
   };
 
   return (
@@ -183,12 +184,26 @@ export default function Settings() {
             <div className="db-ph"><h3>Danger zone</h3></div>
             <div className="db-pb" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
               <div><div style={{ fontWeight: 700, fontSize: 14 }}>Delete restaurant</div><div style={{ fontSize: 12, color: "var(--muted)" }}>Permanently removes your menu, QRs and data.</div></div>
-              <button className="set-del" onClick={del}>Delete {restaurant.name}</button>
+              <button className="set-del" onClick={() => setDelOpen(true)}>Delete {restaurant.name}</button>
             </div>
           </div>
           <div style={{ height: 30 }} />
         </div>
       </main>
+      <Dialog
+        open={delOpen}
+        title="Delete restaurant?"
+        message={`This permanently removes ${restaurant.name}'s menu, tables, QR codes and orders. This can't be undone. Type the restaurant name to confirm.`}
+        input
+        placeholder={restaurant.name}
+        requireMatch={restaurant.name}
+        confirmLabel="Delete forever"
+        danger
+        busy={delBusy}
+        onConfirm={confirmDelete}
+        onCancel={() => setDelOpen(false)}
+      />
+
       <div className={`db-toast${toast ? " show" : ""}`}>{toast}</div>
     </div>
   );
