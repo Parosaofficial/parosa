@@ -1,0 +1,40 @@
+/* Parosa — Customers */
+.cu-bar { margin: 18px 0 14px; }
+.cu-empty { background: var(--cream-card); border: 1.5px dashed var(--line-gold); border-radius: 16px; padding: 48px 24px; text-align: center; max-width: 520px; margin: 20px auto; }
+.cu-empty h3 { font-family: var(--font-display); font-size: 24px; color: var(--maroon-deep); margin-bottom: 8px; }
+.cu-empty p { font-size: 14px; color: var(--ink-2); line-height: 1.6; max-width: 400px; margin: 0 auto; }
+
+.cu-list { background: var(--cream-card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.cu-head, .cu-row { display: grid; grid-template-columns: 1.6fr 1.2fr .6fr .9fr 1.1fr; gap: 12px; align-items: center; padding: 12px 16px; }
+.cu-head { background: var(--parch-hi); border-bottom: 1px solid var(--line); font-family: var(--font-caps); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.cu-wrap { border-bottom: 1px solid var(--line); }
+.cu-wrap:last-child { border-bottom: none; }
+.cu-row { cursor: pointer; transition: background .12s; }
+.cu-row:hover { background: var(--parch-hi); }
+.cu-name { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.cu-name .av { width: 32px; height: 32px; border-radius: 8px; background: var(--oxblood); color: var(--gold-hi); display: grid; place-items: center; font-family: var(--font-display); font-size: 16px; flex: none; }
+.cu-name b { font-size: 14px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cu-ph { font-size: 13.5px; color: var(--ink-2); }
+.cu-v { font-weight: 700; color: var(--maroon); }
+.cu-sp { font-weight: 800; color: var(--ink); }
+.cu-last { font-size: 13px; color: var(--ink-2); display: flex; align-items: center; justify-content: space-between; }
+.cu-caret { color: var(--muted); }
+
+.cu-orders { background: var(--parch-hi); padding: 6px 16px 12px; }
+.cu-o { display: grid; grid-template-columns: 1.3fr 2fr .9fr; gap: 12px; align-items: center; padding: 9px 0; border-bottom: 1px dashed var(--line); }
+.cu-o:last-child { border-bottom: none; }
+.cu-o-l b { display: block; font-size: 13px; color: var(--oxblood); }
+.cu-o-l span { font-size: 11px; color: var(--muted); }
+.cu-o-items { font-size: 12.5px; color: var(--ink-2); }
+.cu-o-amt { text-align: right; font-weight: 800; font-size: 13.5px; color: var(--ink); }
+.cu-o-pay { display: inline-block; margin-left: 8px; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 100px; vertical-align: middle; }
+.cu-o-pay.paid { background: #e2f3e6; color: var(--pos); }
+.cu-o-pay.unpaid { background: #fde7e5; color: var(--nonveg); }
+
+@media (max-width: 720px) {
+  .cu-head { display: none; }
+  .cu-row { grid-template-columns: 1fr auto; grid-template-areas: "name spent" "phone last"; row-gap: 4px; }
+  .cu-name { grid-area: name; } .cu-sp { grid-area: spent; text-align: right; } .cu-ph { grid-area: phone; } .cu-last { grid-area: last; } .cu-v { display: none; }
+  .cu-o { grid-template-columns: 1fr auto; }
+  .cu-o-items { display: none; }
+}

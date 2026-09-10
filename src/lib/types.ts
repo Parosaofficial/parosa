@@ -36,6 +36,29 @@ export type Restaurant = {
   upi_id: string | null;
   hours: Hours | null;
   tables_count: number;
+  staff_code: string | null;
+  staff_code_date: string | null;
+};
+
+export type Staff = {
+  id: string;
+  restaurant_id: string;
+  name: string;
+  phone: string;
+  email: string | null;
+  dob: string | null;
+  aadhaar: string | null;
+  active: boolean;
+  created_at: string;
+};
+
+export type StaffSession = {
+  restaurant_id: string;
+  slug: string;
+  restaurant_name: string;
+  staff_id: string;
+  staff_name: string;
+  code: string;
 };
 
 export type Category = {
@@ -73,6 +96,8 @@ export type Order = {
   payment_status: "paid" | "unpaid";
   payment_method: string | null;
   customer_phone: string | null;
+  customer_name: string | null;
+  staff_name: string | null;
   created_at: string;
 };
 

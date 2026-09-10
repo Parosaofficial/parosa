@@ -3,7 +3,7 @@
 // touches Supabase directly. Change a query once here and it's fixed everywhere.
 
 import { supabase } from "./supabase";
-import type { Category, Dish, NewOrderItem, Order, Restaurant } from "./types";
+import type { Category, Dish, NewOrderItem, Order, Restaurant, Staff, StaffSession } from "./types";
 
 /* ---------------- Menu (public / customer side) ---------------- */
 
@@ -103,6 +103,61 @@ export async function deleteRestaurant(id: string) {
   if (error) throw error;
 }
 
+/* ---------------- Staff (owner-managed) ---------------- */
+
+export async function listStaff(restaurantId: string): Promise<Staff[]> {
+  const { data } = await supabase.from("staff").select("*").eq("restaurant_id", restaurantId).order("created_at");
+  return (data as Staff[]) ?? [];
+}
+
+export async function addStaff(input: {
+  restaurantId: string; name: string; phone: string; email?: string; dob?: string; aadhaar?: string;
+}): Promise<Staff> {
+  const { data, error } = await supabase.from("staff").insert({
+    restaurant_id: input.restaurantId, name: input.name, phone: input.phone,
+    email: input.email || null, dob: input.dob || null, aadhaar: input.aadhaar || null, active: true,
+  }).select().single();
+  if (error) throw error;
+  return data as Staff;
+}
+
+export async function updateStaff(id: string, patch: Partial<Staff>) {
+  const { error } = await supabase.from("staff").update(patch).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteStaff(id: string) {
+  const { error } = await supabase.from("staff").delete().eq("id", id);
+  if (error) throw error;
+}
+
+/** Set (or rotate) today's shared staff code — a 6-digit number valid for the day. */
+export async function generateStaffCode(restaurantId: string): Promise<string> {
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD (local)
+  const { error } = await supabase.from("restaurants").update({ staff_code: code, staff_code_date: today }).eq("id", restaurantId);
+  if (error) throw error;
+  return code;
+}
+
+/* ---------------- Staff login / POS (validated RPCs) ---------------- */
+
+export async function staffLogin(phone: string, code: string): Promise<Omit<StaffSession, "code"> | null> {
+  const { data, error } = await supabase.rpc("staff_login", { p_phone: phone.trim(), p_code: code.trim() });
+  if (error) throw error;
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) return null;
+  return {
+    restaurant_id: row.restaurant_id, slug: row.slug, restaurant_name: row.restaurant_name,
+    staff_id: row.staff_id, staff_name: row.staff_name,
+  };
+}
+
+export async function staffCustomerLookup(restaurantId: string, code: string, phone: string): Promise<string | null> {
+  const { data } = await supabase.rpc("staff_customer_lookup", { p_restaurant_id: restaurantId, p_code: code, p_phone: phone.trim() });
+  return (data as string | null) ?? null;
+}
+
 export async function getMenu(
   slug: string
 ): Promise<{ restaurant: Restaurant; categories: Category[]; dishes: Dish[] } | null> {
@@ -125,6 +180,8 @@ export async function createOrder(input: {
   gst: number;
   total: number;
   phone?: string;
+  customerName?: string;
+  staffName?: string;
 }): Promise<Order> {
   // We generate the id and order number on the client so a customer (anon)
   // only ever needs INSERT permission — never SELECT — under RLS.
@@ -147,6 +204,8 @@ export async function createOrder(input: {
     payment_status: "unpaid",
     payment_method: null,
     customer_phone: input.phone ?? null,
+    customer_name: input.customerName ?? null,
+    staff_name: input.staffName ?? null,
     created_at,
   };
 
@@ -161,6 +220,8 @@ export async function createOrder(input: {
     status: "new",
     payment_status: "unpaid",
     customer_phone: input.phone ?? null,
+    customer_name: input.customerName ?? null,
+    staff_name: input.staffName ?? null,
   });
   if (error) throw error;
 

@@ -4,7 +4,8 @@ import { useEffect, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Seal } from "@/components/Logo";
 import { authMessage, getCurrentUserId, signIn, signUpOwner } from "@/lib/auth";
-import { createRestaurant, generateUniqueSlug, getRestaurantByOwner, uploadPhoto } from "@/lib/db";
+import { createRestaurant, generateUniqueSlug, getRestaurantByOwner, staffLogin, uploadPhoto } from "@/lib/db";
+import { saveStaffSession } from "@/lib/useStaff";
 import { PLANS } from "@/lib/plans";
 import "./login.css";
 
@@ -46,8 +47,12 @@ function Drop({ label, img, onPick, onRemove }: { label: string; img: string; on
 
 export default function Login() {
   const router = useRouter();
-  const [mode, setMode] = useState<"signin" | "create">(() => {
-    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mode") === "create") return "create";
+  const [mode, setMode] = useState<"signin" | "create" | "staff">(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get("staff") === "1") return "staff";
+      if (p.get("mode") === "create") return "create";
+    }
     return "signin";
   });
   const [step, setStep] = useState(0);
@@ -58,6 +63,10 @@ export default function Login() {
   // sign in
   const [siEmail, setSiEmail] = useState("");
   const [siPass, setSiPass] = useState("");
+
+  // staff sign in
+  const [stPhone, setStPhone] = useState("");
+  const [stCode, setStCode] = useState("");
 
   // create — step 0
   const [name, setName] = useState("");
@@ -98,6 +107,20 @@ export default function Login() {
 
   const toSignin = () => { setMode("signin"); setStep(0); setErr(""); };
   const toCreate = () => { setMode("create"); setStep(0); setErr(""); };
+  const toStaff = () => { setMode("staff"); setErr(""); };
+
+  const doStaffLogin = async () => {
+    setErr("");
+    if (!stPhone.trim()) { setErr("Enter your phone number."); return; }
+    if (!stCode.trim()) { setErr("Enter today's staff code."); return; }
+    setBusy(true);
+    try {
+      const s = await staffLogin(stPhone, stCode);
+      if (!s) { setErr("Wrong phone or code — check today's code with your manager."); setBusy(false); return; }
+      saveStaffSession({ ...s, code: stCode.trim() });
+      router.replace("/pos");
+    } catch { setErr("Couldn't log in — please try again."); setBusy(false); }
+  };
   const pickImg = (setPreview: (s: string) => void, setFile: (f: File | null) => void) => (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (f) { setPreview(URL.createObjectURL(f)); setFile(f); }
@@ -192,8 +215,18 @@ export default function Login() {
           <div className="lg-div"><span className="ln" />❖<span className="ln" /></div>
         </div>
 
-        <div className="lg-switch" key={mode === "create" ? `c${step}` : "s"}>
-          {mode === "signin" ? (
+        <div className="lg-switch" key={mode === "create" ? `c${step}` : mode}>
+          {mode === "staff" ? (
+            <>
+              <h1 className="lg-welcome">Staff login</h1>
+              <p className="lg-sub">Enter your phone &amp; today&apos;s staff code to take orders</p>
+              <div className="lg-field"><label>Your phone number</label><input type="tel" autoComplete="tel" placeholder="98765 43210" value={stPhone} onChange={(e) => setStPhone(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doStaffLogin()} /></div>
+              <div className="lg-field"><label>Today&apos;s staff code</label><input type="text" inputMode="numeric" placeholder="6-digit code from your manager" value={stCode} onChange={(e) => setStCode(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doStaffLogin()} /></div>
+              {err && <div className="lg-err">{err}</div>}
+              <button className="lg-prime" onClick={doStaffLogin} disabled={busy}>{busy ? "Logging in…" : "Start taking orders →"}</button>
+              <p className="lg-alt">Are you the owner? <a onClick={toSignin}>Owner login</a></p>
+            </>
+          ) : mode === "signin" ? (
             <>
               <h1 className="lg-welcome">Welcome back</h1>
               <p className="lg-sub">Sign in to manage your restaurant</p>
@@ -202,6 +235,7 @@ export default function Login() {
               {err && <div className="lg-err">{err}</div>}
               <button className="lg-prime" onClick={doSignin} disabled={busy}>{busy ? "Signing in…" : "Sign in →"}</button>
               <p className="lg-alt">New to Parosa? <a onClick={toCreate}>Create your restaurant</a></p>
+              <div className="lg-staffcta"><span className="ln" /><a onClick={toStaff}>Restaurant staff? Log in here →</a><span className="ln" /></div>
             </>
           ) : (
             <>

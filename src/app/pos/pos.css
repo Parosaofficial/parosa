@@ -1,0 +1,90 @@
+/* Parosa — Staff POS (order-taking) */
+.pos { min-height: 100vh; background: var(--parch); color: var(--ink); display: flex; flex-direction: column; }
+.pos-top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--oxblood) var(--paisley); background-size: 80px; color: var(--parch); border-bottom: 2px solid var(--gold); }
+.pos-brand { display: flex; align-items: center; gap: 11px; }
+.pos-brand .rn { font-family: var(--font-display); font-size: 20px; color: var(--parch-hi); line-height: 1; }
+.pos-brand .sub { font-family: var(--font-caps); font-size: 8px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-hi); margin-top: 3px; }
+.pos-lg { width: 36px; height: 36px; border-radius: 9px; background: #ffffff22; }
+.pos-who { display: flex; align-items: center; gap: 10px; }
+.pos-who .chip { background: #ffffff1c; border: 1px solid #ffffff33; border-radius: 100px; padding: 6px 12px; font-size: 12.5px; font-weight: 600; }
+.pos-out { width: 34px; height: 34px; border-radius: 8px; border: 1px solid #ffffff33; background: #ffffff14; color: var(--gold-hi); display: grid; place-items: center; cursor: pointer; }
+.pos-out svg { width: 16px; height: 16px; }
+
+.pos-grid { flex: 1; display: grid; grid-template-columns: 1fr 340px; gap: 16px; padding: 16px; max-width: 1200px; margin: 0 auto; width: 100%; align-items: start; }
+.pos-card { background: var(--cream-card); border: 1px solid var(--line-gold); border-radius: 14px; padding: 14px; box-shadow: 0 10px 26px -20px #5e111360; }
+
+.pos-cust { margin-bottom: 14px; }
+.pos-row3 { display: grid; grid-template-columns: 90px 1fr 1fr; gap: 12px; }
+.pos-f label { display: block; font-family: var(--font-caps); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--maroon); margin-bottom: 6px; font-weight: 700; }
+.pos-f input { width: 100%; font-size: 15px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); }
+.pos-f input:focus { outline: none; border-color: var(--maroon); box-shadow: 0 0 0 3px #8c1c1c1a; }
+.pos-inline { display: flex; gap: 6px; }
+.pos-inline input { flex: 1; }
+.pos-inline button { flex: none; padding: 0 14px; border: none; border-radius: 10px; background: var(--oxblood); color: var(--gold-hi); font-family: var(--font-caps); font-weight: 700; font-size: 12px; cursor: pointer; }
+.pos-inline button:disabled { opacity: .5; }
+
+.pos-menuhd { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.pos-cats { display: flex; gap: 7px; overflow-x: auto; flex: 1; }
+.pos-cats::-webkit-scrollbar { display: none; }
+.pos-pill { flex: none; font-family: var(--font-display); font-size: 15px; padding: 7px 14px 5px; border-radius: 7px; border: 1px solid var(--line-gold); color: var(--maroon); background: transparent; white-space: nowrap; cursor: pointer; }
+.pos-pill.on { background: var(--oxblood); color: var(--gold-hi); border-color: var(--oxblood); }
+.pos-search { display: flex; align-items: center; gap: 7px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; min-width: 190px; }
+.pos-search svg { width: 15px; height: 15px; color: var(--muted); }
+.pos-search input { border: none; outline: none; background: transparent; font-size: 14px; width: 100%; color: var(--ink); }
+
+.pos-dishes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.pos-dish { position: relative; text-align: left; background: var(--parch-hi); border: 1px solid var(--line); border-radius: 12px; padding: 12px 12px 10px; cursor: pointer; transition: border-color .12s, transform .1s; display: flex; flex-direction: column; gap: 6px; min-height: 78px; }
+.pos-dish:hover { border-color: var(--line-gold); }
+.pos-dish:active { transform: scale(.97); }
+.pos-dish.in { border-color: var(--oxblood); box-shadow: 0 0 0 2px #6e161822; }
+.pos-vd { width: 13px; height: 13px; border: 1.5px solid var(--veg); border-radius: 3px; position: relative; }
+.pos-vd::after { content: ""; position: absolute; inset: 2.5px; border-radius: 50%; background: var(--veg); }
+.pos-vd.nv { border-color: var(--nonveg); } .pos-vd.nv::after { background: var(--nonveg); }
+.pos-dish .dn { font-family: var(--font-display); font-size: 16px; color: var(--oxblood); line-height: 1.1; flex: 1; }
+.pos-dish .pr { font-weight: 800; font-size: 14px; color: var(--ink); }
+.pos-dish .qb { position: absolute; top: 8px; right: 8px; min-width: 22px; height: 22px; border-radius: 11px; background: var(--oxblood); color: var(--gold-hi); font-size: 12px; font-weight: 800; display: grid; place-items: center; }
+
+/* cart */
+.pos-cartcol { position: sticky; top: 78px; }
+.pos-cart-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.pos-cart-hd h3 { font-family: var(--font-display); font-size: 20px; color: var(--oxblood); }
+.pos-cart-hd .clear { border: none; background: transparent; color: var(--nonveg); font-size: 12px; font-weight: 700; cursor: pointer; }
+.pos-cart-list { display: flex; flex-direction: column; max-height: 46vh; overflow-y: auto; }
+.pos-empty { padding: 26px 6px; text-align: center; color: var(--muted); font-size: 13px; }
+.pos-cline { display: flex; align-items: center; gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.pos-cline .ci { flex: 1; min-width: 0; }
+.pos-cline .cn { font-family: var(--font-display); font-size: 15px; color: var(--oxblood); line-height: 1.05; }
+.pos-cline .cp { font-size: 11px; color: var(--muted); font-weight: 600; }
+.pos-step { display: flex; align-items: center; background: var(--parch-hi); border: 1px solid var(--line-gold); border-radius: 7px; overflow: hidden; }
+.pos-step button { width: 28px; height: 28px; border: none; background: transparent; color: var(--maroon); font-size: 16px; font-weight: 700; cursor: pointer; }
+.pos-step span { min-width: 22px; text-align: center; font-weight: 800; font-size: 13px; }
+.pos-cline .clt { min-width: 48px; text-align: right; font-weight: 800; font-size: 13px; }
+.pos-tot { padding: 12px 2px 4px; }
+.pos-tot .tr { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-2); padding: 3px 0; }
+.pos-tot .tr.grand { border-top: 1px dashed var(--line-gold); margin-top: 6px; padding-top: 9px; font-family: var(--font-display); font-size: 19px; color: var(--oxblood); }
+.pos-place { width: 100%; margin-top: 12px; font-family: var(--font-caps); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; font-size: 14px; background: var(--oxblood); color: var(--gold-hi); border: none; border-radius: 11px; padding: 14px; cursor: pointer; }
+.pos-place:disabled { opacity: .5; cursor: not-allowed; }
+
+/* mobile sticky bar (hidden on desktop where cart is visible) */
+.pos-bottombar { display: none; }
+
+/* success overlay */
+.pos-done { position: fixed; inset: 0; z-index: 60; background: var(--oxblood) var(--paisley); background-size: 100px; color: var(--parch); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; }
+.pos-done .tick { width: 84px; height: 84px; border-radius: 50%; background: var(--pos); color: #fff; font-size: 44px; display: grid; place-items: center; margin-bottom: 16px; box-shadow: 0 14px 30px -10px #000; }
+.pos-done h2 { font-family: var(--font-display); font-size: 34px; color: var(--gold-hi); }
+.pos-done p { font-size: 14px; color: var(--gold-soft); margin: 10px 0 24px; }
+.pos-done .pos-place { max-width: 300px; }
+
+.pos-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); z-index: 70; background: var(--maroon-deep); color: var(--gold-soft); font-size: 13.5px; font-weight: 600; padding: 11px 18px; border-radius: 10px; box-shadow: 0 14px 30px -12px #000; opacity: 0; pointer-events: none; transition: transform .25s, opacity .25s; }
+.pos-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 860px) {
+  .pos-grid { grid-template-columns: 1fr; padding: 12px; }
+  .pos-cartcol { position: static; }
+  .pos-cart-list { max-height: none; }
+  .pos-cart .pos-place { display: none; } /* use sticky bar instead */
+  .pos-bottombar { display: flex; position: sticky; bottom: 0; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--maroon-deep); color: var(--parch); border-top: 2px solid var(--gold); z-index: 30; }
+  .pos-bottombar b { font-size: 14px; } .pos-bottombar span { display: block; font-size: 12px; color: var(--gold-soft); }
+  .pos-bottombar button { border: none; background: var(--gold); color: var(--maroon-deep); font-family: var(--font-caps); font-weight: 700; font-size: 13px; padding: 12px 18px; border-radius: 10px; cursor: pointer; }
+  .pos-row3 { grid-template-columns: 1fr; }
+}
