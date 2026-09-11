@@ -215,6 +215,19 @@ export default function Login() {
           <div className="lg-div"><span className="ln" />❖<span className="ln" /></div>
         </div>
 
+        {(mode === "signin" || mode === "staff") && (
+          <div className="lg-tabs">
+            <button className={mode === "signin" ? "on" : ""} onClick={toSignin}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 21V9l9-6 9 6v12" /><path d="M9 21v-6h6v6" /></svg>
+              <span><b>Owner</b><i>Login / create account</i></span>
+            </button>
+            <button className={mode === "staff" ? "on" : ""} onClick={toStaff}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
+              <span><b>Staff</b><i>Take orders</i></span>
+            </button>
+          </div>
+        )}
+
         <div className="lg-switch" key={mode === "create" ? `c${step}` : mode}>
           {mode === "staff" ? (
             <>
@@ -224,7 +237,7 @@ export default function Login() {
               <div className="lg-field"><label>Today&apos;s staff code</label><input type="text" inputMode="numeric" placeholder="6-digit code from your manager" value={stCode} onChange={(e) => setStCode(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doStaffLogin()} /></div>
               {err && <div className="lg-err">{err}</div>}
               <button className="lg-prime" onClick={doStaffLogin} disabled={busy}>{busy ? "Logging in…" : "Start taking orders →"}</button>
-              <p className="lg-alt">Are you the owner? <a onClick={toSignin}>Owner login</a></p>
+              <p className="lg-alt lg-muted">Ask your manager for today&apos;s code.</p>
             </>
           ) : mode === "signin" ? (
             <>
@@ -235,7 +248,6 @@ export default function Login() {
               {err && <div className="lg-err">{err}</div>}
               <button className="lg-prime" onClick={doSignin} disabled={busy}>{busy ? "Signing in…" : "Sign in →"}</button>
               <p className="lg-alt">New to Parosa? <a onClick={toCreate}>Create your restaurant</a></p>
-              <div className="lg-staffcta"><span className="ln" /><a onClick={toStaff}>Restaurant staff? Log in here →</a><span className="ln" /></div>
             </>
           ) : (
             <>

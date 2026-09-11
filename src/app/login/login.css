@@ -109,3 +109,17 @@
 .lg-staffcta .ln{flex:1;height:1px;background:var(--line)}
 .lg-staffcta a{font-family:var(--font-caps);font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--maroon);cursor:pointer;white-space:nowrap;text-decoration:none}
 .lg-staffcta a:hover{color:var(--oxblood)}
+
+/* Owner / Staff chooser box */
+.lg-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--parch-hi);border:1px solid var(--line);border-radius:14px;padding:6px;margin:18px 0 4px}
+.lg-tabs button{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid transparent;background:transparent;border-radius:10px;padding:11px 12px;cursor:pointer;transition:background .15s,border-color .15s}
+.lg-tabs button:hover{background:#ffffff70}
+.lg-tabs button.on{background:var(--oxblood);border-color:var(--oxblood);box-shadow:0 8px 20px -12px #6e1618}
+.lg-tabs button svg{width:22px;height:22px;flex:none;color:var(--maroon)}
+.lg-tabs button.on svg{color:var(--gold-hi)}
+.lg-tabs button span{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.lg-tabs button b{font-family:var(--font-display);font-weight:400;font-size:17px;color:var(--oxblood)}
+.lg-tabs button i{font-style:normal;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lg-tabs button.on b{color:var(--gold-hi)}
+.lg-tabs button.on i{color:var(--gold-soft)}
+.lg-muted a,.lg-muted{color:var(--muted)!important}
