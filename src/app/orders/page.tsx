@@ -155,7 +155,7 @@ export default function Orders() {
               <div style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>No orders here yet.</div>
             ) : shown.map((o) => (
               <div className="or-row" key={o.id}>
-                <div className="or-id"><b>#{o.order_no}</b><span>Table {o.table_number} · {time(o.created_at)}</span></div>
+                <div className="or-id"><b>#{o.order_no}</b><span>Table {o.table_number} · {time(o.created_at)}</span><span className={`or-src ${o.staff_name ? "staff" : "qr"}`}>{o.staff_name ? `👤 ${o.staff_name}` : "📱 QR self-order"}</span></div>
                 <div className="or-c-items">{aggregate(o.items).map((i) => `${i.qty}× ${i.name}`).join(" · ") || "—"}</div>
                 <div className="or-c-amt">₹{o.total}</div>
                 <div className="or-pills">
@@ -183,6 +183,7 @@ export default function Orders() {
               <div className="or-brow"><span>Bill No.</span><b>#{bill.order_no}</b></div>
               <div className="or-brow"><span>Table</span><b>{bill.table_number}</b></div>
               <div className="or-brow"><span>Date</span><b>{dateStr(bill.created_at)} · {time(bill.created_at)}</b></div>
+              <div className="or-brow"><span>Order via</span><b>{bill.staff_name ? `Staff · ${bill.staff_name}` : "QR (self-order)"}</b></div>
               <div className="or-bdiv" />
               <div className="or-bhint">Tap an item to see what&apos;s in it.</div>
               {billItems.map((i) => (

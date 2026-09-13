@@ -12,6 +12,7 @@ export type BillOrder = {
   total: number;
   payment_status: string;
   payment_method?: string | null;
+  staff_name?: string | null;
 };
 
 type Agg = { name: string; qty: number; price: number };
@@ -74,7 +75,7 @@ export async function generateBillPdf(r: Restaurant, o: BillOrder): Promise<jsPD
   doc.setFontSize(9); doc.setTextColor(40, 40, 40);
   const dt = new Date(o.created_at).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true });
   doc.text(`Bill #${o.order_no ?? "-"}`, M, y); doc.text(`Table ${o.table_number ?? "-"}`, W - M, y, { align: "right" }); y += 5;
-  doc.text(dt, M, y); y += 6;
+  doc.text(dt, M, y); doc.text(o.staff_name ? `By ${o.staff_name}` : "Via QR", W - M, y, { align: "right" }); y += 6;
 
   doc.setDrawColor(220, 220, 220); doc.line(M, y, W - M, y); y += 5;
   doc.setFont("helvetica", "bold"); doc.setFontSize(8.5);

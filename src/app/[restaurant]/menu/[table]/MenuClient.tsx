@@ -143,12 +143,12 @@ export function MenuClient({
                 {d.tag === "best" && <span className="best">बेस्टसेलर</span>}
                 {!d.photo_url && <ThumbPlaceholder />}
               </div>
-              <div className="mid">
-                <div className="dtop"><span className={`pm-vd${d.is_veg ? "" : " nv"}`} /></div>
-                <div className="dn">{d.name}</div>
-                {d.description && <div className="dd">{d.description}</div>}
-                <div className="dbot">
-                  <span className="price">₹{d.price}</span>
+              <div className="pm-mid">
+                <div className="pm-dtop"><span className={`pm-vd${d.is_veg ? "" : " nv"}`} /></div>
+                <div className="pm-dn">{d.name}</div>
+                {d.description && <div className="pm-dd">{d.description}</div>}
+                <div className="pm-dbot">
+                  <span className="pm-price">₹{d.price}</span>
                   {!d.available ? (
                     <span className="pm-soldout">आज नहीं · Sold out</span>
                   ) : q > 0 ? (

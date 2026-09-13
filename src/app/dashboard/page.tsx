@@ -215,7 +215,7 @@ export default function Dashboard() {
                   <div style={{ padding: "26px 4px", textAlign: "center", color: "var(--muted)", fontSize: 13.5 }}>No live orders right now. Scan a table QR and place one to see it appear here instantly.</div>
                 ) : live.map((o) => (
                   <div key={o.id} className="db-ticket" data-s={o.status}>
-                    <div className="db-tt"><span className="db-tbl">Table {o.table_number} <small>· {ago(o.created_at)}</small></span><span className={`db-pill ${o.status}`}>{LABEL[o.status]}</span></div>
+                    <div className="db-tt"><span className="db-tbl">Table {o.table_number} <small>· {ago(o.created_at)} · {o.staff_name ? o.staff_name : "QR"}</small></span><span className={`db-pill ${o.status}`}>{LABEL[o.status]}</span></div>
                     <div className="db-items">{o.items.map((i) => `${i.qty}× ${i.name}`).join(" · ") || "—"}</div>
                     <div className="db-tf"><span className="db-amt">₹{o.total}</span><button className={`db-adv${o.status === "new" ? " prime" : ""}`} onClick={() => advance(o.id, o.status)} disabled={!NEXT[o.status]}>{BTN[o.status]}</button></div>
                   </div>
