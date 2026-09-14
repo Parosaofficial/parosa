@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Rozha_One, Cinzel, Mukta } from "next/font/google";
+import { Rozha_One, Cinzel, Mukta, Archivo, Noto_Serif_Devanagari } from "next/font/google";
 import "./globals.css";
 
 // Parosa Virasat type system
@@ -21,6 +21,19 @@ const body = Mukta({
   variable: "--font-mukta",
   display: "swap",
 });
+// Editorial type for the marketing site + login (Parosa Modernist)
+const archivo = Archivo({
+  weight: ["400", "500", "600", "800", "900"],
+  subsets: ["latin"],
+  variable: "--font-archivo",
+  display: "swap",
+});
+const notoDev = Noto_Serif_Devanagari({
+  weight: ["600", "700"],
+  subsets: ["devanagari"],
+  variable: "--font-noto-dev",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Parosa — QR Menu",
@@ -32,7 +45,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${display.variable} ${caps.variable} ${body.variable} h-full antialiased`}
+      className={`${display.variable} ${caps.variable} ${body.variable} ${archivo.variable} ${notoDev.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
