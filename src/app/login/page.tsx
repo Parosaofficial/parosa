@@ -15,6 +15,19 @@ function MailIcon() {
 function LockIcon() {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>;
 }
+function Bloom({ className }: { className: string }) {
+  const petals = Array.from({ length: 12 });
+  return (
+    <svg viewBox="-100 -100 200 200" className={className} aria-hidden>
+      <g fill="none" stroke="currentColor" strokeWidth="1.4">
+        {petals.map((_, i) => <ellipse key={i} cx="0" cy="-58" rx="15" ry="40" transform={`rotate(${i * 30})`} />)}
+        {petals.map((_, i) => <ellipse key={"b" + i} cx="0" cy="-40" rx="9" ry="24" transform={`rotate(${i * 30 + 15})`} />)}
+        <circle r="15" /><circle r="7" />
+      </g>
+    </svg>
+  );
+}
+
 const TYPES = ["Restaurant", "Dhaba", "Food truck", "Small cafe", "Other"];
 const VISITORS = ["Less than 50", "50–100", "100–200", "200+"];
 const emailOk = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
@@ -172,27 +185,36 @@ export default function Login() {
 
   if (checking) {
     return (
-      <div className="pl pl-checking">
-        <div className="pl-spin" />
+      <div className="lg-page">
+        <div className="lg-card" style={{ display: "grid", placeItems: "center", minHeight: 320 }}>
+          <div style={{ textAlign: "center" }}>
+            <Seal size={58} />
+            <div style={{ margin: "16px auto 0", height: 24, width: 24, borderRadius: "50%", border: "2px solid rgba(169,130,58,0.3)", borderTopColor: "var(--gold)", animation: "lgspin .8s linear infinite" }} />
+          </div>
+        </div>
         <style>{`@keyframes lgspin{to{transform:rotate(360deg)}}`}</style>
       </div>
     );
   }
 
   return (
-    <div className="pl">
-      <aside className="pl-left">
-        <button className="pl-back" onClick={() => router.push("/")}>← Back to site</button>
-        <div className="pl-left-mid">
-          <Seal size={168} />
-          <div><div className="wm dev">परोसा</div><div className="portal">Restaurant Partner Portal</div></div>
-          <div className="rule" />
-          <p className="tagline"><span className="dev">भारत के हर रेस्टोरेंट के लिए</span> — good food builds better stories.</p>
-        </div>
-        <div className="pl-foot">SCAN · SERVE · SAVOUR</div>
-      </aside>
+    <div className="lg-page">
+      <Bloom className="lg-bloom tl" />
+      <Bloom className="lg-bloom r" />
+      <Bloom className="lg-bloom bl" />
 
-      <main className="pl-right"><div className="pl-inner">
+      <div className="lg-tag-tr">भारत के<br />हर रेस्टोरेंट के लिए<span className="u" /></div>
+      <div className="lg-tag-br">GOOD FOOD<br />BUILDS<br />BETTER STORIES<span className="u" /></div>
+
+      <div className="lg-card">
+        <div className="lg-logo">
+          <Seal size={66} />
+          <div className="lg-wm">परोसा</div>
+          <div className="lg-en">PAROSA</div>
+          <div className="lg-portal">Restaurant Partner Portal</div>
+          <div className="lg-div"><span className="ln" />❖<span className="ln" /></div>
+        </div>
+
         {(mode === "signin" || mode === "staff") && (
           <div className="lg-tabs">
             <button className={mode === "signin" ? "on" : ""} onClick={toSignin}>
@@ -323,7 +345,7 @@ export default function Login() {
         </div>
 
         <p className="lg-terms">By continuing you agree to Parosa&apos;s <a href="/terms" target="_blank">Terms</a> &amp; <a href="/privacy" target="_blank">Privacy</a>.</p>
-      </div></main>
+      </div>
     </div>
   );
 }
