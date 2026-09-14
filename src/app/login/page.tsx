@@ -4,7 +4,7 @@ import { useEffect, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Seal } from "@/components/Logo";
 import { authMessage, getCurrentUserId, signIn, signUpOwner } from "@/lib/auth";
-import { createRestaurant, generateUniqueSlug, getRestaurantByOwner, staffLogin, uploadPhoto } from "@/lib/db";
+import { createRestaurant, generateUniqueSlug, getRestaurantByOwner, staffLogin, updateRestaurant, uploadPhoto } from "@/lib/db";
 import { saveStaffSession } from "@/lib/useStaff";
 import { PLANS } from "@/lib/plans";
 import "./login.css";
@@ -90,6 +90,8 @@ export default function Login() {
   const [fssai, setFssai] = useState(""); const [fssaiFile, setFssaiFile] = useState<File | null>(null);
   const [fssaiImg, setFssaiImg] = useState("");
   const [notes, setNotes] = useState("");
+  // post-creation plan step
+  const [createdRid, setCreatedRid] = useState<string | null>(null);
 
   // On client-side navigation (e.g. the landing's "Create your restaurant"),
   // the ?mode=create query isn't applied yet when the initial state runs — so
@@ -179,17 +181,25 @@ export default function Login() {
       const uid = await getCurrentUserId();
       if (!uid) throw new Error("Session lost");
       const slug = await generateUniqueSlug(name);
-      await createRestaurant({
+      const created = await createRestaurant({
         ownerId: uid, slug, name: name.trim(), ownerName: ownerName.trim(), ownerEmail: email.trim().toLowerCase(),
         phone: phone.trim(), address: address.trim(), city: city.trim(), pincode: pincode.trim(),
-        type: rtype, visitors, plan, logoUrl, gstin: gst.trim(), gstinUrl, fssai: fssai.trim(), fssaiUrl, notes: notes.trim(),
+        type: rtype, visitors, logoUrl, gstin: gst.trim(), gstinUrl, fssai: fssai.trim(), fssaiUrl, notes: notes.trim(),
       });
+      setCreatedRid(created.id);
       setBusy(false);
-      setStep(3);
+      setStep(3); // account created — now pick a plan
     } catch (e) {
       setBusy(false);
       setErr(authMessage(e));
     }
+  };
+
+  // after account creation: save the chosen plan, then into the dashboard.
+  const choosePlanAndGo = async () => {
+    setBusy(true);
+    try { if (createdRid) await updateRestaurant(createdRid, { plan }); } catch { /* still proceed */ }
+    router.replace("/dashboard");
   };
 
   if (checking) {
@@ -260,12 +270,12 @@ export default function Login() {
             </>
           ) : (
             <>
-              {step < 4 && <div className="lg-steps">{[0, 1, 2, 3].map((i) => <span key={i} className={`s${i <= step ? " on" : ""}`} />)}</div>}
+              {step < 3 && <div className="lg-steps">{[0, 1, 2].map((i) => <span key={i} className={`s${i <= step ? " on" : ""}`} />)}</div>}
 
               {step === 0 && (
                 <>
                   <h2 className="lg-h2">Create your account</h2>
-                  <p className="lg-sub">Step 1 of 4 — you &amp; your restaurant</p>
+                  <p className="lg-sub">Step 1 of 3 — you &amp; your restaurant</p>
                   <div className="lg-field"><label>Restaurant name</label><input type="text" placeholder="Raj Darbar" value={name} onChange={(e) => setName(e.target.value)} /></div>
                   <div className="lg-field"><label>Owner name</label><input type="text" placeholder="Your full name" value={ownerName} onChange={(e) => setOwnerName(e.target.value)} /></div>
                   <div className="lg-frow two">
@@ -288,7 +298,7 @@ export default function Login() {
               {step === 1 && (
                 <>
                   <h2 className="lg-h2">About your place</h2>
-                  <p className="lg-sub">Step 2 of 4 — help us set you up right</p>
+                  <p className="lg-sub">Step 2 of 3 — help us set you up right</p>
                   <div className="lg-field" style={{ marginTop: 16 }}>
                     <label>What type of place is it?</label>
                     <div className="lg-choices">{TYPES.map((t) => <button key={t} className={`lg-choice${rtype === t ? " on" : ""}`} onClick={() => setRtype(t)}>{t}</button>)}</div>
@@ -303,8 +313,24 @@ export default function Login() {
 
               {step === 2 && (
                 <>
-                  <h2 className="lg-h2">Choose your plan</h2>
-                  <p className="lg-sub">Step 3 of 4 — no card needed, you won&apos;t be charged during early access</p>
+                  <h2 className="lg-h2">Licences</h2>
+                  <p className="lg-sub">Step 3 of 3 — GSTIN &amp; FSSAI <span style={{ color: "var(--muted)", textTransform: "none", letterSpacing: 0 }}>· optional, add later in Settings</span></p>
+                  <div style={{ marginTop: 16 }}>
+                    <div className="lg-field"><label>GSTIN <span style={{ color: "var(--muted)", fontWeight: 400, letterSpacing: 0, textTransform: "none" }}>· optional</span></label><input type="text" placeholder="06ABCDE1234F1Z5" value={gst} onChange={(e) => setGst(e.target.value)} /></div>
+                    <Drop label="GSTIN certificate" img={gstImg} onPick={pickImg(setGstImg, setGstFile)} onRemove={() => { setGstImg(""); setGstFile(null); }} />
+                    <div className="lg-field"><label>FSSAI Licence No. <span style={{ color: "var(--muted)", fontWeight: 400, letterSpacing: 0, textTransform: "none" }}>· optional</span></label><input type="text" placeholder="10012345000123" value={fssai} onChange={(e) => setFssai(e.target.value)} /></div>
+                    <Drop label="FSSAI licence" img={fssaiImg} onPick={pickImg(setFssaiImg, setFssaiFile)} onRemove={() => { setFssaiImg(""); setFssaiFile(null); }} />
+                    <div className="lg-field"><label>Anything else? <span style={{ color: "var(--muted)", fontWeight: 400, letterSpacing: 0, textTransform: "none" }}>· optional</span></label><textarea placeholder="Opening hours, special notes…" value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
+                  </div>
+                  {err && <div className="lg-err">{err}</div>}
+                  <div className="lg-stepnav"><button className="lg-back" onClick={() => setStep(1)} disabled={busy}>Back</button><button className="lg-prime" onClick={submit} disabled={busy}>{busy ? "Creating…" : "Create my account →"}</button></div>
+                </>
+              )}
+
+              {step === 3 && (
+                <>
+                  <h2 className="lg-h2">स्वागत है! 🎉 Choose your plan</h2>
+                  <p className="lg-sub"><b>{name}</b> is created. Pick a plan to start — no card needed, free during early access.</p>
                   <div className="lg-billing">
                     <button className={billing === "monthly" ? "on" : ""} onClick={() => setBilling("monthly")}>Monthly</button>
                     <button className={billing === "yearly" ? "on" : ""} onClick={() => setBilling("yearly")}>Yearly · save 17%</button>
@@ -321,33 +347,9 @@ export default function Login() {
                       </button>
                     ))}
                   </div>
-                  <p className="lg-planfoot">0% commission on every plan. Cancel anytime.</p>
-                  <div className="lg-stepnav"><button className="lg-back" onClick={() => setStep(1)}>Back</button><button className="lg-prime" onClick={() => setStep(3)}>Continue →</button></div>
+                  <p className="lg-planfoot">0% commission on every plan. Change it anytime in Settings.</p>
+                  <button className="lg-prime" onClick={choosePlanAndGo} disabled={busy}>{busy ? "Setting up…" : `Continue with ${PLANS.find((p) => p.id === plan)?.name ?? "plan"} → Dashboard`}</button>
                 </>
-              )}
-
-              {step === 3 && (
-                <>
-                  <h2 className="lg-h2">Licences</h2>
-                  <p className="lg-sub">Step 4 of 4 — GSTIN &amp; FSSAI <span style={{ color: "var(--muted)", textTransform: "none", letterSpacing: 0 }}>· optional, add later in Settings</span></p>
-                  <div style={{ marginTop: 16 }}>
-                    <div className="lg-field"><label>GSTIN <span style={{ color: "var(--muted)", fontWeight: 400, letterSpacing: 0, textTransform: "none" }}>· optional</span></label><input type="text" placeholder="06ABCDE1234F1Z5" value={gst} onChange={(e) => setGst(e.target.value)} /></div>
-                    <Drop label="GSTIN certificate" img={gstImg} onPick={pickImg(setGstImg, setGstFile)} onRemove={() => { setGstImg(""); setGstFile(null); }} />
-                    <div className="lg-field"><label>FSSAI Licence No. <span style={{ color: "var(--muted)", fontWeight: 400, letterSpacing: 0, textTransform: "none" }}>· optional</span></label><input type="text" placeholder="10012345000123" value={fssai} onChange={(e) => setFssai(e.target.value)} /></div>
-                    <Drop label="FSSAI licence" img={fssaiImg} onPick={pickImg(setFssaiImg, setFssaiFile)} onRemove={() => { setFssaiImg(""); setFssaiFile(null); }} />
-                    <div className="lg-field"><label>Anything else? <span style={{ color: "var(--muted)", fontWeight: 400, letterSpacing: 0, textTransform: "none" }}>· optional</span></label><textarea placeholder="Opening hours, special notes…" value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
-                  </div>
-                  {err && <div className="lg-err">{err}</div>}
-                  <div className="lg-stepnav"><button className="lg-back" onClick={() => setStep(2)} disabled={busy}>Back</button><button className="lg-prime" onClick={submit} disabled={busy}>{busy ? "Creating…" : "Create my restaurant →"}</button></div>
-                </>
-              )}
-
-              {step === 4 && (
-                <div className="lg-done">
-                  <h2>स्वागत है! 🎉</h2>
-                  <p><b>{name}</b> is ready on Parosa.<br />Your account is set up — let&apos;s build your menu.</p>
-                  <button className="lg-prime" style={{ marginTop: 22 }} onClick={() => router.replace("/dashboard")}>Enter dashboard →</button>
-                </div>
               )}
             </>
           )}
