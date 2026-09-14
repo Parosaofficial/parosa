@@ -91,6 +91,15 @@ export default function Login() {
   const [fssaiImg, setFssaiImg] = useState("");
   const [notes, setNotes] = useState("");
 
+  // On client-side navigation (e.g. the landing's "Create your restaurant"),
+  // the ?mode=create query isn't applied yet when the initial state runs — so
+  // re-read it after mount and open the right view.
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get("staff") === "1") setMode("staff");
+    else if (p.get("mode") === "create") { setMode("create"); setStep(0); }
+  }, []);
+
   // already signed in? skip straight to the dashboard.
   useEffect(() => {
     (async () => {
