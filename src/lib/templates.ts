@@ -35,7 +35,7 @@ export const TEMPLATES: TemplateDef[] = [
       "--gold": "#b58f42", "--gold-hi": "#d8b25e", "--gold-soft": "#ecdcb4",
       "--line": "#ddd3bf", "--line-gold": "#c2a24b",
       "--ink": "#1c1712", "--ink-2": "#4a4235", "--muted": "#8c8069",
-      "--font-display": "Georgia, 'Times New Roman', serif", "--font-caps": "var(--font-cinzel), Georgia, serif",
+      "--font-display": "var(--font-rozha), Georgia, serif", "--font-caps": "var(--font-cinzel), Georgia, serif",
     },
   },
   {
@@ -71,7 +71,7 @@ export const TEMPLATES: TemplateDef[] = [
       "--gold": "#8a8a8a", "--gold-hi": "#f2f2f0", "--gold-soft": "#cfcfcf",
       "--line": "#e6e6e3", "--line-gold": "#dad8d2",
       "--ink": "#141414", "--ink-2": "#4a4a4a", "--muted": "#8a8a8a",
-      "--font-display": "Georgia, 'Times New Roman', serif", "--font-caps": "var(--font-cinzel), Georgia, serif",
+      "--font-display": "var(--font-mukta), system-ui, sans-serif", "--font-caps": "var(--font-cinzel), Georgia, serif",
     },
   },
   {
@@ -119,7 +119,7 @@ export const TEMPLATES: TemplateDef[] = [
       "--gold": "#0e8c93", "--gold-hi": "#58c9cd", "--gold-soft": "#bfeaea",
       "--line": "#cfe4e3", "--line-gold": "#6fb6b3",
       "--ink": "#123840", "--ink-2": "#35606a", "--muted": "#7aa0a2",
-      "--font-display": "Georgia, 'Times New Roman', serif", "--font-caps": "var(--font-cinzel), Georgia, serif",
+      "--font-display": "var(--font-mukta), system-ui, sans-serif", "--font-caps": "var(--font-cinzel), Georgia, serif",
     },
   },
 ];

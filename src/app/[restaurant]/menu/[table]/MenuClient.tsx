@@ -8,14 +8,6 @@ import { templateStyle } from "@/lib/templates";
 import type { Category, Dish, Restaurant } from "@/lib/types";
 import "./menu.css";
 
-function ThumbPlaceholder() {
-  return (
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.6" opacity="0.55" aria-hidden>
-      <path d="M7 3v7a3 3 0 0 0 6 0V3M10 3v18M17 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4v9" />
-    </svg>
-  );
-}
-
 export function MenuClient({
   restaurant,
   categories,
@@ -114,7 +106,7 @@ export function MenuClient({
             <div className="pat" />
             <div className="in">
               <div className="art" style={hero.photo_url ? { backgroundImage: `url(${hero.photo_url})`, backgroundSize: "cover" } : undefined}>
-                {!hero.photo_url && "🍽️"}
+                {!hero.photo_url && <span className="pm-artinitial">{hero.name.trim().charAt(0).toUpperCase()}</span>}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="flag">★ आज का ख़ास · Chef&apos;s Special</div>
@@ -122,7 +114,7 @@ export function MenuClient({
                 {hero.description && <div className="en">{hero.description}</div>}
                 <div className="r">
                   <span className="pr">₹{hero.price}</span>
-                  <button className="pm-add" style={{ background: "var(--gold)", color: "var(--maroon-deep)" }} onClick={() => add(hero.id)}>+ जोड़ें</button>
+                  <button className="pm-add" style={{ background: "var(--gold)", color: "var(--maroon-deep)" }} onClick={() => add(hero.id)}>+ Add</button>
                 </div>
               </div>
             </div>
@@ -141,7 +133,7 @@ export function MenuClient({
             <div key={d.id} className={`pm-dish${d.available ? "" : " out"}`}>
               <div className="pm-thumb" style={d.photo_url ? { backgroundImage: `url(${d.photo_url})`, backgroundSize: "cover", fontSize: 0 } : undefined}>
                 {d.tag === "best" && <span className="best">बेस्टसेलर</span>}
-                {!d.photo_url && <ThumbPlaceholder />}
+                {!d.photo_url && <span className="pm-thumbtext">{d.name}</span>}
               </div>
               <div className="pm-mid">
                 <div className="pm-dtop"><span className={`pm-vd${d.is_veg ? "" : " nv"}`} /></div>
@@ -154,7 +146,7 @@ export function MenuClient({
                   ) : q > 0 ? (
                     <div className="pm-stepper"><button onClick={() => dec(d.id)}>−</button><span className="q">{q}</span><button onClick={() => add(d.id)}>+</button></div>
                   ) : (
-                    <button className="pm-add" onClick={() => add(d.id)}>+ जोड़ें</button>
+                    <button className="pm-add" onClick={() => add(d.id)}>+ Add</button>
                   )}
                 </div>
               </div>
