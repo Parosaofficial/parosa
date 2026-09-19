@@ -4,6 +4,11 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.10 — 19 Sep 2026
+- Phone-in-hand moved closer to the QR stand: 16px gap (was 44px), so it no
+  longer sits in the screen corner.
+- Phone kept at its full 390px on every laptop size — no shrinking.
+
 ## v0.4.9 — 19 Sep 2026
 - Phone-in-hand image slightly larger: 390px (was 350px) on 1536px screens and
   wider; scales to ~366px on 1440px laptops so the phone body never clips.
