@@ -4,6 +4,15 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.11 — 19 Sep 2026
+Hero text rhythm, phone position, solid feature strip.
+- Get Started / See Live Demo moved down 23px and the "No App Required · Setup in
+  Minutes · 0% Commission" ticks down 47px, with even spacing under the headline
+  (headline itself unchanged). Phones keep the tighter spacing.
+- Phone-in-hand slightly higher (19px) and slightly left (12px), 4px from the stand.
+- Feature strip (Digital Menu, QR Generation, …) now has a solid white background
+  with a soft shadow instead of the see-through-looking cream.
+
 ## v0.4.10 — 19 Sep 2026
 - Phone-in-hand moved closer to the QR stand: 16px gap (was 44px), so it no
   longer sits in the screen corner.
