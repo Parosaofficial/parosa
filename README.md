@@ -7,12 +7,13 @@ Next.js (App Router) + Supabase (Auth, Postgres with RLS, Realtime, Storage).
 
 ```bash
 npm install
-cp .env.example .env.local   # then fill in the two Supabase values
-npm run dev                  # http://localhost:3000
+npm run dev    # http://localhost:3000
 ```
 
-`.env.local` needs the project URL and the **anon (public)** key from
-Supabase → Project Settings → API. Never put the `service_role` key in this app.
+No setup needed: the Supabase URL and **anon (public)** key are in `.env`
+(committed on purpose; they're browser-safe). To point a copy at another
+Supabase project, override them in `.env.local` (not committed). Never put the
+`service_role` key or an `sbp_` token in any file in this repo.
 
 ## Pages
 
@@ -51,6 +52,6 @@ uploads require sign-in and only the uploader can replace or delete a file.
 
 ## Deploy
 
-Vercel: import this repo, set the two `NEXT_PUBLIC_SUPABASE_*` variables, deploy.
+Vercel: import this repo and deploy — no environment variables needed.
 Then add the production domain to Supabase → Authentication → URL Configuration
 (Site URL + redirect URLs).
