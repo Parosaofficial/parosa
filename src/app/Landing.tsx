@@ -40,11 +40,11 @@ const STRIP: { t: string; s: string; icon: ReactNode }[] = [
   { t: "0% Commission", s: "Keep every rupee", icon: <><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></> },
 ];
 
-const STEPS: { t: string; s: string; icon: ReactNode }[] = [
-  { t: "Create Your Menu", s: "Add dishes, prices, photos and categories — in Hindi and English.", icon: <><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M9 8h6M9 12h6M9 16h4" /></> },
-  { t: "Get Your QR", s: "Parosa makes a unique QR for every table. Print and place it.", icon: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" /></> },
-  { t: "Customers Scan", s: "Guests scan with their camera, browse and order — no app.", icon: <><rect x="6" y="2" width="12" height="20" rx="3" /><path d="M9 8h2v2H9zM13 8h2v2h-2zM9 12h2v2H9zM13 13h2" /></> },
-  { t: "Receive Orders", s: "Orders ring on your dashboard. Bills go out on WhatsApp.", icon: <><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8" /><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0" /></> },
+const STEPS: { t: string; icon: ReactNode }[] = [
+  { t: "Create Your Menu", icon: <><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M9 8h6M9 12h6M9 16h4" /></> },
+  { t: "Get Your QR", icon: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" /></> },
+  { t: "Customers Scan", icon: <><rect x="6" y="2" width="12" height="20" rx="3" /><path d="M9 8h2v2H9zM13 8h2v2h-2zM9 12h2v2H9zM13 13h2" /></> },
+  { t: "Receive Orders", icon: <><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8" /><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0" /></> },
 ];
 
 // Placeholder photos (cropped from the design mock-up) — swap for real ones in public/landing/frames/.
@@ -100,8 +100,8 @@ export function Landing({ fontClass }: { fontClass: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [section, setSection] = useState("home");
-  const [tick, setTick] = useState(0); // how-it-works progress: 0..3 lights steps, 4–5 hold
-  const stepsRef = useRef<HTMLDivElement>(null);
+  const [prog, setProg] = useState(0); // how-it-works: 0 → 1 as you scroll through the pinned section
+  const howRef = useRef<HTMLElement>(null);
   const root = useRef<HTMLDivElement>(null);
 
   // header shadow once the page moves
@@ -134,19 +134,27 @@ export function Landing({ fontClass }: { fontClass: string }) {
     return () => io.disconnect();
   }, []);
 
-  // how-it-works: the progress line runs 1 → 4 while the section is on screen
+  // how-it-works is scroll-driven: the section is tall and its content pinned,
+  // so scrolling through it moves the line from step 1 to "Receive Orders".
   useEffect(() => {
-    const el = stepsRef.current;
+    const el = howRef.current;
     if (!el) return;
-    let timer: ReturnType<typeof setInterval> | undefined;
-    const io = new IntersectionObserver(([e]) => {
-      clearInterval(timer);
-      if (e.isIntersecting) timer = setInterval(() => setTick((t) => (t + 1) % 6), 1300);
-    }, { threshold: 0.35 });
-    io.observe(el);
-    return () => { io.disconnect(); clearInterval(timer); };
+    // Measured straight in the scroll event (browsers already fire it once per frame);
+    // React skips the re-render when the rounded value hasn't changed.
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      const run = r.height - window.innerHeight; // scroll distance while pinned
+      const p = run > 0 ? Math.min(1, Math.max(0, -r.top / run)) : 1;
+      setProg(Math.round(p * 400) / 400);
+    };
+    measure();
+    window.addEventListener("scroll", measure, { passive: true });
+    window.addEventListener("resize", measure);
+    return () => { window.removeEventListener("scroll", measure); window.removeEventListener("resize", measure); };
   }, []);
-  const lit = Math.min(tick, 3); // index of the furthest lit step
+  // the line spans step 1 → 4 over the first 85% of the scroll; the rest holds the finished state
+  const line = Math.min(1, prog / 0.85);
+  const lit = Math.min(3, Math.floor(line * 3 + 0.02)); // furthest step the line has reached
 
   const go = (id: string) => { setMenuOpen(false); document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); };
 
@@ -222,62 +230,46 @@ export function Landing({ fontClass }: { fontClass: string }) {
         </div>
       </section>
 
-      {/* ---------------- how it works ---------------- */}
-      <section className="lp-sec lp-how" id="how">
-        <div className="lp-wrap">
-          <div className="lp-howhead">
-            <div data-reveal>
+      {/* ---------------- how it works — scroll-driven ---------------- */}
+      <section className="lp-how" id="how" ref={howRef}>
+        <div className="lp-howpin">
+          <div className="lp-wrap">
+            <div className="lp-center">
               <div className="lp-eyebrow">How Parosa works</div>
-              <h2 className="lp-h2">From Menu to More Orders.<br />In 4 Simple Steps.</h2>
-              <p className="lp-sub">Get your restaurant online in minutes. No technical skills needed.</p>
-              <Link href="/signup" className="lp-btn">Get Started <Arrow /></Link>
+              <h2 className="lp-h2">From Menu to More Orders,<br />in 4 Simple Steps</h2>
             </div>
-            <div className="lp-tagline" aria-hidden="true">Simple<br />Modern<br />Made for India<span /></div>
-          </div>
-
-          <div className="lp-steps" ref={stepsRef} style={{ ["--p" as string]: lit / 3 }}>
-            <div className="lp-rail" aria-hidden="true"><i /><b /></div>
-            {STEPS.map((s, i) => (
-              <div key={s.t} className={`lp-step${i <= lit ? " on" : ""}${i === lit && tick < 4 ? " now" : ""}`}>
-                <span className="dot"><Icon size={26}>{s.icon}</Icon></span>
-                <b>{i + 1}. {s.t}</b>
-                <p>{s.s}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------- built for every food business — moving frames ---------------- */}
-      <section className="lp-sec lp-built">
-        <div className="lp-wrap lp-builtin">
-          <div className="lp-builtcopy" data-reveal>
-            <div className="lp-eyebrow bar">Built for every<br />food business</div>
-            <h2 className="lp-h2">From Local Dhabas<br />to Growing Chains</h2>
-            <p className="lp-sub">Whether you run a small food stall or a multi-outlet restaurant, Parosa adapts to your needs.</p>
-            <div className="lp-row">
-              <Link href="/signup" className="lp-btn">Get Started <Arrow /></Link>
-              <button className="lp-textlink" onClick={() => go("pricing")}>See plans</button>
-            </div>
-          </div>
-          <div className="lp-marquee" aria-label="Dhabas, restaurants, food trucks and cafés">
-            <div className="lp-track">
-              {[...FRAMES, ...FRAMES, ...FRAMES].map((f, i) => (
-                <figure key={i} className="lp-frame" aria-hidden={i >= FRAMES.length}>
-                  <Image src={f.src} alt={i < FRAMES.length ? f.label : ""} width={330} height={408} sizes="190px" />
-                  <figcaption>{f.label}</figcaption>
-                </figure>
+            <div className="lp-steps" style={{ ["--p" as string]: line }}>
+              <div className="lp-rail" aria-hidden="true"><i /><b /></div>
+              {STEPS.map((s, i) => (
+                <div key={s.t} className={`lp-step${i <= lit ? " on" : ""}${i === lit && line < 1 ? " now" : ""}${line >= 1 ? " done" : ""}`}>
+                  <span className="dot"><Icon size={28}>{s.icon}</Icon></span>
+                  <b><em>{i + 1}</em>{s.t}</b>
+                </div>
               ))}
             </div>
           </div>
         </div>
       </section>
 
+      {/* ---------------- moving 9:16 frames ---------------- */}
+      <section className="lp-built" aria-label="Built for dhabas, restaurants, food trucks and cafés">
+        <div className="lp-marquee">
+          <div className="lp-track x4">
+            {[...FRAMES, ...FRAMES, ...FRAMES, ...FRAMES].map((f, i) => (
+              <figure key={i} className="lp-frame" aria-hidden={i >= FRAMES.length}>
+                <Image src={f.src} alt={i < FRAMES.length ? f.label : ""} width={330} height={408} sizes="240px" />
+                <figcaption>{f.label}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ---------------- reviews — moving white boxes ---------------- */}
       <section className="lp-sec lp-reviews" id="reviews">
-        <div className="lp-wrap lp-revhead" data-reveal>
-          <div className="lp-eyebrow bar">Trusted by<br />food businesses</div>
-          <h2 className="lp-h2">Real Stories.<br />Real Growth.</h2>
+        <div className="lp-wrap lp-center" data-reveal>
+          <div className="lp-eyebrow">Trusted by food businesses</div>
+          <h2 className="lp-h2">Real Stories. Real Growth.</h2>
         </div>
         <div className="lp-marquee wide">
           <div className="lp-track rev">
