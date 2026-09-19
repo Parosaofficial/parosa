@@ -95,7 +95,7 @@
 .lp-stand::after { content: ""; position: absolute; left: 4%; right: -3%; bottom: -14px; height: 30px; z-index: -1; border-radius: 50%;
   background: radial-gradient(closest-side, rgba(70,30,15,.38), rgba(70,30,15,.14) 60%, transparent); filter: blur(4px); }
 .lp-stand img, .lp-phone img { width: 100%; height: auto; display: block; }
-.lp-phone { position: absolute; left: var(--pl); bottom: -22px; width: min(350px, 25vw); /* original size */ z-index: 40; /* top layer of the page — only the sticky header (z 50) sits above it */ animation: lp-phone-in 1s .4s cubic-bezier(.2,.8,.2,1) both;
+.lp-phone { position: absolute; left: var(--pl); bottom: -22px; width: min(390px, 25.4vw); z-index: 40; /* top layer of the page — only the sticky header (z 50) sits above it */ animation: lp-phone-in 1s .4s cubic-bezier(.2,.8,.2,1) both;
   /* the wrist is cut at the photo's bottom and right edges — fade both into the page instead of hard lines */
   -webkit-mask-image: linear-gradient(to bottom, #000 92%, transparent 100%), linear-gradient(to right, #000 88%, transparent 100%); -webkit-mask-composite: source-in;
   mask-image: linear-gradient(to bottom, #000 92%, transparent 100%), linear-gradient(to right, #000 88%, transparent 100%); mask-composite: intersect; }

@@ -4,6 +4,11 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.9 — 19 Sep 2026
+- Phone-in-hand image slightly larger: 390px (was 350px) on 1536px screens and
+  wider; scales to ~366px on 1440px laptops so the phone body never clips.
+  Same 44px gap to the stand; still the top layer.
+
 ## v0.4.8 — 19 Sep 2026
 Phone on the top layer.
 - The phone-in-hand image is now the top layer of the page (above the arch,
