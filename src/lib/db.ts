@@ -83,7 +83,7 @@ export async function createRestaurant(input: {
       fssai: input.fssai || null,
       fssai_url: input.fssaiUrl || null,
       description: input.notes || null,
-      template: "virasat",
+      template: "aurora", // Parosa's signature design
       tables_count: 0,
     })
     .select()
@@ -156,6 +156,24 @@ export async function staffLogin(phone: string, code: string): Promise<Omit<Staf
 export async function staffCustomerLookup(restaurantId: string, code: string, phone: string): Promise<string | null> {
   const { data } = await supabase.rpc("staff_customer_lookup", { p_restaurant_id: restaurantId, p_code: code, p_phone: phone.trim() });
   return (data as string | null) ?? null;
+}
+
+/* ---------------- Pay page (guest, via WhatsApp link) ---------------- */
+
+export type PayInfo = {
+  restaurant_name: string; logo_url: string | null; upi_id: string | null;
+  google_review_url: string | null; review_prompt: boolean | null;
+  order_no: string | null; table_number: string | null; total: number;
+  payment_status: "paid" | "unpaid"; payment_method: string | null;
+};
+
+/** Only the non-private bits of one order, for /pay/<order id>. null = no such order. */
+export async function getPayInfo(orderId: string): Promise<PayInfo | null> {
+  if (!/^[0-9a-f-]{36}$/i.test(orderId)) return null;
+  const { data, error } = await supabase.rpc("order_pay_info", { p_order: orderId });
+  if (error) throw error;
+  const row = Array.isArray(data) ? data[0] : data;
+  return (row as PayInfo) ?? null;
 }
 
 export async function getMenu(

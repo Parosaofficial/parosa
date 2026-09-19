@@ -98,3 +98,30 @@
 .or-src{display:inline-block;margin-top:4px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:100px;width:fit-content}
 .or-src.qr{background:#eef4ff;color:#2c5aa0;border:1px solid #cfdcf3}
 .or-src.staff{background:var(--parch-hi);color:var(--maroon);border:1px solid var(--line-gold)}
+
+/* scan-to-pay on the bill */
+.or-upi{display:flex;gap:14px;align-items:center;margin-top:12px;padding:12px;border:1px solid var(--line-gold);border-radius:12px;background:var(--parch-hi)}
+.or-upi-qr{flex:none;background:#fff;border-radius:8px;padding:4px;line-height:0;box-shadow:0 0 0 1px #00000012}
+.or-upi-tx{display:flex;flex-direction:column;gap:4px;min-width:0}
+.or-upi-tx b{font-size:14px;color:var(--maroon)}
+.or-upi-tx span{font-size:12px;line-height:1.4;color:var(--ink-2)}
+.or-upi-tx i{font-style:normal;font-weight:700;word-break:break-all}
+.or-upi-tx button{align-self:flex-start;margin-top:4px;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-caps);font-weight:700;font-size:11px;letter-spacing:.04em;padding:7px 11px;border-radius:7px;border:1px solid var(--oxblood);background:var(--oxblood);color:var(--gold-hi);cursor:pointer}
+.or-upi-tx button svg{width:14px;height:14px}
+.or-upi-setup{display:block;margin-top:12px;padding:10px 12px;border:1px dashed var(--line-gold);border-radius:10px;font-size:12.5px;font-weight:600;color:var(--maroon);text-decoration:none;text-align:center}
+.or-upi-setup:hover{background:var(--parch-hi)}
+
+/* full-screen "show to customer" */
+.or-paysheet{position:fixed;inset:0;z-index:260;background:rgba(30,10,8,.72);backdrop-filter:blur(6px);display:grid;place-items:center;padding:16px;animation:or-fade .2s ease-out}
+.or-paycard{position:relative;width:min(420px,100%);max-height:100%;overflow:auto;background:#FFFDF8;border-radius:24px;padding:26px 22px 22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;box-shadow:0 30px 80px -30px #000}
+.or-paycard .or-bx{border-color:var(--line-gold);background:#fff;color:var(--maroon)}
+.or-paycard .pn{font-family:var(--font-display);font-size:24px;color:var(--oxblood);margin-top:8px}
+.or-paycard .pm{font-family:var(--font-caps);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.or-paycard .pa{font-family:var(--font-archivo),system-ui,sans-serif;font-weight:800;font-size:42px;letter-spacing:-.02em;color:#2A1A14;margin:6px 0 10px}
+.or-paycard .pq{background:#fff;padding:10px;border-radius:16px;border:1px solid var(--line-gold);line-height:0}
+.or-paycard .pq svg{width:min(260px,70vw);height:auto}
+.or-paycard .ph{font-size:13px;color:var(--ink-2);margin-top:12px}
+.or-paycard .pv{font-size:12.5px;font-weight:700;color:var(--maroon);word-break:break-all}
+.or-paycard .pr{margin-top:16px;width:100%;padding:13px;border:0;border-radius:12px;background:#1E8049;color:#fff;font-weight:700;font-size:14px;cursor:pointer}
+.or-paycard .pd{margin-top:16px;color:#1E8049;font-weight:800}
+@keyframes or-fade{from{opacity:0}to{opacity:1}}

@@ -34,6 +34,8 @@ export type Restaurant = {
   template: string | null;
   plan: string | null; // 'basic' | 'growth' | 'business'
   upi_id: string | null;
+  google_review_url?: string | null; // added in 0005 — optional until that migration runs
+  review_prompt?: boolean | null;
   hours: Hours | null;
   tables_count: number;
   staff_code: string | null;

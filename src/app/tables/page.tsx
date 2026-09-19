@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { QRCodeCanvas } from "qrcode.react";
 import { Sidebar } from "@/components/Sidebar";
 import { Seal } from "@/components/Logo";
 import { AppLoading } from "@/components/AppLoading";
 import { setTablesCount } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
+import { reviewLinkOf } from "@/lib/upi";
 import "../dash.css";
 import "./tables.css";
 
@@ -16,8 +18,7 @@ export default function Tables() {
   useEffect(() => { setOrigin(window.location.origin); }, []);
 
   const [count, setCount] = useState(0);
-  const [reviewUrl, setReviewUrl] = useState("");
-  const [reviewPrompt, setReviewPrompt] = useState(true);
+  const reviewBox = useRef<HTMLDivElement>(null);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2100); };
 
@@ -26,6 +27,17 @@ export default function Tables() {
   if (!ready || !restaurant) return <AppLoading label="Loading tables…" />;
 
   const BASE = `${origin}/${restaurant.slug}/menu`;
+  const review = reviewLinkOf(restaurant);
+
+  const downloadReviewQr = () => {
+    const c = reviewBox.current?.querySelector("canvas");
+    if (!c) return;
+    const a = document.createElement("a");
+    a.href = c.toDataURL("image/png");
+    a.download = `${restaurant.slug}-google-review-qr.png`;
+    a.click();
+    showToast("Review QR downloaded");
+  };
   const tables = Array.from({ length: count }, (_, i) => i + 1);
 
   const changeCount = async (n: number) => {
@@ -58,20 +70,30 @@ export default function Tables() {
             <div className="tb-stepper"><span className="lbl">Tables</span><button onClick={removeTable}>−</button><span className="n">{count}</span><button onClick={addTable}>+</button></div>
           </div>
 
-          {/* Review QR */}
+          {/* Review QR — the link itself lives in Settings */}
           <div className="db-panel">
             <div className="db-ph"><h3>Reviews · Rate us QR</h3><span className="tag">★ Get 5-star reviews</span></div>
-            <div className="db-pb" style={{ display: "flex", gap: 18, alignItems: "flex-start", flexWrap: "wrap" }}>
-              <div className="tb-qbox"><QRCodeCanvas value={reviewUrl} size={120} fgColor="#4A0C0D" bgColor="#FBF4E2" level="M" /></div>
-              <div style={{ flex: 1, minWidth: 240 }}>
-                <div style={{ fontSize: 13.5, color: "var(--ink-2)", lineHeight: 1.5 }}>Put this <b>&ldquo;Rate us ★&rdquo;</b> QR on the bill or at the exit. Happy customers scan it and land on your Google review page.</div>
-                <div className="db-field" style={{ marginTop: 12 }}><label>Your Google review link</label><input value={reviewUrl} onChange={(e) => setReviewUrl(e.target.value)} placeholder="https://g.page/r/…/review" /></div>
-                <div className="db-togrow" style={{ borderTop: "1px solid var(--line)", marginTop: 4 }}>
-                  <div><div className="tt">Ask for a review after the bill</div><div className="ts">Show a &ldquo;Rate your experience ★★★★★&rdquo; prompt when the order is done.</div></div>
-                  <button className={`db-switch${reviewPrompt ? " on" : ""}`} onClick={() => setReviewPrompt((v) => !v)} />
+            {review ? (
+              <div className="db-pb" style={{ display: "flex", gap: 18, alignItems: "center", flexWrap: "wrap" }}>
+                <div className="tb-qbox" ref={reviewBox}><QRCodeCanvas value={review} size={480} style={{ width: 120, height: 120 }} fgColor="#2A1414" bgColor="#FFFFFF" level="M" marginSize={2} /></div>
+                <div style={{ flex: 1, minWidth: 240 }}>
+                  <div style={{ fontSize: 13.5, color: "var(--ink-2)", lineHeight: 1.5 }}>This QR is <b>already printed on every bill</b> and the link goes out with every WhatsApp bill. Download it for a table tent or the exit door too.</div>
+                  <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+                    <button className="db-btn prime" onClick={downloadReviewQr}>Download PNG</button>
+                    <a className="db-btn" href={review} target="_blank" rel="noopener noreferrer">Test link ↗</a>
+                    <Link className="db-btn" href="/settings#collect">Change link</Link>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="db-pb" style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: 240, fontSize: 13.5, color: "var(--ink-2)", lineHeight: 1.5 }}>
+                  {restaurant.google_review_url ? <>Asking for reviews is <b>turned off</b>. Turn it on in Settings to put a &ldquo;Rate us on Google&rdquo; QR on every bill.</>
+                    : <>Add your <b>Google review link</b> once — Parosa puts a &ldquo;Rate us on Google&rdquo; QR on every bill and the link in every WhatsApp bill.</>}
+                </div>
+                <Link className="db-btn prime" href="/settings#collect">{restaurant.google_review_url ? "Open Settings" : "Add review link"}</Link>
+              </div>
+            )}
           </div>
 
           {/* Table QRs */}

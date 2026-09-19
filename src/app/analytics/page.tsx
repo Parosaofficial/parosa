@@ -327,7 +327,7 @@ export default function Analytics() {
                     </div>
                     <div className="an-card">
                       <span className="ic">📲</span>
-                      <div><h4>Turn bills into reviews</h4><p>Add your Google review QR from Tables &amp; QR to every bill — happy guests leave 5-star reviews that bring new customers.</p><span className="tag">Do: add review QR</span></div>
+                      <div><h4>Turn bills into reviews</h4><p>Add your Google review link in Settings — Parosa prints a review QR on every bill — happy guests leave 5-star reviews that bring new customers.</p><span className="tag">Do: add review QR</span></div>
                     </div>
                   </div>
                 </>

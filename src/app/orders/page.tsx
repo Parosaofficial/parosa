@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { QRCodeSVG } from "qrcode.react";
 import { Sidebar } from "@/components/Sidebar";
 import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { AppLoading } from "@/components/AppLoading";
@@ -8,6 +10,7 @@ import { Dialog } from "@/components/Dialog";
 import { addItemToOrder, getMenu, listOrdersWithItems, markOrderPaid, type OrderWithItems } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
 import { buildBillText, billFileName, generateBillPdf } from "@/lib/bill";
+import { cleanUpi, isValidUpi, payNote, reviewLinkOf, upiLink } from "@/lib/upi";
 import type { Dish } from "@/lib/types";
 import "../dash.css";
 import "./orders.css";
@@ -41,6 +44,7 @@ export default function Orders() {
   const [pickSearch, setPickSearch] = useState("");
   const [waOpen, setWaOpen] = useState(false);
   const [printing, setPrinting] = useState(false);
+  const [showPay, setShowPay] = useState(false);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2600); };
 
@@ -74,8 +78,8 @@ export default function Orders() {
     return st && (!q || `${o.order_no} ${o.table_number}`.toLowerCase().includes(q.toLowerCase()));
   });
 
-  const doMarkPaid = async (id: string) => {
-    const method = payVia === "Online" ? "UPI" : "Cash";
+  const doMarkPaid = (id: string) => doMarkPaidAs(id, payVia === "Online" ? "UPI" : "Cash");
+  const doMarkPaidAs = async (id: string, method: string) => {
     await markOrderPaid(id, method);
     setOrders((os) => os.map((o) => (o.id === id ? { ...o, payment_status: "paid", payment_method: method } : o)));
     setBill((b) => (b && b.id === id ? { ...b, payment_status: "paid", payment_method: method } : b));
@@ -112,13 +116,18 @@ export default function Orders() {
     if (!bill || !restaurant || !number.replace(/\D/g, "")) { showToast("Enter a valid number"); return; }
     setWaOpen(false);
     try { const doc = await generateBillPdf(restaurant, bill); doc.save(billFileName(restaurant, bill)); } catch { /* still open chat */ }
-    window.open(waLink(number, buildBillText(restaurant, bill)), "_blank");
+    // The pay link must be https: WhatsApp never makes a upi:// link tappable.
+    const payUrl = `${window.location.origin}/pay/${bill.id}`;
+    window.open(waLink(number, buildBillText(restaurant, bill, { payUrl })), "_blank");
     showToast("WhatsApp opened — attach the downloaded bill PDF, then Send");
   };
 
   if (!ready || !restaurant) return <AppLoading label="Loading orders…" />;
 
   const billItems = bill ? aggregate(bill.items) : [];
+  const upiOk = !!restaurant.upi_id && isValidUpi(restaurant.upi_id);
+  // Derived from the live total, so adding an item re-draws the QR with the new amount.
+  const payLink = bill && upiOk ? upiLink({ upi: restaurant.upi_id!, name: restaurant.name, amount: bill.total, note: payNote(restaurant.name, bill.order_no, bill.table_number) }) : "";
   const availableDishes = dishes.filter((d) => d.available && (!pickSearch || d.name.toLowerCase().includes(pickSearch.toLowerCase())));
 
   return (
@@ -203,6 +212,21 @@ export default function Orders() {
               <div className="or-btot"><span>GST (5%)</span><span>₹{bill.gst}</span></div>
               <div className="or-btot grand"><span>Total</span><span>₹{bill.total}</span></div>
               <div className={`or-bstat ${bill.payment_status}`}>{bill.payment_status === "paid" ? `Paid · ${bill.payment_method}` : "Payment pending"}</div>
+              {bill.payment_status === "unpaid" && (payLink ? (
+                <div className="or-upi">
+                  <div className="or-upi-qr"><QRCodeSVG value={payLink} size={112} level="M" marginSize={1} fgColor="#2A1414" bgColor="#FFFFFF" /></div>
+                  <div className="or-upi-tx">
+                    <b>Scan to pay ₹{bill.total.toLocaleString("en-IN")}</b>
+                    <span>Any UPI app — the amount is already filled in. Money goes to <i>{cleanUpi(restaurant.upi_id!)}</i>.</span>
+                    <button onClick={() => setShowPay(true)}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3" /></svg>
+                      Show to customer
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <Link href="/settings#collect" className="or-upi-setup">＋ Add your UPI ID to show a scan-to-pay QR on every bill</Link>
+              ))}
             </div>
             <div className="or-bf">
               <div className="rowb">
@@ -251,10 +275,29 @@ export default function Orders() {
         )}
       </div>
 
+      {/* full-screen pay QR — turn the screen towards the guest */}
+      {showPay && bill && payLink && (
+        <div className="or-paysheet" onClick={(e) => { if (e.target === e.currentTarget) setShowPay(false); }}>
+          <div className="or-paycard">
+            <button className="or-bx" onClick={() => setShowPay(false)} aria-label="Close">×</button>
+            <RestaurantLogo restaurant={restaurant} size={48} />
+            <div className="pn">{restaurant.name}</div>
+            <div className="pm">Bill #{bill.order_no} · Table {bill.table_number}</div>
+            <div className="pa">₹{bill.total.toLocaleString("en-IN")}</div>
+            <div className="pq"><QRCodeSVG value={payLink} size={260} level="M" marginSize={2} fgColor="#2A1414" bgColor="#FFFFFF" /></div>
+            <div className="ph">Scan with GPay, PhonePe, Paytm or any UPI app</div>
+            <div className="pv">{cleanUpi(restaurant.upi_id!)}</div>
+            {bill.payment_status === "unpaid" ? (
+              <button className="pr" onClick={async () => { setPayVia("Online"); await doMarkPaidAs(bill.id, "UPI"); setShowPay(false); }}>✓ Payment received — mark paid</button>
+            ) : <div className="pd">Paid ✓</div>}
+          </div>
+        </div>
+      )}
+
       <Dialog
         open={waOpen}
         title="Send bill on WhatsApp"
-        message="Enter the customer's WhatsApp number. We'll download the bill PDF and open their chat with the bill details — just attach the PDF and hit Send."
+        message={`Enter the customer's WhatsApp number. We'll download the bill PDF and open their chat with the bill${upiOk && bill?.payment_status === "unpaid" ? ", a tap-to-pay UPI link" : ""}${reviewLinkOf(restaurant) ? " and your Google review link" : ""} — attach the PDF and hit Send.`}
         input
         placeholder="e.g. 98765 43210"
         defaultValue={bill?.customer_phone ?? ""}

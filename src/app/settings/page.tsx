@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
 import { Sidebar } from "@/components/Sidebar";
 import { AppLoading } from "@/components/AppLoading";
 import { deleteRestaurant, updateRestaurant, uploadPhoto } from "@/lib/db";
@@ -9,6 +10,7 @@ import { signOutOwner } from "@/lib/auth";
 import { useOwner } from "@/lib/useOwner";
 import { PLANS, planById } from "@/lib/plans";
 import { missingProfile } from "@/lib/profile";
+import { cleanUpi, isValidReviewUrl, isValidUpi, upiLink } from "@/lib/upi";
 import { Dialog } from "@/components/Dialog";
 import type { Hours } from "@/lib/types";
 import "../dash.css";
@@ -21,6 +23,7 @@ type Form = {
   name: string; name_hi: string; tagline: string; description: string;
   phone: string; whatsapp: string; address: string; city: string;
   gstin: string; fssai: string; hours: Hours;
+  upi_id: string; review_url: string; review_prompt: boolean;
 };
 
 export default function Settings() {
@@ -45,6 +48,8 @@ export default function Settings() {
       address: restaurant.address ?? "", city: restaurant.city ?? "",
       gstin: restaurant.gstin ?? "", fssai: restaurant.fssai ?? "",
       hours: restaurant.hours ?? defaultHours,
+      upi_id: restaurant.upi_id ?? "", review_url: restaurant.google_review_url ?? "",
+      review_prompt: restaurant.review_prompt !== false,
     });
     setLogo(restaurant.logo_url ?? "");
   }, [restaurant]);
@@ -61,8 +66,13 @@ export default function Settings() {
     if (file) { setLogo(URL.createObjectURL(file)); setLogoFile(file); }
   };
 
+  const upiBad = !!f.upi_id.trim() && !isValidUpi(f.upi_id);
+  const reviewBad = !!f.review_url.trim() && !isValidReviewUrl(f.review_url);
+
   const save = async () => {
     if (!f.name.trim()) { showToast("Restaurant name can't be empty"); return; }
+    if (upiBad) { showToast("That UPI ID doesn't look right — it should be like name@bank"); return; }
+    if (reviewBad) { showToast("Paste the Google review link that starts with https://"); return; }
     setBusy(true);
     try {
       let logo_url = restaurant.logo_url;
@@ -72,10 +82,17 @@ export default function Settings() {
         description: f.description.trim() || null, phone: f.phone.trim() || null, whatsapp: f.whatsapp.trim() || null,
         address: f.address.trim() || null, city: f.city.trim() || null, gstin: f.gstin.trim() || null,
         fssai: f.fssai.trim() || null, hours: f.hours, logo_url,
+        upi_id: f.upi_id.trim() ? cleanUpi(f.upi_id) : null,
       });
       setLogoFile(null);
+      // Saved separately so the rest of the profile still saves if the
+      // review columns (migration 0005) aren't in the database yet.
+      let reviewSaved = true;
+      try {
+        await updateRestaurant(restaurant.id, { google_review_url: f.review_url.trim() || null, review_prompt: f.review_prompt });
+      } catch { reviewSaved = false; }
       await reload();
-      showToast("Settings saved ✓");
+      showToast(reviewSaved ? "Settings saved ✓" : "Saved — but the review link needs the 0005 database update");
     } catch { showToast("Could not save — try again"); }
     finally { setBusy(false); }
   };
@@ -92,7 +109,7 @@ export default function Settings() {
     try {
       await deleteRestaurant(restaurant.id);
       await signOutOwner();
-      router.replace("/login?mode=create");
+      router.replace("/signup");
     } catch { setDelBusy(false); setDelOpen(false); showToast("Could not delete — try again"); }
   };
 
@@ -149,6 +166,51 @@ export default function Settings() {
                 <div className="db-field"><label>City</label><input type="text" value={f.city} onChange={(e) => set("city", e.target.value)} /></div>
                 <div className="db-field"><label>GSTIN</label><input type="text" value={f.gstin} onChange={(e) => set("gstin", e.target.value)} /></div>
                 <div className="db-field"><label>FSSAI</label><input type="text" value={f.fssai} onChange={(e) => set("fssai", e.target.value)} /></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="db-panel" id="collect">
+            <div className="db-ph"><h3>Get paid &amp; get reviews</h3><span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600 }}>Printed on every bill · sent on WhatsApp</span></div>
+            <div className="db-pb">
+              <div className="set-collect">
+                <div className="set-cf">
+                  <div className={`db-field${upiBad ? " bad" : ""}`}>
+                    <label>Your UPI ID <span className="set-lbl-note">· guests scan &amp; pay the exact bill</span></label>
+                    <input type="text" value={f.upi_id} placeholder="rajdarbar@okaxis" autoCapitalize="none" spellCheck={false} onChange={(e) => set("upi_id", e.target.value)} />
+                    {upiBad ? <div className="set-err">Should look like <b>name@bank</b> — e.g. rajdarbar@okaxis or 9876543210@ybl</div>
+                      : <div className="set-hint">Use a <b>business</b> UPI ID (free from GPay for Business, PhonePe Business or Paytm Business) — personal IDs can be limited by UPI apps. Money goes straight to your bank; Parosa never touches it.</div>}
+                  </div>
+                </div>
+                <div className="set-verify">
+                  {f.upi_id.trim() && !upiBad ? (
+                    <>
+                      <div className="q"><QRCodeSVG value={upiLink({ upi: f.upi_id, name: f.name || "Restaurant" })} size={104} level="M" marginSize={1} fgColor="#2A1414" bgColor="#FFFFFF" /></div>
+                      <div className="t"><b>Check before you go live</b>Scan with your own UPI app — it should show <i>your</i> name or business. Then just go back; don&apos;t pay.</div>
+                    </>
+                  ) : <div className="t muted">Enter your UPI ID to get a test QR — a wrong ID would send guests&apos; money to someone else.</div>}
+                </div>
+              </div>
+
+              <div className="set-collect" style={{ marginTop: 18 }}>
+                <div className="set-cf">
+                  <div className={`db-field${reviewBad ? " bad" : ""}`}>
+                    <label>Google review link</label>
+                    <input type="url" value={f.review_url} placeholder="https://g.page/r/…/review" autoCapitalize="none" spellCheck={false} onChange={(e) => set("review_url", e.target.value)} />
+                    {reviewBad ? <div className="set-err">Paste the full link from Google — it starts with https:// (g.page or maps.app.goo.gl)</div>
+                      : <div className="set-hint">Where to find it: open <b>Google Maps</b> or search your restaurant on Google → your Business Profile → <b>Ask for reviews</b> → <b>Copy link</b>.</div>}
+                  </div>
+                </div>
+                <div className="set-verify">
+                  {f.review_url.trim() && !reviewBad
+                    ? <a className="set-test" href={f.review_url.trim()} target="_blank" rel="noopener noreferrer">Test link ↗</a>
+                    : <div className="t muted">Paste your link, then test it opens your review box.</div>}
+                </div>
+              </div>
+
+              <div className="db-togrow" style={{ borderTop: "1px solid var(--line)", marginTop: 8 }}>
+                <div><div className="tt">Ask every guest for a Google review</div><div className="ts">Adds a &ldquo;Rate us on Google&rdquo; QR to printed bills, and the link to WhatsApp bills and the pay page. Google&apos;s rules: ask everyone, and never offer a discount for a review.</div></div>
+                <button className={`db-switch${f.review_prompt ? " on" : ""}`} onClick={() => set("review_prompt", !f.review_prompt)} aria-label="Ask for reviews" />
               </div>
             </div>
           </div>

@@ -1,0 +1,43 @@
+/* Parosa — guest pay page */
+.py-wrap {
+  --oxblood: #6E1618; --gold-hi: #F2D48A; --font-display: var(--font-rozha), Georgia, serif;
+  min-height: 100dvh; width: 100%; background: radial-gradient(120% 60% at 50% 0%, #FBF3E2 0%, #F3E7CF 100%);
+  display: flex; flex-direction: column; align-items: center; padding: 28px 16px 22px;
+  font-family: var(--font-mukta), system-ui, sans-serif; color: #2A1A14;
+}
+.py-card {
+  width: 100%; max-width: 420px; background: #FFFDF8; border: 1px solid #E8D9BC; border-radius: 26px;
+  padding: 26px 20px 22px; box-shadow: 0 26px 60px -34px rgba(94,17,19,.45);
+  display: flex; flex-direction: column; gap: 18px; animation: py-up .45s cubic-bezier(.2,.8,.25,1) both;
+}
+.py-center { align-items: center; text-align: center; padding: 42px 22px; }
+.py-head { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.py-name { font-family: var(--font-display); font-size: 25px; line-height: 1.1; color: #5C1A17; margin-top: 4px; }
+.py-meta { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #9A8062; }
+.py-amt { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 16px 0; border-top: 1px dashed #E6D3AF; border-bottom: 1px dashed #E6D3AF; }
+.py-amt .l { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #9A8062; }
+.py-amt .v { font-family: var(--font-archivo), system-ui, sans-serif; font-weight: 800; font-size: 40px; letter-spacing: -.02em; color: #2A1A14; }
+.py-paid { display: flex; align-items: center; gap: 12px; background: #E8F5EC; border: 1px solid #BFE3CB; color: #145C35; border-radius: 16px; padding: 14px 16px; }
+.py-paid .tick { width: 34px; height: 34px; flex: none; border-radius: 50%; background: #1E8049; color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 17px; }
+.py-paid b { display: block; font-size: 15px; }
+.py-paid span { font-size: 12.5px; opacity: .85; }
+.py-review {
+  display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;
+  background: #FFF8EA; border: 1px solid #EED9AE; border-radius: 16px; padding: 13px 14px; transition: transform .14s, border-color .15s;
+}
+.py-review:hover { border-color: #D9A441; }
+.py-review:active { transform: scale(.98); }
+.py-review .stars { color: #E3A21A; font-size: 15px; letter-spacing: 1px; flex: none; }
+.py-review .t { flex: 1; min-width: 0; display: flex; flex-direction: column; text-align: left; }
+.py-review b { font-size: 14px; }
+.py-review .t span { font-size: 12px; color: #8A7560; line-height: 1.35; }
+.py-review .go { font-size: 22px; color: #B07A16; flex: none; }
+.py-h { font-family: var(--font-display); font-size: 22px; color: #5C1A17; margin: 6px 0 0; }
+.py-p { font-size: 13.5px; line-height: 1.5; color: #7A6552; margin: 0; text-align: center; }
+.py-x { width: 46px; height: 46px; border-radius: 50%; background: #FCE8E4; color: #A3281E; display: grid; place-items: center; font-weight: 800; font-size: 22px; }
+.py-retry { margin-top: 6px; background: #6E1618; color: #FFF6E6; border: 0; border-radius: 100px; padding: 11px 22px; font-weight: 700; cursor: pointer; }
+.py-spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid #EAD9BA; border-top-color: #6E1618; animation: py-rot .8s linear infinite; }
+.py-foot { margin-top: 18px; font-size: 11.5px; color: #A08A6E; letter-spacing: .04em; }
+.py-foot b { color: #6E1618; }
+@keyframes py-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes py-rot { to { transform: rotate(360deg); } }

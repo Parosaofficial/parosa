@@ -1,0 +1,38 @@
+/* Parosa — guest scan-to-pay block. Picks up the menu template's tokens when
+   it sits inside a themed menu, and falls back to Parosa brand colours elsewhere. */
+.up {
+  --up-accent: var(--m-accent, #6E1618);
+  --up-accent-ink: var(--m-accent-ink, #FFF6E6);
+  --up-ink: var(--m-ink, #2A1A14);
+  --up-muted: var(--m-muted, #8A7560);
+  --up-line: var(--m-line, #E6D8BE);
+  --up-surface: var(--m-surface, #FFFFFF);
+  display: flex; flex-direction: column; gap: 10px; width: 100%; text-align: center;
+}
+.up-lbl { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--up-muted); }
+.up-btn {
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  background: var(--up-accent); color: var(--up-accent-ink); text-decoration: none;
+  font-weight: 800; font-size: 15.5px; padding: 15px 18px; border-radius: 100px;
+  box-shadow: 0 12px 26px -14px rgba(0,0,0,.55); transition: transform .14s;
+}
+.up-btn:active, .up-app:active { transform: scale(.96); }
+.up-mark { width: 20px; height: 20px; flex: none; }
+.up-apps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.up-app {
+  background: var(--up-accent); color: var(--up-accent-ink); text-decoration: none;
+  font-weight: 800; font-size: 14px; padding: 13px 6px; border-radius: 14px; transition: transform .14s;
+}
+.up-other { font-size: 13px; font-weight: 700; color: var(--up-accent); text-decoration: underline; text-underline-offset: 3px; }
+.up-toggle { background: none; border: 0; color: var(--up-muted); font-size: 12.5px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 2px; }
+.up-qr { align-self: center; background: #fff; border: 1px solid var(--up-line); border-radius: 18px; padding: 14px 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; animation: up-in .25s ease-out; }
+.up-qrcap { font-size: 11.5px; color: #6b5a4a; max-width: 190px; line-height: 1.35; text-wrap: balance; }
+.up-vpa {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  border: 1px dashed var(--up-line); border-radius: 12px; padding: 9px 10px 9px 13px;
+  font-size: 12.5px; color: var(--up-muted); text-align: left;
+}
+.up-vpa b { color: var(--up-ink); font-weight: 700; word-break: break-all; }
+.up-vpa button { flex: none; background: var(--up-surface); border: 1px solid var(--up-line); color: var(--up-ink); border-radius: 8px; font-size: 12px; font-weight: 700; padding: 6px 11px; cursor: pointer; }
+.up-note { font-size: 11.5px; color: var(--up-muted); margin: 0; line-height: 1.45; }
+@keyframes up-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
