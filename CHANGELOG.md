@@ -4,6 +4,13 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.12 — 19 Sep 2026
+- Phone-in-hand raised 24px so the whole phone — including its bottom menu bar
+  and bezel — is visible on the first screen of a ~760px-tall browser window
+  (on 1536-wide screens its bottom sat just below the window edge).
+- "For / Food Businesses" refitted inside the arch, left of the phone and above
+  the stand (slightly smaller), so nothing overlaps at any laptop size.
+
 ## v0.4.11 — 19 Sep 2026
 Hero text rhythm, phone position, solid feature strip.
 - Get Started / See Live Demo moved down 23px and the "No App Required · Setup in
