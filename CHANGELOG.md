@@ -4,6 +4,15 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.3 — 19 Sep 2026
+Hero corrections.
+- The semicircle arch behind the visuals is moved down, so it no longer rises
+  behind the header's Get Started button.
+- Script reads "For" on the first line and "Food Businesses" on the second.
+- Stand and phone restored to their v0.4.1 positions (v0.4.2 had moved the phone
+  over the stand); the phone is now the front-most layer.
+- The arrow under "Scan · Order · Enjoy" is nudged slightly left.
+
 ## v0.4.2 — 19 Sep 2026
 Header and hero alignment.
 - **Header**: logo left, Home / Features / Pricing / FAQ's centred, Login and

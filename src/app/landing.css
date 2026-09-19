@@ -73,7 +73,7 @@
     radial-gradient(60% 70% at 78% 30%, #F8E7D2 0%, transparent 60%),
     radial-gradient(40% 50% at 10% 90%, #F6E6D3 0%, transparent 70%),
     linear-gradient(180deg, #FBF3E8 0%, #F7EADB 100%); }
-.lp-arch { position: absolute; right: max(5%, calc((100vw - 1200px) / 2 + 10px)); top: 40px; width: min(430px, 34vw); height: 88%; border-radius: 220px 220px 0 0; background: linear-gradient(180deg, #F3DFC5 0%, #F1DCC0 60%, rgba(241,220,192,0) 100%); box-shadow: inset 18px 0 50px -30px rgba(160,100,50,.25); }
+.lp-arch { position: absolute; right: 5%; top: 150px; width: min(430px, 34vw); height: 88%; border-radius: 220px 220px 0 0; background: linear-gradient(180deg, #F3DFC5 0%, #F1DCC0 60%, rgba(241,220,192,0) 100%); box-shadow: inset 18px 0 50px -30px rgba(160,100,50,.25); }
 .lp-leaf { position: absolute; left: 40%; top: 0; width: 460px; height: 340px; opacity: .22; filter: blur(14px);
   background: radial-gradient(closest-side, rgba(150,95,50,.55), transparent), radial-gradient(closest-side at 70% 60%, rgba(150,95,50,.45), transparent); transform: rotate(-18deg); }
 .lp-herogrid { position: relative; display: grid; grid-template-columns: 1.02fr 1fr; align-items: center; gap: 20px; }
@@ -86,14 +86,14 @@
 .lp-visual { position: relative; height: 560px; }
 .lp-stand { position: absolute; left: 4%; bottom: 0; width: 330px; animation: lp-rise .9s .25s cubic-bezier(.2,.8,.2,1) both; filter: drop-shadow(0 28px 30px rgba(79,14,16,.18)); }
 .lp-stand img, .lp-phone img { width: 100%; height: auto; display: block; }
-.lp-phone { position: absolute; right: max(1%, calc((100vw - 1200px) / 2 - 60px)); bottom: 0; width: min(350px, 25vw); z-index: 2; animation: lp-phone-in 1s .4s cubic-bezier(.2,.8,.2,1) both;
+.lp-phone { position: absolute; right: 1%; bottom: 0; width: min(350px, 25vw); z-index: 5; /* front-most layer of the hero */ animation: lp-phone-in 1s .4s cubic-bezier(.2,.8,.2,1) both;
   /* the wrist is cut at the photo's bottom and right edges — fade both into the page instead of hard lines */
   -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent 100%), linear-gradient(to right, #000 84%, transparent 100%); -webkit-mask-composite: source-in;
   mask-image: linear-gradient(to bottom, #000 80%, transparent 100%), linear-gradient(to right, #000 84%, transparent 100%); mask-composite: intersect; }
 .lp-phone img { animation: lp-float 6s 1.4s ease-in-out infinite; transform-origin: 80% 100%; }
-.lp-script.s1 { position: absolute; right: 3%; top: -10px; font-size: 32px; line-height: .98; text-align: left; transform: rotate(-9deg); z-index: 1; /* under the phone (z 2) */ }
+.lp-script.s1 { position: absolute; right: 2%; top: 14px; white-space: nowrap; font-size: 32px; line-height: .98; text-align: left; transform: rotate(-9deg); z-index: 1; /* under the phone (z 2) */ }
 .lp-script.s2 { position: absolute; left: -76px; top: 36%; font-size: 26px; transform: rotate(-10deg); }
-.lp-curl { position: absolute; left: -26px; top: calc(36% + 104px); width: 66px; color: var(--maroon); opacity: .9; z-index: 3; }
+.lp-curl { position: absolute; left: -48px; top: calc(36% + 104px); width: 66px; color: var(--maroon); opacity: .9; z-index: 3; }
 
 /* ---------- feature strip ---------- */
 .lp-strip { background: #FFF9F1; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); position: relative; z-index: 4; }
