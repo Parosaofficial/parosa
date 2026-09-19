@@ -211,7 +211,7 @@ export function Landing({ fontClass }: { fontClass: string }) {
             <span className="lp-script s2">Scan<br />Order<br />Enjoy</span>
             {/* hand-drawn arrow from "Scan · Order · Enjoy" sweeping right into the stand */}
             <svg className="lp-curl" viewBox="0 0 80 50" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 4c-3 20 9 34 32 34 11 0 21-3 30-8" /><path d="M61 24l10 6-8 8" /></svg>
-            <div className="lp-stand"><Image src="/landing/stand.webp" alt="" width={968} height={1423} priority sizes="(max-width: 900px) 46vw, 330px" /></div>
+            <div className="lp-stand"><Image src="/landing/stand.webp" alt="" width={888} height={1313} priority sizes="(max-width: 900px) 44vw, 304px" /></div>
           </div>
         </div>
         <div className="lp-phone" aria-hidden="true"><Image src="/landing/phone.webp" alt="" width={957} height={1422} priority sizes="(max-width: 900px) 52vw, 420px" /></div>

@@ -4,6 +4,15 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.5 — 19 Sep 2026
+QR stand shadow fix.
+- The stand image carried the photo's grey studio haze and cast shadow, which
+  showed as a grey box beside the stand with a hard edge, and the stand floated
+  38px above that shadow. Re-cut the stand cleanly (no background at all).
+- One soft contact shadow now sits directly under the stand's base; the old
+  offset drop-shadow is removed.
+- The stand stays in exactly the same place as before (within 1–2px).
+
 ## v0.4.4 — 19 Sep 2026
 Arch and script placement.
 - The semicircle arch now sits directly under the header's Login / Get Started

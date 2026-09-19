@@ -84,7 +84,11 @@
 .lp-ticks svg { color: var(--maroon); flex: none; }
 
 .lp-visual { position: relative; height: 560px; }
-.lp-stand { position: absolute; left: 4%; bottom: 0; width: 330px; animation: lp-rise .9s .25s cubic-bezier(.2,.8,.2,1) both; filter: drop-shadow(0 28px 30px rgba(79,14,16,.18)); }
+.lp-stand { position: absolute; left: calc(4% + 23px); bottom: 37px; width: 304px; /* same spot as the original stand; the image is now cropped to the stand itself */
+  animation: lp-rise .9s .25s cubic-bezier(.2,.8,.2,1) both; filter: drop-shadow(0 6px 10px rgba(79,14,16,.16)); }
+/* contact shadow, exactly under the stand's base */
+.lp-stand::after { content: ""; position: absolute; left: 4%; right: -3%; bottom: -14px; height: 30px; z-index: -1; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(70,30,15,.38), rgba(70,30,15,.14) 60%, transparent); filter: blur(4px); }
 .lp-stand img, .lp-phone img { width: 100%; height: auto; display: block; }
 .lp-phone { position: absolute; right: 1%; bottom: 0; width: min(350px, 25vw); z-index: 5; /* front-most layer of the hero */ animation: lp-phone-in 1s .4s cubic-bezier(.2,.8,.2,1) both;
   /* the wrist is cut at the photo's bottom and right edges — fade both into the page instead of hard lines */
@@ -279,7 +283,7 @@
   .lp-copy { padding-bottom: 0; }
   .lp-arch { right: -10%; top: auto; bottom: 0; width: 70vw; height: 39%; }
   .lp-visual { height: min(84vw, 420px); margin-top: 26px; }
-  .lp-stand { width: 48vw; max-width: 300px; left: 2%; }
+  .lp-stand { width: 44vw; max-width: 276px; left: calc(2% + 3.3vw); bottom: 5vw; }
   .lp-phone { width: 52vw; max-width: 330px; }
   .lp-script.s1 { font-size: 19px; top: 8px; left: 44%; }
 
