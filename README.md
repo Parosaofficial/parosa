@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Parosa — परोसा
 
-## Getting Started
+Bilingual QR menus, ordering and billing for Indian restaurants and dhabas.
+Next.js (App Router) + Supabase (Auth, Postgres with RLS, Realtime, Storage).
 
-First, run the development server:
+## Run it locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # then fill in the two Supabase values
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env.local` needs the project URL and the **anon (public)** key from
+Supabase → Project Settings → API. Never put the `service_role` key in this app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Pages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| URL | What it is |
+|---|---|
+| `/` | Landing page |
+| `/login` · `/login/staff` | Owner sign-in · staff sign-in (phone + daily code) |
+| `/signup` → `/signup/details` → `/signup/licences` → `/signup/plan` | Create a restaurant, one URL per step |
+| `/dashboard` `/menu-editor` `/tables` `/orders` `/customers` `/staff` `/analytics` `/templates` `/payments` `/settings` | Owner dashboard |
+| `/pos` | Staff order-taking |
+| `/<restaurant>/menu/<table>` | The guest menu a table's QR opens |
+| `/pay/<order id>` | Guest pay page linked from the WhatsApp bill |
+| `/terms` · `/privacy` | Legal |
 
-## Learn More
+Aliases: `/template` → `/templates`, `/register` → `/signup`, `/staff-login` → `/login/staff`.
 
-To learn more about Next.js, take a look at the following resources:
+## Database (Supabase)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Schema changes live in `supabase/migrations/` and run in order (`0001` → latest).
+The CLI is configured in `supabase/config.toml`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+supabase login                                   # once per machine
+supabase link --project-ref cyyyrunhjwnadjnsrtog # once per clone
+supabase migration new <name>                    # write the SQL in the new file
+supabase db push                                 # apply pending migrations to the live project
+supabase migration list                          # local vs live, should match
+```
 
-## Deploy on Vercel
+`supabase/seed.sql` holds the Raj Darbar demo restaurant (only for a fresh project).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Security model, in short: menus are public to read; everything else is scoped to
+the signed-in owner (`restaurants.owner_id = auth.uid()`); guests can only
+*insert* orders; staff act through validated `SECURITY DEFINER` functions; photo
+uploads require sign-in and only the uploader can replace or delete a file.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy
+
+Vercel: import this repo, set the two `NEXT_PUBLIC_SUPABASE_*` variables, deploy.
+Then add the production domain to Supabase → Authentication → URL Configuration
+(Site URL + redirect URLs).

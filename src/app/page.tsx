@@ -64,7 +64,7 @@ export default function Landing() {
         </nav>
         <div className="pw-navcta">
           <Link href="/login" className="pw-btn ghost">Login</Link>
-          <Link href="/login?mode=create" className="pw-btn solid">Get started <span className="ar">→</span></Link>
+          <Link href="/signup" className="pw-btn solid">Get started <span className="ar">→</span></Link>
         </div>
       </header>
 
@@ -76,7 +76,7 @@ export default function Landing() {
           <div className="pw-rule" />
           <p>Guests scan a QR, browse your bilingual menu and order. You hear the bell instantly and send the bill on WhatsApp. No app for guests, no hardware, <strong>0% commission</strong>.</p>
           <div className="pw-hero-btns">
-            <Link href="/login?mode=create" className="pw-btn gold wide">Start your restaurant <span>→</span></Link>
+            <Link href="/signup" className="pw-btn gold wide">Start your restaurant <span>→</span></Link>
             <a href="#pricing" className="pw-btn outline">See pricing</a>
           </div>
           <div className="pw-hero-facts"><span>From ₹99 / month</span><span className="dev">हिंदी + English</span><span>Live in minutes</span></div>
@@ -150,7 +150,7 @@ export default function Landing() {
               <div className="price"><span className="amt">₹{yearly ? p.y : p.m}</span><span className="per">/mo</span><div className="billed">{yearly ? "billed yearly" : "billed monthly"}</div></div>
               <p className="tag">{p.tag}</p>
               <div className="items">{p.items.map((it) => (<div className="it" key={it}><span className="dia" />{it}</div>))}</div>
-              <Link href="/login?mode=create" className="choose"><span>Choose {p.name}</span><span>→</span></Link>
+              <Link href="/signup" className="choose"><span>Choose {p.name}</span><span>→</span></Link>
             </div>
           ))}
         </div>
@@ -181,7 +181,7 @@ export default function Landing() {
           <div className="wm dev">परोसा</div>
           <h2>Give your tables a smarter menu today.</h2>
           <p>Set up in minutes, print your QR codes, and take your first scan-to-order this week.</p>
-          <Link href="/login?mode=create" className="pw-btn gold wide">Create your restaurant <span>→</span></Link>
+          <Link href="/signup" className="pw-btn gold wide">Create your restaurant <span>→</span></Link>
         </div>
       </section>
 
@@ -193,7 +193,7 @@ export default function Landing() {
           <div className="scan">SCAN · SERVE · SAVOUR</div>
         </div>
         <div className="col"><h4>Product</h4><a href="#features">Features</a><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div>
-        <div className="col"><h4>Company</h4><Link href="/login?mode=create">Get started</Link><Link href="/login">Login</Link><a href="mailto:sahustartup@gmail.com">Contact</a></div>
+        <div className="col"><h4>Company</h4><Link href="/signup">Get started</Link><Link href="/login">Login</Link><a href="mailto:sahustartup@gmail.com">Contact</a></div>
         <div className="col"><h4>Legal</h4><Link href="/terms">Terms of Service</Link><Link href="/privacy">Privacy Policy</Link></div>
         <div className="copy">© {new Date().getFullYear()} Parosa. All rights reserved.</div>
       </footer>

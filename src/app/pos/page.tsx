@@ -82,7 +82,7 @@ export default function POS() {
   };
 
   const newOrder = () => { setDoneNo(null); setCart({}); setTable(""); setPhone(""); setCustName(""); setSearch(""); };
-  const logout = () => { clearStaffSession(); router.replace("/login?staff=1"); };
+  const logout = () => { clearStaffSession(); router.replace("/login/staff"); };
 
   if (!ready || !staff) return <AppLoading label="Opening POS…" />;
 

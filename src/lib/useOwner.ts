@@ -23,7 +23,7 @@ export function useOwner() {
     }
     const r = await getRestaurantByOwner(uid);
     if (!r) {
-      router.replace("/login?mode=create");
+      router.replace("/signup");
       return;
     }
     setRestaurant(r);

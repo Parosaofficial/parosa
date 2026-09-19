@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LegalShell } from "@/components/LegalShell";
 
-export const metadata: Metadata = { title: "Privacy Policy — Parosa" };
+export const metadata: Metadata = { title: "Privacy Policy" };
 
 export default function Privacy() {
   return (

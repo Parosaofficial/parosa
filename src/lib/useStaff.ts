@@ -23,7 +23,7 @@ export function useStaff() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     const s = readStaffSession();
-    if (!s) { router.replace("/login?staff=1"); return; }
+    if (!s) { router.replace("/login/staff"); return; }
     setStaff(s);
     setReady(true);
   }, [router]);

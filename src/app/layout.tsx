@@ -36,7 +36,8 @@ const notoDev = Noto_Serif_Devanagari({
 });
 
 export const metadata: Metadata = {
-  title: "Parosa — QR Menu",
+  // Each page sets its own title; the tab reads e.g. "Orders & Bills · Parosa".
+  title: { default: "Parosa — QR menus & billing for Indian restaurants", template: "%s · Parosa" },
   description:
     "स्वाद में देसीपन, मेन्यू में पहचान — the QR menu with a heritage heart.",
 };
