@@ -90,9 +90,9 @@
   /* the wrist is cut at the photo's edge — fade it into the page instead of a hard line */
   -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%); mask-image: linear-gradient(to bottom, #000 82%, transparent 100%); }
 .lp-phone img { animation: lp-float 6s 1.4s ease-in-out infinite; transform-origin: 80% 100%; }
-.lp-script.s1 { position: absolute; right: -4px; top: -4px; font-size: 34px; transform: rotate(-12deg); z-index: 3; }
+.lp-script.s1 { position: absolute; right: 13%; top: -18px; font-size: 34px; line-height: 1; text-align: left; transform: rotate(-9deg); z-index: 3; }
 .lp-script.s2 { position: absolute; left: -76px; top: 36%; font-size: 26px; transform: rotate(-10deg); }
-.lp-curl { position: absolute; left: -58px; top: calc(36% + 86px); width: 34px; color: var(--maroon); opacity: .8; }
+.lp-curl { position: absolute; left: -42px; top: calc(36% + 88px); width: 118px; color: var(--maroon); opacity: .85; z-index: 3; }
 
 /* ---------- feature strip ---------- */
 .lp-strip { background: #FFF9F1; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); position: relative; z-index: 4; }

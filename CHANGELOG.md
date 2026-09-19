@@ -4,6 +4,13 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.1 — 19 Sep 2026
+Hero fixes.
+- The script beside the phone now reads "For Food Businesses" (was "Good Food
+  More People") and sits further left, above the gap between stand and phone.
+- The arrow under "Scan · Order · Enjoy" is redrawn to sweep right and point
+  into the QR stand (it used to curl downward).
+
 ## v0.4.0 — 19 Sep 2026
 Pricing and FAQ redesign.
 - **Pricing**: side text removed — centred "Simple, Transparent Pricing" heading,

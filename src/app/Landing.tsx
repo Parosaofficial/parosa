@@ -209,9 +209,10 @@ export function Landing({ fontClass }: { fontClass: string }) {
           </div>
 
           <div className="lp-visual" aria-hidden="true">
-            <span className="lp-script s1">Good<br />Food<br />More People</span>
+            <span className="lp-script s1">For<br />Food Businesses</span>
             <span className="lp-script s2">Scan<br />Order<br />Enjoy</span>
-            <svg className="lp-curl" viewBox="0 0 60 70" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M8 4c18 8 26 26 20 44-3 9-8 13-14 12" /><path d="M8 52l6 8 8-5" /></svg>
+            {/* hand-drawn arrow from "Scan · Order · Enjoy" sweeping right into the stand */}
+            <svg className="lp-curl" viewBox="0 0 120 70" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M10 4c-6 30 14 52 50 52 16 0 30-4 44-10" /><path d="M92 38l13 8-11 11" /></svg>
             <div className="lp-stand"><Image src="/landing/stand.webp" alt="" width={968} height={1423} priority sizes="(max-width: 900px) 46vw, 330px" /></div>
           </div>
         </div>
