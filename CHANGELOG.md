@@ -4,6 +4,17 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.2 — 19 Sep 2026
+Header and hero alignment.
+- **Header**: logo left, Home / Features / Pricing / FAQ's centred, Login and
+  Get Started right. The "For Food Businesses" script in the header is removed.
+- **Hero script**: stacked "For / Food / Businesses", placed behind the phone
+  layer and above it, clear of the header buttons at every screen width.
+- **Arrow** under "Scan · Order · Enjoy": smaller, with a gap under the words
+  and before the stand, so it reads as a pointer.
+- On wide screens (1920px) the phone and arch now stay with the page content,
+  so the phone overlaps the stand instead of drifting to the screen edge.
+
 ## v0.4.1 — 19 Sep 2026
 Hero fixes.
 - The script beside the phone now reads "For Food Businesses" (was "Good Food

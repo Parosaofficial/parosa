@@ -175,7 +175,6 @@ export function Landing({ fontClass }: { fontClass: string }) {
             <Link href="/login" className="lp-btn ghost sm">Login</Link>
             <Link href="/signup" className="lp-btn sm">Get Started</Link>
           </div>
-          <span className="lp-for">For<br />Food Businesses</span>
           <button className={`lp-burger${menuOpen ? " x" : ""}`} onClick={() => setMenuOpen((v) => !v)} aria-label="Menu" aria-expanded={menuOpen}><span /><span /><span /></button>
         </div>
       </header>
@@ -209,10 +208,10 @@ export function Landing({ fontClass }: { fontClass: string }) {
           </div>
 
           <div className="lp-visual" aria-hidden="true">
-            <span className="lp-script s1">For<br />Food Businesses</span>
+            <span className="lp-script s1">For<br />Food<br />Businesses</span>
             <span className="lp-script s2">Scan<br />Order<br />Enjoy</span>
             {/* hand-drawn arrow from "Scan · Order · Enjoy" sweeping right into the stand */}
-            <svg className="lp-curl" viewBox="0 0 120 70" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M10 4c-6 30 14 52 50 52 16 0 30-4 44-10" /><path d="M92 38l13 8-11 11" /></svg>
+            <svg className="lp-curl" viewBox="0 0 80 50" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 4c-3 20 9 34 32 34 11 0 21-3 30-8" /><path d="M61 24l10 6-8 8" /></svg>
             <div className="lp-stand"><Image src="/landing/stand.webp" alt="" width={968} height={1423} priority sizes="(max-width: 900px) 46vw, 330px" /></div>
           </div>
         </div>
