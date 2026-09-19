@@ -4,6 +4,15 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.6 — 19 Sep 2026
+Hero spacing.
+- A constant 44px gap between the QR stand and the phone at every desktop width
+  (the phone is now positioned from the stand's edge, not the screen's edge, and
+  scales down a little on narrower laptops so it always fits). ~17px on phones.
+- Semicircle moved slightly up (38px below the header buttons, was 55px).
+- Left-side headline and text moved up slightly (44px).
+- QR stand unchanged on the 1536px screen.
+
 ## v0.4.5 — 19 Sep 2026
 QR stand shadow fix.
 - The stand image carried the photo's grey studio haze and cast shadow, which

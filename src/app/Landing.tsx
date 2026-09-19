@@ -214,7 +214,7 @@ export function Landing({ fontClass }: { fontClass: string }) {
             <div className="lp-stand"><Image src="/landing/stand.webp" alt="" width={888} height={1313} priority sizes="(max-width: 900px) 44vw, 304px" /></div>
           </div>
         </div>
-        <div className="lp-phone" aria-hidden="true"><Image src="/landing/phone.webp" alt="" width={957} height={1422} priority sizes="(max-width: 900px) 52vw, 420px" /></div>
+        <div className="lp-phone" aria-hidden="true"><Image src="/landing/phone.webp" alt="" width={957} height={1422} priority sizes="(max-width: 900px) 46vw, 350px" /></div>
       </section>
 
       {/* ---------------- feature strip ---------------- */}
