@@ -4,6 +4,14 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.7 — 19 Sep 2026
+Hero corrections.
+- QR stand moved 30px to the left.
+- Phone-in-hand restored to its original size (350px) — v0.4.6 had shrunk it on
+  narrower screens; the 44px gap to the stand is kept.
+- Smaller arrow under "Scan · Order · Enjoy" (46px, was 66px), still pointing
+  at the stand.
+
 ## v0.4.6 — 19 Sep 2026
 Hero spacing.
 - A constant 44px gap between the QR stand and the phone at every desktop width
