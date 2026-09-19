@@ -4,6 +4,15 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.4 — 19 Sep 2026
+Arch and script placement.
+- The semicircle arch now sits directly under the header's Login / Get Started
+  (its right edge lines up with Get Started) with a 55px gap below them.
+- "For / Food Businesses" is placed inside the arch's crown — fully within the
+  curve and clear of the stand and the phone (checked at 1280, 1536, 1920 px
+  and on phones).
+- The QR stand is unchanged — same position as the first release.
+
 ## v0.4.3 — 19 Sep 2026
 Hero corrections.
 - The semicircle arch behind the visuals is moved down, so it no longer rises

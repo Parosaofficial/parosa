@@ -181,7 +181,7 @@ export function Landing({ fontClass }: { fontClass: string }) {
 
       {/* ---------------- hero ---------------- */}
       <section className="lp-hero" id="home">
-        <div className="lp-arch" aria-hidden="true" />
+        <div className="lp-arch" aria-hidden="true"><span className="lp-script s1">For<br />Food Businesses</span></div>
         <div className="lp-leaf" aria-hidden="true" />
         <div className="lp-wrap lp-herogrid">
           <div className="lp-copy">
@@ -208,7 +208,6 @@ export function Landing({ fontClass }: { fontClass: string }) {
           </div>
 
           <div className="lp-visual" aria-hidden="true">
-            <span className="lp-script s1">For<br />Food Businesses</span>
             <span className="lp-script s2">Scan<br />Order<br />Enjoy</span>
             {/* hand-drawn arrow from "Scan · Order · Enjoy" sweeping right into the stand */}
             <svg className="lp-curl" viewBox="0 0 80 50" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 4c-3 20 9 34 32 34 11 0 21-3 30-8" /><path d="M61 24l10 6-8 8" /></svg>
