@@ -4,6 +4,16 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.8 — 19 Sep 2026
+Phone on the top layer.
+- The phone-in-hand image is now the top layer of the page (above the arch,
+  scripts, stand and the feature strip); only the sticky header stays above it,
+  so the menu is never covered while scrolling.
+- It is no longer clipped at the bottom of the hero: it comes down 22px over the
+  feature strip's empty top edge (no strip content is covered).
+- The long bottom fade is replaced by a short one at the photo's cut wrist edge,
+  so the phone looks crisp and in front.
+
 ## v0.4.7 — 19 Sep 2026
 Hero corrections.
 - QR stand moved 30px to the left.
