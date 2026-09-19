@@ -286,11 +286,10 @@ export function Landing({ fontClass }: { fontClass: string }) {
 
       {/* ---------------- pricing ---------------- */}
       <section className="lp-sec lp-pricing" id="pricing">
-        <div className="lp-wrap lp-pricein">
-          <div className="lp-pricecopy" data-reveal>
-            <div className="lp-eyebrow bar">Pricing</div>
-            <h2 className="lp-h2">Simple, Transparent<br />Pricing</h2>
-            <p className="lp-sub">Choose a plan that fits your business. No hidden charges, and 0% commission on every plan.</p>
+        <div className="lp-wrap">
+          <div className="lp-center" data-reveal>
+            <div className="lp-eyebrow">Pricing</div>
+            <h2 className="lp-h2">Simple, Transparent Pricing</h2>
           </div>
           <div className="lp-pricebox">
             <div className="lp-toggle" role="tablist" aria-label="Billing period">
@@ -320,16 +319,15 @@ export function Landing({ fontClass }: { fontClass: string }) {
 
       {/* ---------------- FAQ ---------------- */}
       <section className="lp-sec lp-faq" id="faq">
-        <div className="lp-wrap lp-faqin">
-          <div data-reveal>
-            <div className="lp-eyebrow bar">FAQ&apos;s</div>
-            <h2 className="lp-h2">Questions,<br />Answered.</h2>
-            <p className="lp-sub">Anything else? <a href={SALES_MAIL} target="_blank" rel="noopener">Write to us</a> — we reply within a day.</p>
+        <div className="lp-wrap">
+          <div className="lp-center" data-reveal>
+            <div className="lp-eyebrow">FAQ&apos;s</div>
+            <h2 className="lp-h2">Frequently Asked Questions</h2>
           </div>
           <div className="lp-qs">
             {FAQS.map((f, i) => (
               <div key={f.q} className={`lp-q${faq === i ? " open" : ""}`}>
-                <button onClick={() => setFaq(faq === i ? null : i)} aria-expanded={faq === i}>{f.q}<span className="pm" aria-hidden="true" /></button>
+                <button onClick={() => setFaq(faq === i ? null : i)} aria-expanded={faq === i}><span><span className="qn">{String(i + 1).padStart(2, "0")}</span>{f.q}</span><span className="pm" aria-hidden="true" /></button>
                 <div className="ans"><div><p>{f.a}</p></div></div>
               </div>
             ))}

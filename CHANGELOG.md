@@ -4,6 +4,14 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.0 — 19 Sep 2026
+Pricing and FAQ redesign.
+- **Pricing**: side text removed — centred "Simple, Transparent Pricing" heading,
+  then the Monthly/Yearly switch, then the three plans.
+- **FAQ's**: centred "Frequently Asked Questions" heading only (extra line removed);
+  numbered questions with answers on a deep maroon background with a faint gold
+  jaali pattern; the open question is highlighted in gold.
+
 ## v0.3.0 — 19 Sep 2026
 Landing page refinements.
 - **How it works** is now scroll-driven: the section pins in place and scrolling
