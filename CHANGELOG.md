@@ -4,6 +4,11 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.14 — 22 Sep 2026
+- "Owner / Staff" tabs and "Welcome back" now use Mukta — the same font as
+  "Restaurant Partner Portal" (v0.4.13's Playfair is dropped from the login).
+- Pricing amounts on the homepage (₹99 / ₹299 / ₹499) use the same font.
+
 ## v0.4.13 — 22 Sep 2026
 Login page.
 - The whole sign-in view now fits one screen (no scrolling) down to ~700px-tall

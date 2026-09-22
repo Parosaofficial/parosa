@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, type ChangeEvent } from "react";
-import { Playfair_Display } from "next/font/google";
 import { usePathname, useRouter } from "next/navigation";
 import { Seal } from "@/components/Logo";
 import { authMessage, getCurrentUserId, signIn, signUpOwner } from "@/lib/auth";
@@ -9,9 +8,6 @@ import { createRestaurant, generateUniqueSlug, getRestaurantByOwner, staffLogin,
 import { saveStaffSession } from "@/lib/useStaff";
 import { PLANS } from "@/lib/plans";
 import "./login.css";
-
-// headings + Owner/Staff tabs (Rozha One's Latin letters read too heavy here)
-const serif = Playfair_Display({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-lg-serif", display: "swap" });
 
 function MailIcon() {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>;
@@ -248,7 +244,7 @@ export default function AuthScreen() {
 
   if (checking) {
     return (
-      <div className={`lg-page ${serif.variable}`}>
+      <div className="lg-page">
         <div className="lg-card" style={{ display: "grid", placeItems: "center", minHeight: 320 }}>
           <div style={{ textAlign: "center" }}>
             <Seal size={58} />
@@ -261,7 +257,7 @@ export default function AuthScreen() {
   }
 
   return (
-    <div className={`lg-page ${serif.variable}`}>
+    <div className="lg-page">
       <Bloom className="lg-bloom tl" />
       <Bloom className="lg-bloom r" />
       <Bloom className="lg-bloom bl" />
