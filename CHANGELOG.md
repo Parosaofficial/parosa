@@ -4,6 +4,11 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.15 — 22 Sep 2026
+- No scrollbar inside the app's own panels. The sidebar menu (and the
+  notifications list, order picker and bill dialogs) still scroll with the
+  wheel, trackpad, touch and keyboard, but no bar is drawn.
+
 ## v0.4.14 — 22 Sep 2026
 - "Owner / Staff" tabs and "Welcome back" now use Mukta — the same font as
   "Restaurant Partner Portal" (v0.4.13's Playfair is dropped from the login).

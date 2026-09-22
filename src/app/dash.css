@@ -104,3 +104,8 @@
 .db-rule .ln{height:1px;background:linear-gradient(90deg,var(--gold-soft),transparent);flex:1}
 .db-rule .t{font-family:var(--font-caps);font-size:11px;letter-spacing:.16em;color:var(--maroon);text-transform:uppercase}
 .db-navwarn{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#e0362e;color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;line-height:1;box-shadow:0 0 0 3px #e0362e33}
+
+/* In-app scroll areas scroll normally (wheel, trackpad, touch, keyboard) but
+   don't paint a scrollbar — the bar looked out of place inside the sidebar. */
+.db-side,.db-nav,.db-notif-list,.ed-clist,.or-pk-list,.or-paycard,.or-backdrop,.ed-backdrop{scrollbar-width:none;-ms-overflow-style:none}
+.db-side::-webkit-scrollbar,.db-nav::-webkit-scrollbar,.db-notif-list::-webkit-scrollbar,.ed-clist::-webkit-scrollbar,.or-pk-list::-webkit-scrollbar,.or-paycard::-webkit-scrollbar,.or-backdrop::-webkit-scrollbar,.ed-backdrop::-webkit-scrollbar{width:0;height:0;display:none}
