@@ -4,6 +4,21 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.16 — 22 Sep 2026
+Customers page rebuilt.
+- **Bug**: the page used .or-stat / .or-search from the Orders stylesheet without
+  importing it, so the stat cards rendered as bare text and the search icon blew
+  up to a giant magnifier. Customers now has its own complete stylesheet.
+- Four stat cards: customers, repeat rate, lifetime collected, average per customer.
+- Filter tabs (All / Regular / Repeat / New) with counts, search, and sort by
+  recent visit, highest spend or most visits.
+- Customer cards with a coloured initials avatar, tier badge, favourite dish,
+  visits, spend (and any unpaid amount) and "3 days ago" style last visit.
+- Expanding a customer shows WhatsApp and Call buttons, first-visit date and the
+  full order history (items, table, staff/QR, amount, payment).
+- Export CSV of the current list; friendlier empty and no-results states;
+  responsive down to phones.
+
 ## v0.4.15 — 22 Sep 2026
 - No scrollbar inside the app's own panels. The sidebar menu (and the
   notifications list, order picker and bill dialogs) still scroll with the
