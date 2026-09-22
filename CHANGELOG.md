@@ -4,6 +4,15 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.13 — 22 Sep 2026
+Login page.
+- The whole sign-in view now fits one screen (no scrolling) down to ~700px-tall
+  windows and on phones — the "By continuing you agree to…" line included.
+  Tighter logo, spacing and field sizes; the card is centred safely so the long
+  signup steps still scroll normally with their top reachable.
+- "Owner / Staff" tabs and "Welcome back" now use Playfair Display instead of
+  Rozha One, whose Latin letters read too heavy (same serif as the landing page).
+
 ## v0.4.12 — 19 Sep 2026
 - Phone-in-hand raised 24px so the whole phone — including its bottom menu bar
   and bezel — is visible on the first screen of a ~760px-tall browser window
