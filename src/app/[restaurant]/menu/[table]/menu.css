@@ -251,3 +251,120 @@
 [data-tpl="virasat"] .pm-pill { font-weight: 400; font-size: 15px; border-radius: 8px; }
 [data-tpl="virasat"] .pm-add, [data-tpl="virasat"] .pm-stepper, [data-tpl="virasat"] .pm-cartbar, [data-tpl="virasat"] .pm-cartbar .go, [data-tpl="virasat"] .pm-place { border-radius: 10px; }
 [data-tpl="virasat"] .pm-cartbar { border-radius: 14px; }
+
+/* ============================================================
+   TEMPLATE 0 — PAROSA · our own design
+   Centred brand header with search + cart, "All" pill, photo cards,
+   "Our Specialties" intro and a closing India banner.
+   ============================================================ */
+/* the extra pieces belong to this design only */
+.pm-cartbtn, .pm-intro, .pm-banner, .pm-all { display: none; }
+
+[data-tpl="parosa"] .pm-top { background: color-mix(in srgb, var(--m-bg) 92%, transparent); }
+[data-tpl="parosa"] .pm-head { display: grid; grid-template-columns: 48px 1fr auto auto; align-items: center; gap: 10px; padding: 14px 16px 10px; }
+[data-tpl="parosa"] .pm-id { text-align: center; }
+[data-tpl="parosa"] .pm-id .rn { font-size: 21px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--m-chrome); }
+[data-tpl="parosa"] .pm-id .tb { font-size: 9px; letter-spacing: .3em; margin-top: 4px; color: var(--m-muted); }
+[data-tpl="parosa"] .pm-vsw { display: none; }                 /* icons only, like the design */
+[data-tpl="parosa"] .pm-icon { border: none; background: transparent; width: 32px; height: 32px; color: var(--m-chrome); }
+[data-tpl="parosa"] .pm-icon svg { width: 21px; height: 21px; }
+[data-tpl="parosa"] .pm-cartbtn { display: grid; place-items: center; position: relative; width: 34px; height: 34px; border: none; background: transparent; color: var(--m-chrome); cursor: pointer; }
+[data-tpl="parosa"] .pm-cartbtn svg { width: 23px; height: 23px; }
+[data-tpl="parosa"] .pm-cartbtn .n { position: absolute; top: -2px; right: -3px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 100px; background: #E23B2E; color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; box-shadow: 0 2px 6px -1px rgba(0,0,0,.35); }
+
+[data-tpl="parosa"] .pm-rail { padding: 6px 16px 14px; gap: 9px; }
+[data-tpl="parosa"] .pm-all { display: inline-flex; }
+[data-tpl="parosa"] .pm-pill { font-family: var(--m-font-body); font-weight: 600; font-size: 13.5px; padding: 10px 18px; border-radius: 100px; background: var(--m-surface-2); border-color: transparent; color: var(--m-ink-2); }
+[data-tpl="parosa"] .pm-pill .n { display: none; }
+[data-tpl="parosa"] .pm-pill.on { background: var(--m-chrome); color: var(--m-chrome-ink); }
+
+[data-tpl="parosa"] .pm-hero { display: none; }                /* the intro replaces the hero card */
+[data-tpl="parosa"] .pm-intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin: 2px 0 16px; }
+[data-tpl="parosa"] .pm-introtx h2 { font-size: 25px; font-weight: 700; letter-spacing: -.01em; color: var(--m-chrome); }
+[data-tpl="parosa"] .pm-introtx p { font-size: 13.5px; color: var(--m-ink-2); margin-top: 3px; }
+[data-tpl="parosa"] .pm-introscript { display: block; flex: none; font-family: var(--font-pm-script), cursive; font-size: 21px; line-height: 1.05; text-align: center; color: var(--m-chrome); transform: rotate(-8deg); padding-top: 2px; }
+
+[data-tpl="parosa"] .pm-sec { margin-bottom: 18px; }
+[data-tpl="parosa"] .pm-sechead { margin-bottom: 10px; }
+[data-tpl="parosa"] .pm-sechead h3 { font-size: 17px; font-weight: 700; color: var(--m-ink); }
+[data-tpl="parosa"] .pm-sechead .cnt { display: none; }
+[data-tpl="parosa"] .pm-list { gap: 12px; }
+
+[data-tpl="parosa"] .pm-dish { grid-template-columns: 104px 1fr; gap: 13px; padding: 10px; border-radius: var(--m-radius); align-items: stretch; }
+[data-tpl="parosa"] .pm-thumb { border-radius: 14px; }
+[data-tpl="parosa"] .pm-dish.noimg { grid-template-columns: 1fr; }
+[data-tpl="parosa"] .pm-dn { font-size: 16.5px; font-weight: 700; }
+[data-tpl="parosa"] .pm-dd { font-size: 12.5px; margin-top: 3px; }
+[data-tpl="parosa"] .pm-dbot { padding-top: 9px; }
+[data-tpl="parosa"] .pm-price { font-size: 16px; font-weight: 800; }
+[data-tpl="parosa"] .pm-add { white-space: nowrap; flex: none; border-radius: 12px; padding: 10px 18px; font-size: 14.5px; font-weight: 700; letter-spacing: .01em; box-shadow: 0 8px 18px -12px rgba(70,20,20,.7); }
+[data-tpl="parosa"] .pm-add span { font-weight: 700; margin-left: 5px; }
+[data-tpl="parosa"] .pm-stepper { border-radius: 12px; }
+
+/* closing banner — the palace strip from the Parosa artwork */
+[data-tpl="parosa"] .pm-banner { display: block; position: relative; margin: 20px 0 6px; border-radius: 16px; overflow: hidden; min-height: 92px; border: 1px solid var(--m-line);
+  background-image: linear-gradient(90deg, #F6E7CE 8%, rgba(246,231,206,.55) 46%, rgba(246,231,206,0) 72%), url("/landing/cta-banner.webp");
+  background-size: auto, 180% auto; background-position: center, 62% 74%; background-repeat: no-repeat; }
+[data-tpl="parosa"] .pm-banner span { display: block; padding: 20px 18px; font-size: 16px; line-height: 1.35; color: #6E1618; text-align: left; }
+[data-tpl="parosa"] .pm-banner b { font-size: 19px; font-weight: 700; }
+
+/* ============================================================
+   TEMPLATE 0b — TRANSPARENT · frosted glass, two-across grid
+   Logo + name, search and cart on top; round photos; price chip.
+   ============================================================ */
+[data-tpl="transparent"] { background: radial-gradient(120% 80% at 12% 0%, #F4F1FA 0%, #E9ECF6 45%, #DFE4F2 100%) fixed; }
+[data-tpl="transparent"] .pm-top { background: color-mix(in srgb, #EDEFF8 72%, transparent); border-bottom: none; }
+[data-tpl="transparent"] .pm-head { gap: 10px; padding: 14px 18px 8px; }
+[data-tpl="transparent"] .pm-id .rn { font-weight: 800; font-size: 19px; letter-spacing: -.02em; }
+[data-tpl="transparent"] .pm-id .tb { color: var(--m-muted); letter-spacing: .06em; font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[data-tpl="transparent"] .pm-vsw { padding: 0 10px; }
+[data-tpl="transparent"] .pm-vsw .lbl { display: none; }
+[data-tpl="transparent"] .pm-icon { width: 38px; height: 38px; border-radius: 14px; border: 1px solid rgba(255,255,255,.9); background: rgba(255,255,255,.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--m-ink); box-shadow: 0 8px 20px -14px rgba(40,45,80,.6); }
+[data-tpl="transparent"] .pm-icon.on { background: var(--m-chrome); color: #fff; }
+[data-tpl="transparent"] .pm-vsw { height: 38px; border-radius: 14px; border: 1px solid rgba(255,255,255,.9); background: rgba(255,255,255,.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+[data-tpl="transparent"] .pm-cartbtn { display: grid; place-items: center; position: relative; width: 38px; height: 38px; flex: none; border-radius: 14px; border: 1px solid rgba(255,255,255,.9); background: rgba(255,255,255,.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--m-ink); cursor: pointer; box-shadow: 0 8px 20px -14px rgba(40,45,80,.6); }
+[data-tpl="transparent"] .pm-cartbtn svg { width: 19px; height: 19px; }
+[data-tpl="transparent"] .pm-cartbtn .n { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 100px; background: var(--m-chrome); color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; }
+[data-tpl="transparent"] .pm-search input { border-radius: 16px; border: 1px solid rgba(255,255,255,.9); background: rgba(255,255,255,.65); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+
+/* category strip — plain labels, the active one goes dark */
+[data-tpl="transparent"] .pm-rail { padding: 8px 18px 14px; gap: 22px; }
+[data-tpl="transparent"] .pm-all { display: inline-flex; }
+[data-tpl="transparent"] .pm-pill { flex-direction: column; gap: 0; padding: 2px 0 6px; border: none; background: transparent; border-radius: 0; font-size: 14px; font-weight: 600; color: var(--m-muted); position: relative; }
+[data-tpl="transparent"] .pm-pill .n { display: none; }
+[data-tpl="transparent"] .pm-pill.on { background: transparent; color: var(--m-ink); font-weight: 800; }
+[data-tpl="transparent"] .pm-pill.on::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 18px; height: 3px; border-radius: 3px; background: var(--m-chrome); transform: translateX(-50%); }
+
+/* no greeting / hero card on this design */
+[data-tpl="transparent"] .pm-hero { display: none; }
+[data-tpl="transparent"] .pm-body { padding: 8px 18px 140px; }
+[data-tpl="transparent"] .pm-sec { margin-bottom: 22px; }
+[data-tpl="transparent"] .pm-sechead h3 { font-size: 17px; font-weight: 800; }
+[data-tpl="transparent"] .pm-sechead .ln { display: none; }
+[data-tpl="transparent"] .pm-sechead .cnt { color: var(--m-muted); }
+
+/* two-across glass cards */
+[data-tpl="transparent"] .pm-list { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; }
+[data-tpl="transparent"] .pm-dish { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 14px 12px 12px; border-radius: 24px;
+  background: rgba(255,255,255,.62); border: 1px solid rgba(255,255,255,.9);
+  backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: 0 18px 40px -28px rgba(40,45,80,.75); }
+[data-tpl="transparent"] .pm-dish.in { border-color: var(--m-chrome); box-shadow: 0 0 0 2px color-mix(in srgb, var(--m-chrome) 22%, transparent); }
+[data-tpl="transparent"] .pm-thumb { width: 108px; height: 108px; aspect-ratio: 1; border-radius: 50%; margin: 10px 0 12px; box-shadow: 0 14px 26px -16px rgba(40,45,80,.8); }
+[data-tpl="transparent"] .pm-thumb .badge { top: auto; bottom: -2px; left: 50%; transform: translateX(-50%); }
+[data-tpl="transparent"] .pm-dish.noimg { padding-top: 48px; }   /* clear the price chip */
+[data-tpl="transparent"] .pm-dtop { flex-wrap: wrap; }
+[data-tpl="transparent"] .pm-tag { order: 3; }
+[data-tpl="transparent"] .pm-mid { width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
+[data-tpl="transparent"] .pm-dtop { justify-content: center; gap: 6px; }
+[data-tpl="transparent"] .pm-dn { font-size: 15px; font-weight: 800; letter-spacing: -.01em; white-space: normal; }
+[data-tpl="transparent"] .pm-dd { font-size: 11.5px; color: var(--m-muted); margin-top: 2px; -webkit-line-clamp: 1; text-align: center; }
+
+/* price sits as a chip in the top-right corner of the card */
+[data-tpl="transparent"] .pm-price { position: absolute; top: 10px; right: 10px; padding: 6px 12px; border-radius: 100px; background: rgba(255,255,255,.92); box-shadow: 0 8px 18px -12px rgba(40,45,80,.9); font-size: 13.5px; font-weight: 800; color: var(--m-ink); }
+[data-tpl="transparent"] .pm-mid { flex: 1; }
+[data-tpl="transparent"] .pm-dbot { margin-top: auto; width: 100%; padding-top: 12px; justify-content: space-between; align-items: center; }
+[data-tpl="transparent"] .pm-dbot::before { content: ""; width: 0; }
+[data-tpl="transparent"] .pm-add { width: 100%; justify-content: center; border-radius: 14px; padding: 9px 0; font-size: 13.5px; font-weight: 800; }
+[data-tpl="transparent"] .pm-stepper { width: 100%; justify-content: space-between; border-radius: 14px; }
+[data-tpl="transparent"] .pm-vd { position: absolute; top: 12px; left: 12px; }

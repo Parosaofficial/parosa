@@ -53,6 +53,49 @@ const CINZEL = "var(--font-cinzel), Georgia, serif";
 const ROZHA = "var(--font-rozha), Georgia, serif";
 
 export const TEMPLATES: TemplateDef[] = [
+  /* ---------------- FLAGSHIP 0b — Transparent (glass) ---------------- */
+  {
+    id: "transparent",
+    name: "Transparent",
+    hi: "पारदर्शी",
+    blurb: "Frosted glass cards on a soft gradient. Round photos, a price chip and a two-across grid.",
+    best: "Cafes, juice bars, modern kitchens",
+    swatches: ["#E9ECF7", "#FFFFFF", "#1B1D28"],
+    vars: {
+      "--m-bg": "#E9ECF6", "--m-surface": "rgba(255,255,255,.62)", "--m-surface-2": "rgba(255,255,255,.45)",
+      "--m-chrome": "#1B1D28", "--m-chrome-ink": "#FFFFFF",
+      "--m-accent": "#1B1D28", "--m-accent-ink": "#FFFFFF",
+      "--m-ink": "#171923", "--m-ink-2": "#7B8094", "--m-muted": "#9AA0B4",
+      "--m-line": "rgba(255,255,255,.75)",
+      "--m-radius": "24px", "--m-radius-sm": "18px",
+      "--m-shadow": "0 18px 40px -26px rgba(40,45,80,.45)",
+      "--m-font-display": SANS, "--m-font-body": SANS,
+      "--oxblood": "#1B1D28", "--gold-hi": "#8C93B5", "--font-display": SANS,
+    },
+  },
+
+  /* ---------------- FLAGSHIP 0 — the Parosa design ---------------- */
+  {
+    id: "parosa",
+    name: "Parosa",
+    hi: "परोसा",
+    blurb: "Our own design. Centred brand header, category pills, big photo cards and a warm closing banner.",
+    best: "Signature · the Parosa look",
+    flagship: true,
+    swatches: ["#6E1618", "#F7F1E5", "#C9A24B"],
+    vars: {
+      "--m-bg": "#F8F3EA", "--m-surface": "#FFFFFF", "--m-surface-2": "#F2EADD",
+      "--m-chrome": "#6E1618", "--m-chrome-ink": "#FFF4E6",
+      "--m-accent": "#6E1618", "--m-accent-ink": "#FFF4E6",
+      "--m-ink": "#231512", "--m-ink-2": "#6A554B", "--m-muted": "#9C8A7E",
+      "--m-line": "#EADFCE",
+      "--m-radius": "18px", "--m-radius-sm": "14px",
+      "--m-shadow": "0 10px 26px -18px rgba(70,35,20,.35)",
+      "--m-font-display": SANS, "--m-font-body": SANS,
+      "--oxblood": "#6E1618", "--gold-hi": "#C9A24B", "--font-display": SANS,
+    },
+  },
+
   /* ---------------- FLAGSHIP 1 — the face of Parosa ---------------- */
   {
     id: "aurora",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Mr_Dafoe } from "next/font/google";
 import { Seal } from "@/components/Logo";
 import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { UpiPay } from "@/components/UpiPay";
@@ -9,6 +10,9 @@ import { isValidUpi, payNote } from "@/lib/upi";
 import { resolveTemplateId, templateStyle } from "@/lib/templates";
 import type { Category, Dish, Restaurant } from "@/lib/types";
 import "./menu.css";
+
+// the handwritten accent on the Parosa design
+const script = Mr_Dafoe({ subsets: ["latin"], weight: "400", variable: "--font-pm-script", display: "swap" });
 
 export function MenuClient({
   restaurant,
@@ -140,11 +144,11 @@ export function MenuClient({
           <button onClick={() => add(d.id)} aria-label="Add one">+</button>
         </div>
       );
-    return <button className="pm-add" onClick={() => add(d.id)}>+ Add</button>;
+    return <button className="pm-add" onClick={() => add(d.id)}>Add <span aria-hidden="true">+</span></button>;
   };
 
   return (
-    <div className="pm-app" data-tpl={tpl} style={templateStyle(template ?? restaurant.template, theme ?? restaurant.theme)}>
+    <div className={`pm-app ${script.variable}`} data-tpl={tpl} style={templateStyle(template ?? restaurant.template, theme ?? restaurant.theme)}>
       {/* ---------- sticky chrome ---------- */}
       <header className="pm-top">
         <div className="pm-head">
@@ -159,6 +163,10 @@ export function MenuClient({
           <button className={`pm-vsw${vegOnly ? " on" : ""}`} onClick={() => setVegOnly((v) => !v)} aria-label="Veg only" title="Veg only">
             <span className="dot" /><span className="lbl">Veg</span>
           </button>
+          <button className="pm-cartbtn" onClick={() => setCartOpen(true)} aria-label="Your order">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" /><path d="M2 3h3l2.4 12.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6" /></svg>
+            {count > 0 && <span className="n">{count}</span>}
+          </button>
         </div>
 
         {searchOpen && (
@@ -170,6 +178,7 @@ export function MenuClient({
 
         {groups.length > 0 && (
           <nav className="pm-rail">
+            <button className={`pm-pill pm-all${active === "__all" ? " on" : ""}`} onClick={() => { setActive("__all"); window.scrollTo({ top: 0, behavior: "smooth" }); }}>All</button>
             {groups.map((g) => (
               <button key={g.cat.id} className={`pm-pill${g.cat.id === active ? " on" : ""}`} onClick={() => goTo(g.cat.id)}>
                 {g.cat.name}<span className="n">{g.items.length}</span>
@@ -181,6 +190,16 @@ export function MenuClient({
 
       {/* ---------- body ---------- */}
       <main className="pm-body">
+        {!query && (
+          <div className="pm-intro">
+            <div className="pm-introtx">
+              <h2>Our Specialties</h2>
+              <p>Authentic flavours, made with love</p>
+            </div>
+            <span className="pm-introscript" aria-hidden="true">Good<br />Food<br />Brighter<br />People</span>
+          </div>
+        )}
+
         {hero && !query && (
           <section className={`pm-hero${hero.photo_url ? "" : " noimg"}`}>
             {hero.photo_url && <div className="pm-hero-img" style={{ backgroundImage: `url(${hero.photo_url})` }} />}
@@ -238,7 +257,11 @@ export function MenuClient({
           ))
         )}
 
-        <p className="pm-endnote">❖ End of menu ❖<br />Tap <b>+ Add</b> on a dish — it goes straight to your order.</p>
+        <div className="pm-banner" aria-hidden="true">
+          <span>Taste<br /><b>A More Connected India</b></span>
+        </div>
+
+        <p className="pm-endnote">❖ End of menu ❖<br />Tap <b>Add</b> on a dish — it goes straight to your order.</p>
       </main>
 
       {/* ---------- cart bar ---------- */}

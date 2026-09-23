@@ -83,7 +83,7 @@ export async function createRestaurant(input: {
       fssai: input.fssai || null,
       fssai_url: input.fssaiUrl || null,
       description: input.notes || null,
-      template: "aurora", // Parosa's signature design
+      template: "parosa", // our signature design
       tables_count: 0,
     })
     .select()
