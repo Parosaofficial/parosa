@@ -43,6 +43,7 @@ export function MenuClient({
   const [payOpen, setPayOpen] = useState(false);
   const [err, setErr] = useState("");
   const [bump, setBump] = useState(0); // cart-bar pop on add
+  const [small, setSmall] = useState(false); // header shrinks once you scroll
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const byId = useMemo(() => Object.fromEntries(dishes.map((d) => [d.id, d])), [dishes]);
@@ -74,6 +75,14 @@ export function MenuClient({
     const g = Math.round(s * 0.05);
     return { count: c, sub: s, gst: g, grand: s + g };
   }, [cart, byId]);
+
+  /* shrink the sticky header as soon as the guest scrolls */
+  useEffect(() => {
+    const onScroll = () => setSmall(window.scrollY > 36);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   /* scroll-spy: highlight the category you're reading */
   useEffect(() => {
@@ -150,9 +159,9 @@ export function MenuClient({
   return (
     <div className={`pm-app ${script.variable}`} data-tpl={tpl} style={templateStyle(template ?? restaurant.template, theme ?? restaurant.theme)}>
       {/* ---------- sticky chrome ---------- */}
-      <header className="pm-top">
+      <header className={`pm-top${small ? " small" : ""}`}>
         <div className="pm-head">
-          <RestaurantLogo restaurant={restaurant} size={42} />
+          <span className="pm-logo"><RestaurantLogo restaurant={restaurant} size={42} /></span>
           <div className="pm-id">
             <div className="rn">{restaurant.name}</div>
             <div className="tb">Table {table} · Scan &amp; order</div>

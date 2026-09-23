@@ -44,13 +44,13 @@
 .pm-search input:focus { border-color: var(--m-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--m-accent) 22%, transparent); }
 .pm-search button { width: 34px; height: 34px; border-radius: 10px; border: none; background: var(--m-surface-2); color: var(--m-ink-2); font-size: 18px; cursor: pointer; }
 
-.pm-rail { display: flex; gap: 8px; padding: 4px 16px 12px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; }
+.pm-rail { display: flex; gap: 9px; padding: 4px 16px 12px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; }
 .pm-rail::-webkit-scrollbar { display: none; }
-.pm-pill { flex: none; display: inline-flex; align-items: center; gap: 7px; font-family: var(--m-font-display); font-weight: 700; font-size: 13.5px; padding: 9px 14px; border-radius: 100px; border: 1px solid var(--m-line); background: var(--m-surface); color: var(--m-ink-2); white-space: nowrap; cursor: pointer; transition: background .2s, color .2s, border-color .2s, transform .15s; }
-.pm-pill .n { font-size: 10.5px; font-weight: 800; opacity: .55; }
+.pm-pill { flex: none; display: inline-flex; align-items: center; gap: 7px; font-family: var(--m-font-body); font-weight: 600; font-size: 13.5px; padding: 10px 18px; border-radius: 100px; border: 1px solid transparent; background: var(--m-surface-2); color: var(--m-ink-2); white-space: nowrap; cursor: pointer; transition: background .2s, color .2s, border-color .2s, transform .15s; }
+.pm-pill .n { display: none; }
 .pm-pill:active { transform: scale(.95); }
 .pm-pill.on { background: var(--m-chrome); color: var(--m-chrome-ink); border-color: var(--m-chrome); }
-.pm-pill.on .n { opacity: .75; }
+.pm-all { display: inline-flex; }   /* every design opens on "All" */
 
 /* ---------------- body ---------------- */
 .pm-body { flex: 1; padding: 16px 16px 140px; }
@@ -248,7 +248,6 @@
 [data-tpl="virasat"] .pm-dn { font-weight: 400; font-size: 18px; }
 [data-tpl="virasat"] .pm-sechead h3 { font-weight: 400; font-size: 22px; color: var(--m-chrome); }
 [data-tpl="virasat"] .pm-hero h2 { font-weight: 400; font-size: 27px; }
-[data-tpl="virasat"] .pm-pill { font-weight: 400; font-size: 15px; border-radius: 8px; }
 [data-tpl="virasat"] .pm-add, [data-tpl="virasat"] .pm-stepper, [data-tpl="virasat"] .pm-cartbar, [data-tpl="virasat"] .pm-cartbar .go, [data-tpl="virasat"] .pm-place { border-radius: 10px; }
 [data-tpl="virasat"] .pm-cartbar { border-radius: 14px; }
 
@@ -258,7 +257,7 @@
    "Our Specialties" intro and a closing India banner.
    ============================================================ */
 /* the extra pieces belong to this design only */
-.pm-cartbtn, .pm-intro, .pm-banner, .pm-all { display: none; }
+.pm-cartbtn, .pm-intro, .pm-banner { display: none; }
 
 [data-tpl="parosa"] .pm-top { background: color-mix(in srgb, var(--m-bg) 92%, transparent); }
 [data-tpl="parosa"] .pm-head { display: grid; grid-template-columns: 48px 1fr auto auto; align-items: center; gap: 10px; padding: 14px 16px 10px; }
@@ -273,10 +272,6 @@
 [data-tpl="parosa"] .pm-cartbtn .n { position: absolute; top: -2px; right: -3px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 100px; background: #E23B2E; color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; box-shadow: 0 2px 6px -1px rgba(0,0,0,.35); }
 
 [data-tpl="parosa"] .pm-rail { padding: 6px 16px 14px; gap: 9px; }
-[data-tpl="parosa"] .pm-all { display: inline-flex; }
-[data-tpl="parosa"] .pm-pill { font-family: var(--m-font-body); font-weight: 600; font-size: 13.5px; padding: 10px 18px; border-radius: 100px; background: var(--m-surface-2); border-color: transparent; color: var(--m-ink-2); }
-[data-tpl="parosa"] .pm-pill .n { display: none; }
-[data-tpl="parosa"] .pm-pill.on { background: var(--m-chrome); color: var(--m-chrome-ink); }
 
 [data-tpl="parosa"] .pm-hero { display: none; }                /* the intro replaces the hero card */
 [data-tpl="parosa"] .pm-intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin: 2px 0 16px; }
@@ -325,15 +320,11 @@
 [data-tpl="transparent"] .pm-cartbtn { display: grid; place-items: center; position: relative; width: 38px; height: 38px; flex: none; border-radius: 14px; border: 1px solid rgba(255,255,255,.9); background: rgba(255,255,255,.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--m-ink); cursor: pointer; box-shadow: 0 8px 20px -14px rgba(40,45,80,.6); }
 [data-tpl="transparent"] .pm-cartbtn svg { width: 19px; height: 19px; }
 [data-tpl="transparent"] .pm-cartbtn .n { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 100px; background: var(--m-chrome); color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; }
+[data-tpl="transparent"] .pm-rail { padding: 8px 18px 14px; }
+[data-tpl="transparent"] .pm-pill:not(.on) { background: rgba(255,255,255,.62); border-color: rgba(255,255,255,.9); }
 [data-tpl="transparent"] .pm-search input { border-radius: 16px; border: 1px solid rgba(255,255,255,.9); background: rgba(255,255,255,.65); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 
 /* category strip — plain labels, the active one goes dark */
-[data-tpl="transparent"] .pm-rail { padding: 8px 18px 14px; gap: 22px; }
-[data-tpl="transparent"] .pm-all { display: inline-flex; }
-[data-tpl="transparent"] .pm-pill { flex-direction: column; gap: 0; padding: 2px 0 6px; border: none; background: transparent; border-radius: 0; font-size: 14px; font-weight: 600; color: var(--m-muted); position: relative; }
-[data-tpl="transparent"] .pm-pill .n { display: none; }
-[data-tpl="transparent"] .pm-pill.on { background: transparent; color: var(--m-ink); font-weight: 800; }
-[data-tpl="transparent"] .pm-pill.on::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 18px; height: 3px; border-radius: 3px; background: var(--m-chrome); transform: translateX(-50%); }
 
 /* no greeting / hero card on this design */
 [data-tpl="transparent"] .pm-hero { display: none; }
@@ -368,3 +359,29 @@
 [data-tpl="transparent"] .pm-add { width: 100%; justify-content: center; border-radius: 14px; padding: 9px 0; font-size: 13.5px; font-weight: 800; }
 [data-tpl="transparent"] .pm-stepper { width: 100%; justify-content: space-between; border-radius: 14px; }
 [data-tpl="transparent"] .pm-vd { position: absolute; top: 12px; left: 12px; }
+
+/* ---------------- header shrinks on scroll ---------------- */
+.pm-logo { display: inline-flex; flex: none; }
+.pm-logo > span { transition: width .22s ease, height .22s ease, font-size .22s ease; }
+.pm-top { transition: box-shadow .22s ease; }
+.pm-head { transition: padding .22s ease; }
+.pm-id .rn { transition: font-size .22s ease; }
+.pm-id .tb { transition: opacity .18s ease, max-height .22s ease, margin-top .22s ease; overflow: hidden; max-height: 20px; }
+
+.pm-top.small { box-shadow: 0 10px 24px -22px rgba(0,0,0,.6); }
+.pm-top.small .pm-head { padding-top: 7px; padding-bottom: 6px; }
+.pm-top.small .pm-logo > span { width: 30px !important; height: 30px !important; font-size: 13px !important; }
+.pm-top.small .pm-id .rn { font-size: 15.5px; }
+.pm-top.small .pm-id .tb { opacity: 0; max-height: 0; margin-top: 0; }
+.pm-top.small .pm-icon, .pm-top.small .pm-vsw, .pm-top.small .pm-cartbtn { height: 32px; }
+.pm-top.small .pm-icon, .pm-top.small .pm-cartbtn { width: 32px; }
+.pm-top.small .pm-rail { padding-top: 0; padding-bottom: 9px; }
+.pm-top.small .pm-pill { padding: 7px 15px; font-size: 12.5px; }
+
+/* the Parosa header is centred, so keep its proportions while it shrinks */
+[data-tpl="parosa"] .pm-top.small .pm-head { grid-template-columns: 34px 1fr auto auto; }
+[data-tpl="parosa"] .pm-top.small .pm-id .rn { font-size: 17px; letter-spacing: .12em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-logo > span, .pm-head, .pm-id .rn, .pm-id .tb { transition: none; }
+}

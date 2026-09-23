@@ -4,6 +4,16 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.6.1 - 23 Sep 2026
+Same category pills everywhere, and a header that gets out of the way.
+- Every design now uses the Parosa category strip: soft rounded boxes, the one
+  you're reading filled in the template's own colour, and an **All** chip in front
+  that jumps back to the top. Virasat's square tabs and Transparent's underline
+  are gone.
+- The sticky header shrinks as soon as the guest scrolls - the logo and buttons
+  get smaller, the "Table 1 - Scan & order" line folds away and the pills tighten,
+  so about a third of the header comes back as menu. It grows again at the top.
+
 ## v0.6.0 — 23 Sep 2026
 Two Parosa-made menu designs.
 - **Parosa** (new default): our own signature look. Centred brand header with the
