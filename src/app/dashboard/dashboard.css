@@ -31,9 +31,9 @@
 .db-icobtn{position:relative;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--cream-card);color:var(--maroon);display:grid;place-items:center;cursor:pointer}
 .db-icobtn svg{width:18px;height:18px}
 .db-dot{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--nonveg);border:1.5px solid var(--cream-card)}
-.db-user{display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer}
-.db-user .av{width:34px;height:34px;border-radius:50%;background:var(--oxblood);color:var(--gold-hi);display:grid;place-items:center;font-weight:700;font-size:14px}
-.db-user svg{width:14px;height:14px;color:var(--ink-2)}
+.db-user{display:flex;align-items:center;background:none;border:none;cursor:pointer;border-radius:50%;transition:box-shadow .18s,transform .18s}
+.db-user:hover{transform:translateY(-1px);box-shadow:0 0 0 3px #6e161822}
+.db-user>span{border-radius:50%!important;box-shadow:inset 0 0 0 1px #00000014}
 
 .db-see{font-size:12.5px;color:var(--maroon);font-weight:600;display:inline-flex;align-items:center;gap:4px;cursor:pointer;background:none;border:none}
 

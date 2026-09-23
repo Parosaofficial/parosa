@@ -4,6 +4,11 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.4.17 — 23 Sep 2026
+- The avatar beside the notification bell now shows the restaurant's own
+  uploaded logo (a round monogram of its initials until a logo is uploaded),
+  with no dropdown arrow. It links to Settings, where the logo is uploaded.
+
 ## v0.4.16 — 22 Sep 2026
 Customers page rebuilt.
 - **Bug**: the page used .or-stat / .or-search from the Orders stylesheet without

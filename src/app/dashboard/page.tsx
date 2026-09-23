@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
+import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { AppLoading } from "@/components/AppLoading";
 import { listOrdersWithItems, updateOrderStatus, type OrderWithItems } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
@@ -172,7 +173,10 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
-              <button className="db-user"><span className="av">{(restaurant.name || "प").trim().slice(0, 1).toUpperCase()}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="m6 9 6 6 6-6" /></svg></button>
+              {/* the restaurant's own uploaded logo (initials monogram until one is uploaded) */}
+              <Link className="db-user" href="/settings" title={`${restaurant.name} — profile & logo`} aria-label="Restaurant profile">
+                <RestaurantLogo restaurant={restaurant} size={36} />
+              </Link>
             </div>
             <div className="db-acts">
               <Link className="db-btn" href="/menu-editor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add dish</Link>
