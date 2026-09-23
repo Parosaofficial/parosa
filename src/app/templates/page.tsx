@@ -5,7 +5,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { AppLoading } from "@/components/AppLoading";
 import { updateRestaurant } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
-import { TEMPLATES, resolveTemplateId } from "@/lib/templates";
+import { TEMPLATES, THEMES, resolveTemplateId, themeById } from "@/lib/templates";
 import "../dash.css";
 import "./templates.css";
 
@@ -20,11 +20,16 @@ const DEMO: Record<string, { dish: string; pr: string }> = {
 export default function Templates() {
   const { restaurant, ready, reload } = useOwner();
   const [current, setCurrent] = useState("aurora");
+  const [colour, setColour] = useState("default");
   const [saving, setSaving] = useState("");
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2200); };
 
-  useEffect(() => { if (restaurant) setCurrent(resolveTemplateId(restaurant.template)); }, [restaurant]);
+  useEffect(() => {
+    if (!restaurant) return;
+    setCurrent(resolveTemplateId(restaurant.template));
+    setColour(themeById(restaurant.theme).id);
+  }, [restaurant]);
 
   const apply = async (id: string, label: string) => {
     if (!restaurant || id === current) return;
@@ -38,9 +43,20 @@ export default function Templates() {
     finally { setSaving(""); }
   };
 
-  const preview = (id: string) => {
+  const applyColour = async (id: string, label: string) => {
+    if (!restaurant || id === colour) return;
+    const before = colour;
+    setColour(id);
+    try {
+      await updateRestaurant(restaurant.id, { theme: id });
+      await reload();
+      showToast(`Menu colour: ${label}`);
+    } catch { setColour(before); showToast("Could not change the colour — try again"); }
+  };
+
+  const preview = (id: string, themeId = colour) => {
     if (!restaurant) return;
-    window.open(`/${restaurant.slug}/menu/1?preview=${id}`, "_blank");
+    window.open(`/${restaurant.slug}/menu/1?preview=${id}&theme=${themeId}`, "_blank");
   };
 
   if (!ready || !restaurant) return <AppLoading label="Loading templates…" />;
@@ -54,6 +70,34 @@ export default function Templates() {
           <div className="db-note">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
             <span><b>These are live.</b> <b>Preview</b> opens your real menu in that design; <b>Apply</b> makes it what every guest sees. Your dishes &amp; prices never change — only the layout and look.</span>
+          </div>
+
+          {/* colour theme — the template sets the layout, this sets the colours */}
+          <div className="tp-colours">
+            <div className="tp-chd">
+              <div>
+                <h3>Menu colour</h3>
+                <p>Pick your restaurant&apos;s colours. The layout stays the same — only the colours change.</p>
+              </div>
+              <button className="db-btn" onClick={() => preview(current)}>Preview on my menu ↗</button>
+            </div>
+            <div className="tp-swatches">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  className={`tp-sw${colour === t.id ? " on" : ""}`}
+                  onClick={() => applyColour(t.id, t.name)}
+                  title={`${t.name} — ${t.hint}`}
+                  aria-pressed={colour === t.id}
+                >
+                  <span className="dot" style={t.id === "default"
+                    ? { background: `conic-gradient(#E2761B, #D7342A, #8250B8, #1E7FB8, #1E9160, #C9A227, #E2761B)` }
+                    : { background: `linear-gradient(135deg, ${t.chrome} 46%, ${t.accent} 46%)` }} />
+                  <span className="tx"><b>{t.name}</b><i>{t.hint}</i></span>
+                  {colour === t.id && <span className="tick" aria-hidden="true">✓</span>}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="tp-grid">

@@ -4,6 +4,18 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.5.0 — 23 Sep 2026
+Menu colour themes.
+- After choosing a template, owners pick a **colour** for their menu: As designed,
+  Saffron (orange), Chilli (red), Ocean (blue & white), Emerald, Grape, Rose or
+  Charcoal (black & gold). The template keeps the layout and fonts; the theme
+  recolours the header, buttons, prices and background tints. Dark designs (Noir)
+  take the brand colours but keep their dark background.
+- Saved per restaurant (`restaurants.theme`, migration 0007) and applied to the
+  live guest menu; "Preview on my menu" opens the real menu in the chosen colour.
+- Already in place and verified: the guest menu header shows the restaurant's own
+  logo and name, and tapping Add turns into a − 1 + stepper.
+
 ## v0.4.17 — 23 Sep 2026
 - The avatar beside the notification bell now shows the restaurant's own
   uploaded logo (a round monogram of its initials until a logo is uploaded),

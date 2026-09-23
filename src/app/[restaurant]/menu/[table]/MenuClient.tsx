@@ -16,12 +16,14 @@ export function MenuClient({
   dishes,
   table,
   template,
+  theme,
 }: {
   restaurant: Restaurant;
   categories: Category[];
   dishes: Dish[];
   table: string;
   template?: string;
+  theme?: string;
 }) {
   const tpl = resolveTemplateId(template ?? restaurant.template);
 
@@ -142,7 +144,7 @@ export function MenuClient({
   };
 
   return (
-    <div className="pm-app" data-tpl={tpl} style={templateStyle(template ?? restaurant.template)}>
+    <div className="pm-app" data-tpl={tpl} style={templateStyle(template ?? restaurant.template, theme ?? restaurant.theme)}>
       {/* ---------- sticky chrome ---------- */}
       <header className="pm-top">
         <div className="pm-head">

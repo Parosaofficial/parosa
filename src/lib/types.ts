@@ -32,6 +32,7 @@ export type Restaurant = {
   tagline: string | null;
   description: string | null;
   template: string | null;
+  theme?: string | null; // colour theme for the menu (added in 0007)
   plan: string | null; // 'basic' | 'growth' | 'business'
   upi_id: string | null;
   google_review_url?: string | null; // added in 0005 — optional until that migration runs

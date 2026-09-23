@@ -16,8 +16,36 @@ export type TemplateDef = {
   /** The two Parosa signature designs. */
   flagship?: boolean;
   swatches: [string, string, string];
+  /** Dark designs only take a theme's brand colours, never its light tints. */
+  dark?: boolean;
   vars: Record<string, string>;
 };
+
+/**
+ * A theme recolours any template: the template owns the layout and fonts,
+ * the theme owns the brand colours. "default" keeps the template's own palette.
+ */
+export type ThemeDef = {
+  id: string;
+  name: string;
+  hint: string;
+  chrome: string; chromeInk: string;   // header / cart bar / hero
+  accent: string; accentInk: string;   // Add buttons, prices, highlights
+  bg: string; surface2: string; line: string;  // light tints (skipped on dark templates)
+};
+
+export const THEMES: ThemeDef[] = [
+  { id: "default", name: "As designed", hint: "the template's own colours", chrome: "", chromeInk: "", accent: "", accentInk: "", bg: "", surface2: "", line: "" },
+  { id: "saffron", name: "Saffron", hint: "warm orange", chrome: "#8A3B0B", chromeInk: "#FFF3E4", accent: "#E2761B", accentInk: "#2E1503", bg: "#FFF9F1", surface2: "#FBEEDF", line: "#F1E0CB" },
+  { id: "chilli", name: "Chilli", hint: "classic red", chrome: "#8C1D18", chromeInk: "#FFF1EF", accent: "#D7342A", accentInk: "#FFF4F2", bg: "#FFF7F5", surface2: "#FBE7E3", line: "#F2D9D4" },
+  { id: "ocean", name: "Ocean", hint: "blue & white", chrome: "#0F3D5C", chromeInk: "#EAF5FC", accent: "#1E7FB8", accentInk: "#FFFFFF", bg: "#F6FAFD", surface2: "#E8F1F8", line: "#D9E7F1" },
+  { id: "emerald", name: "Emerald", hint: "fresh green", chrome: "#12523A", chromeInk: "#EDF9F2", accent: "#1E9160", accentInk: "#FFFFFF", bg: "#F6FBF8", surface2: "#E6F4EC", line: "#D7EADF" },
+  { id: "grape", name: "Grape", hint: "deep purple", chrome: "#43225E", chromeInk: "#F6EEFD", accent: "#8250B8", accentInk: "#FFFFFF", bg: "#FAF7FD", surface2: "#F0E8F8", line: "#E4D9EF" },
+  { id: "rose", name: "Rose", hint: "soft pink", chrome: "#7A1540", chromeInk: "#FFF0F5", accent: "#D94F7E", accentInk: "#FFFFFF", bg: "#FFF7FA", surface2: "#FBE7EE", line: "#F3D8E2" },
+  { id: "charcoal", name: "Charcoal", hint: "black & gold", chrome: "#232323", chromeInk: "#FBF7EC", accent: "#C9A227", accentInk: "#241B02", bg: "#FAF9F7", surface2: "#EFEDEA", line: "#E2DFD9" },
+];
+
+export const themeById = (id?: string | null) => THEMES.find((t) => t.id === id) ?? THEMES[0];
 
 const SANS = "var(--font-mukta), system-ui, -apple-system, sans-serif";
 const ARCHIVO = "var(--font-archivo), system-ui, sans-serif";
@@ -56,6 +84,7 @@ export const TEMPLATES: TemplateDef[] = [
     best: "Signature · fine dining & bars",
     flagship: true,
     swatches: ["#12100E", "#D9A441", "#F4EBDD"],
+    dark: true,
     vars: {
       "--m-bg": "#12100E", "--m-surface": "#1B1815", "--m-surface-2": "#241F1A",
       "--m-chrome": "#0C0A09", "--m-chrome-ink": "#F4EBDD",
@@ -146,7 +175,25 @@ export const templateById = (id?: string | null) => {
 /** Resolve any stored id to a live template id (used by the menu route). */
 export const resolveTemplateId = (id?: string | null) => templateById(id).id;
 
-/** CSS custom-property style object to spread onto the menu root. */
-export function templateStyle(id?: string | null): CSSProperties {
-  return templateById(id).vars as CSSProperties;
+/**
+ * CSS custom-property style object for the menu root: the template's tokens
+ * with the chosen theme's colours layered on top.
+ */
+export function templateStyle(id?: string | null, themeId?: string | null): CSSProperties {
+  const tpl = templateById(id);
+  const theme = themeById(themeId);
+  if (theme.id === "default") return tpl.vars as CSSProperties;
+  const vars: Record<string, string> = {
+    ...tpl.vars,
+    "--m-chrome": theme.chrome, "--m-chrome-ink": theme.chromeInk,
+    "--m-accent": theme.accent, "--m-accent-ink": theme.accentInk,
+    "--oxblood": theme.chrome, "--gold-hi": theme.accent,
+  };
+  // dark designs keep their own dark backgrounds; light ones take the tint
+  if (!tpl.dark) {
+    vars["--m-bg"] = theme.bg;
+    vars["--m-surface-2"] = theme.surface2;
+    vars["--m-line"] = theme.line;
+  }
+  return vars as CSSProperties;
 }
