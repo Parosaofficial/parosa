@@ -4,6 +4,19 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.6.0 — 23 Sep 2026
+Two Parosa-made menu designs.
+- **Parosa** (new default): our own signature look. Centred brand header with the
+  restaurant's logo, name and a cart button that carries a live item count, a row
+  of rounded category pills starting with **All**, an "Our Specialties" opener with
+  a handwritten *Good Food Brighter People* accent, wide white photo cards with an
+  **Add +** button, and a warm "Taste - A More Connected India" closing banner.
+  No bottom navigation bar. New restaurants start on this design.
+- **Transparent**: frosted-glass cards on a soft gradient. Logo and name, search
+  and cart on top, a plain category strip with the active one underlined, and a
+  two-across grid of glass cards with round photos and a floating price chip.
+- Both work with every colour theme from v0.5.0.
+
 ## v0.5.0 — 23 Sep 2026
 Menu colour themes.
 - After choosing a template, owners pick a **colour** for their menu: As designed,
