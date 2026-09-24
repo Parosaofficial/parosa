@@ -4,6 +4,20 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.8.0 - 24 Sep 2026
+Manage each table QR, and download it for real.
+- Every table QR card now has an **On/Off switch** and a **delete** button. Turn a
+  table off to grey it out while it's not in use (a renovation, a slow day); delete
+  removes it — including a table in the middle, keeping the higher ones intact.
+- **Removed the Print button.** Each card keeps a single **Download PNG**, and
+  it now actually works: it builds a full printable standee image (restaurant
+  logo, name, the QR, table number and the Parosa branding) in whichever design
+  you picked — Classic or Branded — and saves it as a PNG. "Download all" saves
+  one for every active table.
+- On/off and delete are saved on this device for now. (Syncing them across devices
+  and reflecting an "off" table on the scanned menu needs a small database change,
+  which is a follow-up.)
+
 ## v0.7.1 - 24 Sep 2026
 The dhaba's own logo on the table QR, and a second standee design.
 - **Fixed:** the table QR standee showed the Parosa seal, not the restaurant's

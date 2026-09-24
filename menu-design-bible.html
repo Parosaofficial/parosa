@@ -1,0 +1,582 @@
+<title>Menu Design Bible</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Karla:wght@400;500;700&family=Jost:wght@400;500;600&family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Baloo+2:wght@500;600;700&family=Mukta:wght@400;600;700&family=Bebas+Neue&family=Fraunces:wght@400&family=Sora:wght@400;600;700&family=Cinzel:wght@400;600&family=Marcellus&family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=DM+Serif+Display&display=swap">
+<style>
+  :root{
+    --paper:#FBF7F1; --paper-2:#F3ECE1; --card:#FFFFFF;
+    --ink:#1A1614; --ink-2:#4A423C; --muted:#8B8178;
+    --line:#E7DCCd; --line-2:#EFE7DA;
+    --accent:#E8552D; --accent-2:#F2A20C; --accent-soft:#FBE4D8;
+    --shadow:0 1px 2px rgba(40,25,15,.05), 0 12px 30px -12px rgba(60,35,15,.14);
+    --shadow-sm:0 1px 2px rgba(40,25,15,.06);
+    --maxw:1180px;
+    --display:'Fraunces',Georgia,serif;
+    --body:'Manrope',system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#14110F; --paper-2:#1C1815; --card:#211C18;
+      --ink:#F5EFE7; --ink-2:#C9BEB2; --muted:#948A7E;
+      --line:#332C26; --line-2:#2A241F;
+      --accent:#FF6B3D; --accent-2:#FFB020; --accent-soft:#3A2418;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 18px 40px -16px rgba(0,0,0,.6);
+      --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#14110F; --paper-2:#1C1815; --card:#211C18;
+    --ink:#F5EFE7; --ink-2:#C9BEB2; --muted:#948A7E;
+    --line:#332C26; --line-2:#2A241F;
+    --accent:#FF6B3D; --accent-2:#FFB020; --accent-soft:#3A2418;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 18px 40px -16px rgba(0,0,0,.6);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{padding:64px 0;border-top:1px solid var(--line-2)}
+  h1,h2,h3{font-family:var(--display);font-weight:600;text-wrap:balance;line-height:1.08;margin:0}
+  p{margin:0}
+  a{color:inherit}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .lead{color:var(--ink-2);font-size:clamp(16px,1.6vw,19px);max-width:64ch}
+  .muted{color:var(--muted)}
+
+  /* ---------- HERO ---------- */
+  .hero{border-top:none;padding:56px 0 40px;position:relative}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+    border:1px solid var(--line);border-radius:100px;padding:7px 14px;background:var(--card)}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-soft)}
+  .hero h1{font-size:clamp(42px,7vw,88px);font-weight:600;margin:22px 0 0;letter-spacing:-.02em}
+  .hero h1 em{font-style:italic;color:var(--accent)}
+  .hero .lead{margin-top:22px;font-size:clamp(17px,1.8vw,21px)}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:28px;margin-top:34px;padding-top:26px;border-top:1px solid var(--line)}
+  .hero-meta .k{font-family:var(--display);font-size:30px;font-weight:600;color:var(--ink)}
+  .hero-meta .v{font-size:13px;color:var(--muted);margin-top:2px}
+
+  .grid{display:grid;gap:22px}
+  @media(min-width:720px){.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}}
+
+  .sec-head{max-width:70ch;margin-bottom:36px}
+  .sec-head h2{font-size:clamp(28px,3.6vw,42px);margin:12px 0 14px;letter-spacing:-.015em}
+
+  /* principle cards */
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:var(--shadow-sm)}
+  .pcard h3{font-family:var(--body);font-weight:700;font-size:17px;margin-bottom:8px}
+  .pcard p{font-size:14.5px;color:var(--ink-2)}
+  .pnum{font-family:var(--display);font-size:14px;font-weight:600;color:var(--accent);
+    border:1px solid var(--accent);width:30px;height:30px;border-radius:8px;display:grid;place-items:center;margin-bottom:16px}
+
+  /* color psychology row */
+  .swrow{display:flex;flex-wrap:wrap;gap:14px}
+  .sw{flex:1 1 150px;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow-sm)}
+  .sw .chip{height:74px}
+  .sw .cap{padding:12px 14px}
+  .sw .cap b{font-size:14px}
+  .sw .cap span{display:block;font-size:12.5px;color:var(--muted);margin-top:3px}
+
+  /* motion demo */
+  .mgrid{display:grid;gap:16px}
+  @media(min-width:640px){.mgrid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:960px){.mgrid{grid-template-columns:repeat(4,1fr)}}
+  .mtile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .25s ease, box-shadow .25s ease}
+  .mtile:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+  .mtile h3{font-family:var(--body);font-weight:700;font-size:15px;margin-bottom:6px}
+  .mtile p{font-size:13px;color:var(--muted)}
+  .mtile .demo{height:66px;display:grid;place-items:center;margin-bottom:14px;border-radius:10px;background:var(--paper-2);overflow:hidden}
+  .pill-add{font-family:var(--body);font-weight:700;font-size:13px;border:none;border-radius:100px;padding:9px 16px;background:var(--accent);color:#fff;cursor:pointer}
+  .pill-add:active{transform:scale(.92)}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  .steam{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));animation:floaty 2.4s ease-in-out infinite}
+  @keyframes shimmer{0%{background-position:-200px 0}100%{background-position:220px 0}}
+  .skel{width:76%;height:14px;border-radius:7px;background:linear-gradient(90deg,var(--line) 25%,var(--line-2) 37%,var(--line) 63%);background-size:400px 100%;animation:shimmer 1.4s linear infinite}
+  .heartbtn{font-size:24px;line-height:1;cursor:pointer;user-select:none;transition:transform .2s}
+  .heartbtn:active{transform:scale(1.4)}
+
+  /* ---------- TEMPLATE GALLERY ---------- */
+  .fam-head{display:flex;align-items:baseline;gap:14px;margin:44px 0 20px;flex-wrap:wrap}
+  .fam-head h3{font-size:24px;letter-spacing:-.01em}
+  .fam-head .tag{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .fam-head .rule{flex:1;height:1px;background:var(--line);min-width:30px}
+
+  .tgrid{display:grid;gap:22px}
+  @media(min-width:640px){.tgrid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1000px){.tgrid{grid-template-columns:repeat(3,1fr)}}
+
+  /* the live menu preview card - each template a self-contained color world */
+  .tpl{border-radius:18px;overflow:hidden;border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow);display:flex;flex-direction:column}
+  .tpl .stage{padding:20px;background:var(--t-bg);color:var(--t-text);font-family:var(--t-body);min-height:236px;display:flex;flex-direction:column;gap:14px}
+  .tpl .brandrow{display:flex;align-items:center;justify-content:space-between}
+  .tpl .brand{font-family:var(--t-display);font-weight:var(--t-bw,700);font-size:19px;color:var(--t-brand,var(--t-text));letter-spacing:var(--t-ls,normal);line-height:1.1}
+  .tpl .tno{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t-muted);border:1px solid var(--t-line);border-radius:100px;padding:4px 9px}
+  .tpl .cats{display:flex;gap:7px;flex-wrap:wrap}
+  .tpl .cat{font-family:var(--t-body);font-size:11px;font-weight:700;padding:5px 11px;border-radius:var(--t-pill,100px);background:var(--t-chipbg);color:var(--t-chiptext);border:var(--t-chipborder,none)}
+  .tpl .cat.on{background:var(--t-accent);color:var(--t-oncat,#fff)}
+  .dish{display:flex;gap:12px;align-items:center;background:var(--t-surface,transparent);border:var(--t-dishborder,none);border-radius:var(--t-radius,14px);padding:var(--t-dishpad,10px)}
+  .dish .thumb{width:46px;height:46px;border-radius:var(--t-thumb,12px);flex:none;background:var(--t-thumbbg);display:grid;place-items:center;font-size:20px}
+  .dish .info{flex:1;min-width:0}
+  .dish .dn{font-family:var(--t-dishfont,var(--t-display));font-weight:var(--t-dnw,600);font-size:14.5px;color:var(--t-text);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dish .dd{font-size:11px;color:var(--t-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dish .price{font-family:var(--t-pricefont,var(--t-body));font-weight:700;font-size:14px;color:var(--t-price,var(--t-text));white-space:nowrap}
+  .dish .add{width:30px;height:30px;flex:none;border-radius:var(--t-addr,10px);border:none;background:var(--t-accent);color:var(--t-onacc,#fff);font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:transform .18s ease,filter .18s ease}
+  .dish .add:hover{filter:brightness(1.06)}
+  .dish .add:active{transform:scale(.85)}
+  .tpl .footbar{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:4px}
+  .tpl .veg{width:15px;height:15px;border:2px solid #128a2b;border-radius:3px;display:grid;place-items:center}
+  .tpl .veg::after{content:"";width:6px;height:6px;border-radius:50%;background:#128a2b}
+  .tpl .cta{font-family:var(--t-body);font-weight:700;font-size:12.5px;border:none;border-radius:var(--t-ctar,100px);padding:9px 16px;background:var(--t-cta,var(--t-accent));color:var(--t-onacc,#fff);cursor:pointer}
+
+  .tpl .meta{padding:15px 18px 17px;border-top:1px solid var(--line);background:var(--card)}
+  .tpl .meta .nm{font-family:var(--display);font-weight:600;font-size:17px;display:flex;align-items:center;gap:8px}
+  .tpl .meta .nm .no{font-size:11px;color:var(--muted);font-family:var(--body);font-weight:700}
+  .tpl .meta .de{font-size:12.5px;color:var(--ink-2);margin-top:5px;line-height:1.45}
+  .tpl .meta .specs{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .tpl .meta .spec{font-size:10.5px;font-weight:600;color:var(--muted);background:var(--paper-2);border:1px solid var(--line);border-radius:6px;padding:3px 7px}
+  .tpl .meta .fonts{font-size:11px;color:var(--muted);margin-top:9px}
+  .tpl .meta .fonts b{color:var(--ink-2);font-weight:600}
+
+  /* callout / engine */
+  .callout{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:clamp(24px,4vw,40px);box-shadow:var(--shadow)}
+  .flow{display:grid;gap:14px;margin-top:22px}
+  @media(min-width:820px){.flow{grid-template-columns:repeat(5,1fr);align-items:stretch}}
+  .fstep{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:16px;position:relative}
+  .fstep .fn{font-family:var(--display);color:var(--accent);font-weight:600;font-size:13px}
+  .fstep h4{font-family:var(--body);font-size:14px;font-weight:700;margin:6px 0 5px}
+  .fstep p{font-size:12.5px;color:var(--muted)}
+
+  .checklist{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:10px}
+  @media(min-width:720px){.checklist{grid-template-columns:1fr 1fr}}
+  .checklist li{display:flex;gap:11px;font-size:14px;color:var(--ink-2);align-items:flex-start}
+  .checklist svg{flex:none;margin-top:2px;color:var(--accent)}
+
+  footer{padding:56px 0 80px;border-top:1px solid var(--line-2);color:var(--muted);font-size:13.5px}
+
+  /* theme toggle */
+  .toggle{position:fixed;top:16px;right:16px;z-index:50;background:var(--card);border:1px solid var(--line);
+    border-radius:100px;padding:8px 14px;font-family:var(--body);font-weight:700;font-size:12px;color:var(--ink-2);cursor:pointer;box-shadow:var(--shadow-sm)}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+
+<button class="toggle" id="themeToggle" aria-label="Toggle light or dark theme">◑ Theme</button>
+
+<div class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <span class="hero-badge"><span class="dot"></span> Design study &amp; template system · v1</span>
+    <h1>The menu is the <em>product.</em></h1>
+    <p class="lead">Every competitor ships four or five flat themes. This is the design language and the twenty-template library that makes a QR menu <b>look worth ordering from</b> — built appetite-first, motion-considered, and ready for a dhaba phone on weak signal.</p>
+    <div class="hero-meta">
+      <div><div class="k">20</div><div class="v">distinct templates, live below</div></div>
+      <div><div class="k">8</div><div class="v">style families</div></div>
+      <div><div class="k">1</div><div class="v">engine — themes are just data</div></div>
+      <div><div class="k">₹0</div><div class="v">added build cost per new theme</div></div>
+    </div>
+  </header>
+
+  <!-- ================= WHY DESIGN WINS ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">The thesis</span>
+      <h2>People eat with their eyes first — so the menu has to make them hungry.</h2>
+      <p class="lead">A QR menu isn't a document, it's the moment of decision. Research on 2026 digital menus is blunt about it: motion and imagery trigger genuine appetite cues, and impulse dining lives or dies on how fast a screen gets someone from "I'm hungry" to "added." Our edge over MenuScan, DineOpen &amp; DotPe isn't features — it's that our menus <b>look designed and feel alive</b>, while theirs look like a spreadsheet with a logo.</p>
+    </div>
+    <div class="grid g4">
+      <div class="pcard"><div class="pnum">1</div><h3>Appetite over information</h3><p>Warm reds, oranges and golds measurably stimulate hunger. Hero the dish, not the database. Photography (or a tasteful illustrated stand-in) does the selling.</p></div>
+      <div class="pcard"><div class="pnum">2</div><h3>Speed to "Add"</h3><p>Every screen shortens the gap between craving and cart. Sticky category rail, one-tap add, running total always visible. Friction is lost revenue.</p></div>
+      <div class="pcard"><div class="pnum">3</div><h3>Motion with a job</h3><p>A pulse on add, a gentle steam loop on a bestseller, a skeleton while images load. If an animation doesn't clarify, guide or confirm — it's cut.</p></div>
+      <div class="pcard"><div class="pnum">4</div><h3>Made for the real phone</h3><p>16px+ text, 44px tap targets, lazy-loaded WebP, works on a ₹8,000 Android on 3G. A beautiful menu that won't load is worthless in a dhaba.</p></div>
+    </div>
+  </section>
+
+  <!-- ================= COLOR ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Color psychology</span>
+      <h2>The palette does the persuading before a single word is read.</h2>
+      <p class="lead">Each template is built on one of these appetite strategies. The point is range: a fine-dining bistro and a highway dhaba should never be handed the same colors.</p>
+    </div>
+    <div class="swrow">
+      <div class="sw"><div class="chip" style="background:linear-gradient(135deg,#DC2626,#F2A20C)"></div><div class="cap"><b>Appetite red + gold</b><span>Hunger &amp; premium. Fine dining, tandoor, biryani houses.</span></div></div>
+      <div class="sw"><div class="chip" style="background:linear-gradient(135deg,#F2A20C,#FCE7B0)"></div><div class="cap"><b>Turmeric &amp; spice</b><span>Warm, Indian, energetic. Street food, chaat, dhaba.</span></div></div>
+      <div class="sw"><div class="chip" style="background:linear-gradient(135deg,#2F5D50,#CFE0C3)"></div><div class="cap"><b>Sage &amp; herb</b><span>Fresh, healthy, calm. Cafes, salads, juice bars.</span></div></div>
+      <div class="sw"><div class="chip" style="background:linear-gradient(135deg,#1A1614,#C79A45)"></div><div class="cap"><b>Charcoal &amp; brass</b><span>Nightlife, bars, lounges, premium.</span></div></div>
+      <div class="sw"><div class="chip" style="background:linear-gradient(135deg,#F7B7C6,#F6E7CE)"></div><div class="cap"><b>Pastel sweet</b><span>Bakery, gelato, desserts, kids.</span></div></div>
+      <div class="sw"><div class="chip" style="background:linear-gradient(135deg,#7A1E2B,#D4A73C)"></div><div class="cap"><b>Royal maroon &amp; gold</b><span>Heritage, Rajwada, thali, celebration.</span></div></div>
+    </div>
+  </section>
+
+  <!-- ================= MOTION ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Motion library · try them</span>
+      <h2>Six micro-interactions, each earning its place.</h2>
+      <p class="lead">150–300ms, transform/opacity only, always with a <code>prefers-reduced-motion</code> off-switch. Tap the tiles.</p>
+    </div>
+    <div class="mgrid">
+      <div class="mtile"><div class="demo"><button class="pill-add" onclick="this.animate([{transform:'scale(1)'},{transform:'scale(.88)'},{transform:'scale(1)'}],{duration:220})">+ Add</button></div><h3>Add-to-cart tap</h3><p>Spring press confirms the tap without a page change.</p></div>
+      <div class="mtile"><div class="demo"><div class="steam"></div></div><h3>Bestseller float</h3><p>A slow ambient loop draws the eye to the dish you want to sell.</p></div>
+      <div class="mtile"><div class="demo"><div class="skel"></div></div><h3>Skeleton load</h3><p>Reserved space + shimmer so weak signal never looks broken.</p></div>
+      <div class="mtile"><div class="demo"><span class="heartbtn" onclick="this.textContent=this.textContent==='♡'?'♥':'♡';this.style.color=this.textContent==='♥'?'#E8552D':''">♡</span></div><h3>Favourite pop</h3><p>Overshoot scale rewards a save. Small dopamine, real retention.</p></div>
+      <div class="mtile"><div class="demo"><div style="display:flex;gap:6px"><span style="width:26px;height:8px;border-radius:9px;background:var(--accent)"></span><span style="width:8px;height:8px;border-radius:9px;background:var(--line)"></span><span style="width:8px;height:8px;border-radius:9px;background:var(--line)"></span></div></div><h3>Category snap</h3><p>Sticky rail with a sliding indicator as you scroll sections.</p></div>
+      <div class="mtile"><div class="demo"><div style="font-family:var(--display);font-weight:600"><span style="color:var(--muted);font-size:13px">Total </span><span style="color:var(--accent);font-size:20px">₹460</span></div></div><h3>Rolling total</h3><p>The bill counts up as items are added — always in view.</p></div>
+    </div>
+  </section>
+
+  <!-- ================= TYPOGRAPHY ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Typography · the Indian reality</span>
+      <h2>Every template ships bilingual-ready.</h2>
+      <p class="lead">A dhaba's items are <i>Chole Bhature</i>, <i>छोले भटूरे</i>. Most competitors break on Devanagari. We pair a characterful Latin display with a font that also carries Hindi/regional scripts — so the same menu reads beautifully in both.</p>
+    </div>
+    <div class="grid g3">
+      <div class="pcard"><div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700">Saffron &amp; Silk</div><div style="font-family:'Mukta',sans-serif;font-size:20px;font-weight:600;margin-top:4px">केसर और रेशम</div><p style="margin-top:12px">Playfair Display + Mukta — elegant houses, thali &amp; heritage menus.</p></div>
+      <div class="pcard"><div style="font-family:'Fredoka',sans-serif;font-size:26px;font-weight:700">Chatpata Corner</div><div style="font-family:'Baloo 2',sans-serif;font-size:20px;font-weight:600;margin-top:4px">चटपटा कॉर्नर</div><p style="margin-top:12px">Fredoka + Baloo 2 — street food, chaat, playful youthful spots.</p></div>
+      <div class="pcard"><div style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">Slow Roast</div><div style="font-family:'Mukta',sans-serif;font-size:20px;font-weight:600;margin-top:4px">धीमी आँच</div><p style="margin-top:12px">Fraunces + Mukta — modern cafes, bistros, specialty coffee.</p></div>
+    </div>
+  </section>
+
+  <!-- ================= THE 20 TEMPLATES ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">The library · 20 live templates</span>
+      <h2>Twenty finished looks — not four. Each one a real, working menu card.</h2>
+      <p class="lead">These are rendered live, in-browser, in their own palette, fonts and shape language — the same components the full menu will use. Tap an <b>+</b> or a chip. This is the range a restaurant owner picks from on day one.</p>
+    </div>
+
+    <!-- FAMILY 1: FINE DINING -->
+    <div class="fam-head"><h3>Fine Dining &amp; Bistro</h3><span class="tag">Elegant · serif · restrained</span><span class="rule"></span></div>
+    <div class="tgrid">
+
+      <article class="tpl" style="--t-bg:#12100E;--t-text:#F3EAD8;--t-muted:#9C8F79;--t-line:#3A322704;--t-accent:#C79A45;--t-cta:#C79A45;--t-onacc:#12100E;--t-surface:#1C1813;--t-line:#2E271E;--t-chipbg:#1C1813;--t-chiptext:#C7B48E;--t-thumbbg:#241E17;--t-display:'Playfair Display',serif;--t-body:'Jost',sans-serif;--t-price:#C79A45;--t-dishborder:1px solid #2A241C">
+        <div class="stage">
+          <div class="brandrow"><div class="brand">Noir Maison</div><span class="tno">Table 07</span></div>
+          <div class="cats"><span class="cat on">Mains</span><span class="cat">Small plates</span><span class="cat">Cellar</span></div>
+          <div class="dish"><div class="thumb">🥩</div><div class="info"><div class="dn">Coal-fired Lamb</div><div class="dd">rosemary jus · heirloom carrot</div></div><span class="price">₹740</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🍷</div><div class="info"><div class="dn">Cabernet, Nashik</div><div class="dd">glass · full-bodied</div></div><span class="price">₹520</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:11px;color:var(--t-muted);letter-spacing:.14em;text-transform:uppercase">Chef's table</span><button class="cta">View bill · ₹1,260</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">01</span> Noir Maison</div><div class="de">Candle-lit luxury. Near-black ground, brass accent, generous negative space. Reveal-on-scroll, no clutter.</div><div class="specs"><span class="spec">#12100E</span><span class="spec">#C79A45</span><span class="spec">dark-only</span></div><div class="fonts"><b>Playfair Display</b> + Jost</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#FBF9F3;--t-text:#2B3026;--t-muted:#8A9080;--t-accent:#5E7A5A;--t-cta:#5E7A5A;--t-onacc:#fff;--t-surface:#fff;--t-line:#E5E7DC;--t-chipbg:#EEF1E7;--t-chiptext:#5E7A5A;--t-thumbbg:#EEF1E7;--t-display:'Cormorant Garamond',serif;--t-body:'Karla',sans-serif;--t-price:#5E7A5A;--t-dishborder:1px solid #ECEFE4;--t-dnw:600">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-size:23px">Ivory &amp; Sage</div><span class="tno">Table 12</span></div>
+          <div class="cats"><span class="cat on">Garden</span><span class="cat">Grains</span><span class="cat">Press</span></div>
+          <div class="dish"><div class="thumb">🥗</div><div class="info"><div class="dn">Burrata &amp; Fig</div><div class="dd">basil oil · toasted walnut</div></div><span class="price">₹460</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🍋</div><div class="info"><div class="dn">Citrus Cooler</div><div class="dd">yuzu · mint · soda</div></div><span class="price">₹220</span><button class="add">+</button></div>
+          <div class="footbar"><span class="veg" title="Pure veg"></span><button class="cta">Review order</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">02</span> Ivory &amp; Sage</div><div class="de">Airy, botanical, calm. Soft cream + sage for cafes, brunch and healthy fine dining. Whisper-quiet motion.</div><div class="specs"><span class="spec">#FBF9F3</span><span class="spec">#5E7A5A</span><span class="spec">light</span></div><div class="fonts"><b>Cormorant Garamond</b> + Karla</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#2A0E14;--t-text:#F6E3DE;--t-muted:#B98A8A;--t-accent:#E5A0A8;--t-cta:#E5A0A8;--t-onacc:#2A0E14;--t-surface:#3A141C;--t-line:#4A1E27;--t-chipbg:#3A141C;--t-chiptext:#E5A0A8;--t-thumbbg:#43171F;--t-display:'Playfair Display',serif;--t-body:'Jost',sans-serif;--t-price:#E5A0A8;--t-dishborder:1px solid #431920">
+        <div class="stage">
+          <div class="brandrow"><div class="brand">Bordeaux</div><span class="tno">Table 03</span></div>
+          <div class="cats"><span class="cat on">À la carte</span><span class="cat">Charcuterie</span><span class="cat">Wine</span></div>
+          <div class="dish"><div class="thumb">🍝</div><div class="info"><div class="dn">Truffle Tagliatelle</div><div class="dd">parmesan · 62° egg</div></div><span class="price">₹580</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🧀</div><div class="info"><div class="dn">Cheese Board</div><div class="dd">selection of five · honeycomb</div></div><span class="price">₹640</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:11px;color:var(--t-muted);letter-spacing:.14em;text-transform:uppercase">Est. 2019</span><button class="cta">Bill · ₹1,220</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">03</span> Bordeaux</div><div class="de">Deep wine + blush. Romantic and moody for date-night restaurants and wine bars. Rich, warm, intimate.</div><div class="specs"><span class="spec">#2A0E14</span><span class="spec">#E5A0A8</span><span class="spec">dark-only</span></div><div class="fonts"><b>Playfair Display</b> + Jost</div></div>
+      </article>
+    </div>
+
+    <!-- FAMILY 2: STREET FOOD / DHABA -->
+    <div class="fam-head"><h3>Street Food &amp; Dhaba</h3><span class="tag">Vibrant · bold · playful</span><span class="rule"></span></div>
+    <div class="tgrid">
+
+      <article class="tpl" style="--t-bg:#B3160F;--t-text:#FFF3E0;--t-muted:#F0B69A;--t-accent:#FFC533;--t-cta:#FFC533;--t-onacc:#5A1200;--t-surface:#C41E12;--t-line:#D63A24;--t-chipbg:#C41E12;--t-chiptext:#FFE0A8;--t-thumbbg:#D42A18;--t-display:'Fredoka',sans-serif;--t-body:'Nunito',sans-serif;--t-price:#FFC533;--t-radius:16px;--t-bw:600;--t-dishborder:1px solid #D42A1A">
+        <div class="stage">
+          <div class="brandrow"><div class="brand">Tandoor 🔥</div><span class="tno">Table 21</span></div>
+          <div class="cats"><span class="cat on">Grills</span><span class="cat">Breads</span><span class="cat">Curries</span></div>
+          <div class="dish"><div class="thumb">🍗</div><div class="info"><div class="dn">Tandoori Chicken</div><div class="dd">half · smoky · yogurt marinade</div></div><span class="price">₹320</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🫓</div><div class="info"><div class="dn">Butter Naan</div><div class="dd">clay oven · fresh</div></div><span class="price">₹45</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:11px;font-weight:800;color:var(--t-accent)">🌶 SPICY FAVOURITE</span><button class="cta">Order ₹365</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">04</span> Tandoor</div><div class="de">Loud, hot, appetising. Spice-red + turmeric-yellow, rounded friendly type. The default dhaba crowd-pleaser.</div><div class="specs"><span class="spec">#B3160F</span><span class="spec">#FFC533</span><span class="spec">bold</span></div><div class="fonts"><b>Fredoka</b> + Nunito</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#FFF3D6;--t-text:#5A3A12;--t-muted:#A9895A;--t-accent:#E4761B;--t-cta:#E4761B;--t-onacc:#fff;--t-surface:#fff;--t-line:#F0DFB4;--t-chipbg:#FCE9BE;--t-chiptext:#B4671B;--t-thumbbg:#FBE7BA;--t-display:'Baloo 2',sans-serif;--t-body:'Mukta',sans-serif;--t-price:#E4761B;--t-dishborder:1px solid #F3E4BC">
+        <div class="stage">
+          <div class="brandrow"><div class="brand">Masala Market</div><span class="tno">Table 09</span></div>
+          <div class="cats"><span class="cat on">Chaat</span><span class="cat">Thali</span><span class="cat">Lassi</span></div>
+          <div class="dish"><div class="thumb">🥘</div><div class="info"><div class="dn">Chole Bhature · छोले भटूरे</div><div class="dd">2 pcs · pickle · onion</div></div><span class="price">₹120</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🥤</div><div class="info"><div class="dn">Sweet Lassi · लस्सी</div><div class="dd">malai · glass</div></div><span class="price">₹70</span><button class="add">+</button></div>
+          <div class="footbar"><span class="veg"></span><button class="cta">Bill dekhein · ₹190</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">05</span> Masala Market</div><div class="de">Warm turmeric &amp; terracotta, fully bilingual (Hindi + English shown). Built for classic North-Indian dhabas.</div><div class="specs"><span class="spec">#FFF3D6</span><span class="spec">#E4761B</span><span class="spec">bilingual</span></div><div class="fonts"><b>Baloo 2</b> + Mukta</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#141018;--t-text:#F4ECFF;--t-muted:#9E8BB5;--t-accent:#FF3D8B;--t-cta:#3DE0C0;--t-onacc:#141018;--t-surface:#1E1826;--t-line:#2E2338;--t-chipbg:#1E1826;--t-chiptext:#FF7DB0;--t-thumbbg:#261D30;--t-display:'Space Grotesk',sans-serif;--t-body:'Poppins',sans-serif;--t-price:#3DE0C0;--t-dishborder:1px solid #2A2034;--t-oncat:#141018">
+        <div class="stage">
+          <div class="brandrow"><div class="brand">Chatpata</div><span class="tno">Table 15</span></div>
+          <div class="cats"><span class="cat on">Momos</span><span class="cat">Rolls</span><span class="cat">Shakes</span></div>
+          <div class="dish"><div class="thumb">🥟</div><div class="info"><div class="dn">Schezwan Momos</div><div class="dd">8 pcs · fried · fiery dip</div></div><span class="price">₹110</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🥤</div><div class="info"><div class="dn">Oreo Thickshake</div><div class="dd">whipped cream · large</div></div><span class="price">₹140</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:11px;font-weight:700;color:var(--t-accent)">⚡ TRENDING</span><button class="cta">Order ₹250</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">06</span> Chatpata</div><div class="de">Neon-on-dark for Gen-Z hangouts, momo &amp; roll joints, college cafes. High-contrast, punchy, shareable.</div><div class="specs"><span class="spec">#141018</span><span class="spec">#FF3D8B</span><span class="spec">neon</span></div><div class="fonts"><b>Space Grotesk</b> + Poppins</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#EDE3D1;--t-text:#3B2F1E;--t-muted:#8B7856;--t-accent:#C2451D;--t-cta:#3B2F1E;--t-onacc:#EDE3D1;--t-surface:#F6EEDF;--t-line:#DBCBA8;--t-chipbg:#E3D6BC;--t-chiptext:#7A5A2A;--t-thumbbg:#E3D6BC;--t-display:'Bebas Neue',sans-serif;--t-body:'Nunito',sans-serif;--t-price:#C2451D;--t-ls:.03em;--t-pill:8px;--t-radius:10px;--t-thumb:8px;--t-addr:8px;--t-ctar:8px;--t-dishborder:1.5px solid #3B2F1E22;--t-chipborder:1.5px solid #3B2F1E22">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-size:26px">HIGHWAY DHABA</div><span class="tno">Table 04</span></div>
+          <div class="cats"><span class="cat on">Sizzlers</span><span class="cat">Dal</span><span class="cat">Roti</span></div>
+          <div class="dish"><div class="thumb">🍛</div><div class="info"><div class="dn">Dal Makhani</div><div class="dd">slow-cooked · overnight · ghee</div></div><span class="price">₹180</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🧅</div><div class="info"><div class="dn">Laccha Onion</div><div class="dd">lemon · green chilli</div></div><span class="price">₹40</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--t-muted)">SINCE 1994 · NH-48</span><button class="cta">BILL · ₹220</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">07</span> Highway Dhaba</div><div class="de">Retro kraft-paper &amp; stamp aesthetic — condensed display type, boxy shapes. Nostalgic roadside authenticity.</div><div class="specs"><span class="spec">#EDE3D1</span><span class="spec">#C2451D</span><span class="spec">retro</span></div><div class="fonts"><b>Bebas Neue</b> + Nunito</div></div>
+      </article>
+    </div>
+
+    <!-- FAMILY 3: MODERN CAFE / MINIMAL -->
+    <div class="fam-head"><h3>Modern Cafe &amp; Minimal</h3><span class="tag">Clean · airy · editorial</span><span class="rule"></span></div>
+    <div class="tgrid">
+
+      <article class="tpl" style="--t-bg:#FFFFFF;--t-text:#111111;--t-muted:#8A8A8A;--t-accent:#111111;--t-cta:#111111;--t-onacc:#fff;--t-surface:#fff;--t-line:#ECECEC;--t-chipbg:#F4F4F4;--t-chiptext:#111;--t-thumbbg:#F4F4F4;--t-display:'Fraunces',serif;--t-body:'Manrope',sans-serif;--t-price:#111;--t-radius:12px;--t-dishborder:1px solid #F0F0F0">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-size:22px">Blanc.</div><span class="tno">Table 02</span></div>
+          <div class="cats"><span class="cat on">Coffee</span><span class="cat">Bakes</span><span class="cat">All-day</span></div>
+          <div class="dish"><div class="thumb">☕</div><div class="info"><div class="dn">Flat White</div><div class="dd">single origin · oat option</div></div><span class="price">₹190</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🥐</div><div class="info"><div class="dn">Almond Croissant</div><div class="dd">baked in-house daily</div></div><span class="price">₹160</span><button class="add">+</button></div>
+          <div class="footbar"><span class="veg"></span><button class="cta">View order</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">08</span> Blanc</div><div class="de">Pure white, black type, one editorial serif accent. Maximum restraint for specialty coffee &amp; concept cafes.</div><div class="specs"><span class="spec">#FFFFFF</span><span class="spec">#111111</span><span class="spec">minimal</span></div><div class="fonts"><b>Fraunces</b> + Manrope</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#EAF0E6;--t-text:#25311F;--t-muted:#7C8B70;--t-accent:#3F7D3A;--t-cta:#3F7D3A;--t-onacc:#fff;--t-surface:#fff;--t-line:#D6E0CE;--t-chipbg:#DCE7D3;--t-chiptext:#3F7D3A;--t-thumbbg:#DCE7D3;--t-display:'Fraunces',serif;--t-body:'Manrope',sans-serif;--t-price:#3F7D3A;--t-radius:16px;--t-dishborder:1px solid #E1E9DA">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-size:21px">Matcha House</div><span class="tno">Table 06</span></div>
+          <div class="cats"><span class="cat on">Matcha</span><span class="cat">Bowls</span><span class="cat">Vegan</span></div>
+          <div class="dish"><div class="thumb">🍵</div><div class="info"><div class="dn">Iced Matcha Latte</div><div class="dd">ceremonial grade · almond</div></div><span class="price">₹240</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🥣</div><div class="info"><div class="dn">Acai Bowl</div><div class="dd">granola · seasonal fruit</div></div><span class="price">₹320</span><button class="add">+</button></div>
+          <div class="footbar"><span class="veg"></span><button class="cta">Checkout · ₹560</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">09</span> Matcha House</div><div class="de">Soft green wellness palette, rounded cards, gentle. Health cafes, vegan spots, juice &amp; smoothie bars.</div><div class="specs"><span class="spec">#EAF0E6</span><span class="spec">#3F7D3A</span><span class="spec">fresh</span></div><div class="fonts"><b>Fraunces</b> + Manrope</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#D9CDB8;--t-text:#3A3226;--t-muted:#8A7C64;--t-accent:#6E5A3A;--t-cta:#3A3226;--t-onacc:#EDE4D2;--t-surface:#E6DCC8;--t-line:#C7B899;--t-chipbg:#DFD3BB;--t-chiptext:#5A4A30;--t-thumbbg:#DFD3BB;--t-display:'Space Grotesk',sans-serif;--t-body:'Manrope',sans-serif;--t-price:#6E5A3A;--t-radius:10px;--t-dishborder:1px dashed #A9986F">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-size:20px">KRAFT / kitchen</div><span class="tno">Table 11</span></div>
+          <div class="cats"><span class="cat on">Toasts</span><span class="cat">Salads</span><span class="cat">Cold brew</span></div>
+          <div class="dish"><div class="thumb">🥪</div><div class="info"><div class="dn">Avocado Toast</div><div class="dd">sourdough · chilli · lime</div></div><span class="price">₹280</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🧊</div><div class="info"><div class="dn">Cold Brew</div><div class="dd">18-hour steep</div></div><span class="price">₹200</span><button class="add">+</button></div>
+          <div class="footbar"><span class="veg"></span><button class="cta">Order · ₹480</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">10</span> Kraft Kitchen</div><div class="de">Recycled-paper texture, dashed rules, honest &amp; sustainable. Artisan bakeries, farm-to-table, eco cafes.</div><div class="specs"><span class="spec">#D9CDB8</span><span class="spec">#6E5A3A</span><span class="spec">craft</span></div><div class="fonts"><b>Space Grotesk</b> + Manrope</div></div>
+      </article>
+    </div>
+
+    <!-- FAMILY 4: NIGHT / BAR / LOUNGE -->
+    <div class="fam-head"><h3>Bar, Lounge &amp; Nightlife</h3><span class="tag">Dark · premium · atmospheric</span><span class="rule"></span></div>
+    <div class="tgrid">
+
+      <article class="tpl" style="--t-bg:#0C1116;--t-text:#E6EEF2;--t-muted:#7C8B96;--t-accent:#31E0C4;--t-cta:#31E0C4;--t-onacc:#06100D;--t-surface:#131B22;--t-line:#202A33;--t-chipbg:#131B22;--t-chiptext:#31E0C4;--t-thumbbg:#1A232B;--t-display:'Sora',sans-serif;--t-body:'Sora',sans-serif;--t-price:#31E0C4;--t-radius:14px;--t-dishborder:1px solid #1D2731;--t-oncat:#06100D">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-weight:700">Midnight</div><span class="tno">Table 18</span></div>
+          <div class="cats"><span class="cat on">Cocktails</span><span class="cat">Bar bites</span><span class="cat">Zero-proof</span></div>
+          <div class="dish"><div class="thumb">🍸</div><div class="info"><div class="dn">Smoked Negroni</div><div class="dd">campari · barrel gin</div></div><span class="price">₹550</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🍟</div><div class="info"><div class="dn">Truffle Fries</div><div class="dd">parmesan · aioli</div></div><span class="price">₹290</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:11px;color:var(--t-muted);letter-spacing:.12em">HAPPY HOUR 6–8</span><button class="cta">Tab · ₹840</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">11</span> Midnight</div><div class="de">Ink-blue dark with an electric mint accent. Cocktail bars, gastropubs, rooftop lounges. Glows in a dim room.</div><div class="specs"><span class="spec">#0C1116</span><span class="spec">#31E0C4</span><span class="spec">dark-only</span></div><div class="fonts"><b>Sora</b> display + body</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#17120B;--t-text:#F0E4CC;--t-muted:#A08A66;--t-accent:#C9962E;--t-cta:#C9962E;--t-onacc:#17120B;--t-surface:#211A10;--t-line:#352A19;--t-chipbg:#211A10;--t-chiptext:#C9962E;--t-thumbbg:#291F13;--t-display:'Cinzel',serif;--t-body:'Jost',sans-serif;--t-price:#C9962E;--t-radius:6px;--t-thumb:6px;--t-addr:6px;--t-ctar:4px;--t-pill:4px;--t-ls:.08em;--t-dishborder:1px solid #2E2415;--t-oncat:#17120B;--t-chipborder:1px solid #3A2E1B">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-size:16px">SPEAKEASY</div><span class="tno">Table 08</span></div>
+          <div class="cats"><span class="cat on">Whisky</span><span class="cat">Classics</span><span class="cat">Cigars</span></div>
+          <div class="dish"><div class="thumb">🥃</div><div class="info"><div class="dn">Old Fashioned</div><div class="dd">bourbon · orange · bitters</div></div><span class="price">₹620</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🫒</div><div class="info"><div class="dn">Dirty Martini</div><div class="dd">vodka · brine · olive</div></div><span class="price">₹580</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:10px;color:var(--t-muted);letter-spacing:.16em">MEMBERS ONLY</span><button class="cta">TAB · ₹1,200</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">12</span> Speakeasy</div><div class="de">Prohibition-era brass &amp; leather. Engraved serif caps, sharp corners. Whisky bars, cigar lounges, hotels.</div><div class="specs"><span class="spec">#17120B</span><span class="spec">#C9962E</span><span class="spec">dark-only</span></div><div class="fonts"><b>Cinzel</b> + Jost</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#160B1E;--t-text:#FCE9FF;--t-muted:#B085C4;--t-accent:#FF2E88;--t-cta:#00E0FF;--t-onacc:#160B1E;--t-surface:#211029;--t-line:#37173F;--t-chipbg:#211029;--t-chiptext:#FF6EB0;--t-thumbbg:#2A1434;--t-display:'Bebas Neue',sans-serif;--t-body:'Poppins',sans-serif;--t-price:#00E0FF;--t-ls:.04em;--t-radius:12px;--t-dishborder:1px solid #37173F;--t-oncat:#160B1E">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-size:26px">NEON DINER</div><span class="tno">Table 13</span></div>
+          <div class="cats"><span class="cat on">Burgers</span><span class="cat">Wings</span><span class="cat">Floats</span></div>
+          <div class="dish"><div class="thumb">🍔</div><div class="info"><div class="dn">Double Smash</div><div class="dd">cheddar · pickles · secret sauce</div></div><span class="price">₹280</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🥤</div><div class="info"><div class="dn">Cola Float</div><div class="dd">vanilla scoop</div></div><span class="price">₹150</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:11px;font-weight:700;color:var(--t-accent)">★ OPEN LATE</span><button class="cta">ORDER ₹430</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">13</span> Neon Diner</div><div class="de">80s arcade neon — hot pink + cyan on purple-black. Late-night burger joints, shake bars, gaming cafes.</div><div class="specs"><span class="spec">#160B1E</span><span class="spec">#FF2E88</span><span class="spec">neon</span></div><div class="fonts"><b>Bebas Neue</b> + Poppins</div></div>
+      </article>
+    </div>
+
+    <!-- FAMILY 5: MODERN APP / BENTO -->
+    <div class="fam-head"><h3>Modern App &amp; Bento</h3><span class="tag">Product-grade · card-led</span><span class="rule"></span></div>
+    <div class="tgrid">
+
+      <article class="tpl" style="--t-bg:#F5F6F8;--t-text:#151A20;--t-muted:#7A828C;--t-accent:#FF5A1F;--t-cta:#151A20;--t-onacc:#fff;--t-surface:#fff;--t-line:#E7EAEE;--t-chipbg:#EEF0F3;--t-chiptext:#151A20;--t-thumbbg:#EEF0F3;--t-display:'Manrope',sans-serif;--t-body:'Manrope',sans-serif;--t-price:#151A20;--t-radius:16px;--t-bw:800;--t-dishborder:1px solid #EDEFF2">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-weight:800">Bento Fresh</div><span class="tno">Table 05</span></div>
+          <div class="cats"><span class="cat on">Popular</span><span class="cat">Meals</span><span class="cat">Sides</span></div>
+          <div class="dish"><div class="thumb">🍱</div><div class="info"><div class="dn">Teriyaki Bowl</div><div class="dd">chicken · rice · slaw · 4.8★</div></div><span class="price">₹260</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🍜</div><div class="info"><div class="dn">Shoyu Ramen</div><div class="dd">soft egg · nori · 4.9★</div></div><span class="price">₹340</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:11px;font-weight:700;color:var(--t-accent)">● 22 min prep</span><button class="cta">Cart · ₹600</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">14</span> Bento Fresh</div><div class="de">Swiggy/Zomato-grade product UI — ratings, prep time, big tap targets. Cloud kitchens &amp; QSR chains.</div><div class="specs"><span class="spec">#F5F6F8</span><span class="spec">#FF5A1F</span><span class="spec">app-style</span></div><div class="fonts"><b>Manrope</b> display + body</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:linear-gradient(150deg,#1B2A4A,#3A2160 60%,#7A2E63);--t-text:#F3F0FF;--t-muted:#B9B3D6;--t-accent:#FFD166;--t-cta:#FFD166;--t-onacc:#221436;--t-surface:rgba(255,255,255,.09);--t-line:rgba(255,255,255,.16);--t-chipbg:rgba(255,255,255,.12);--t-chiptext:#fff;--t-thumbbg:rgba(255,255,255,.14);--t-display:'Poppins',sans-serif;--t-body:'Poppins',sans-serif;--t-price:#FFD166;--t-radius:16px;--t-dishborder:1px solid rgba(255,255,255,.14);--t-oncat:#221436">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-weight:700">Aurora</div><span class="tno">Table 10</span></div>
+          <div class="cats"><span class="cat on">Fusion</span><span class="cat">Sushi</span><span class="cat">Bao</span></div>
+          <div class="dish"><div class="thumb">🍣</div><div class="info"><div class="dn">Dragon Roll</div><div class="dd">eel · avocado · 8 pcs</div></div><span class="price">₹420</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🥢</div><div class="info"><div class="dn">Pork Bao</div><div class="dd">2 pcs · hoisin</div></div><span class="price">₹260</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:11px;color:var(--t-muted)">✦ Chef's picks</span><button class="cta">Order · ₹680</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">15</span> Aurora</div><div class="de">Frosted-glass cards on a jewel gradient. Iridescent, premium, modern. Fusion, sushi, rooftop dining.</div><div class="specs"><span class="spec">gradient</span><span class="spec">#FFD166</span><span class="spec">glass</span></div><div class="fonts"><b>Poppins</b> display + body</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#101317;--t-text:#E9EDF2;--t-muted:#828B96;--t-accent:#A3E635;--t-cta:#A3E635;--t-onacc:#101317;--t-surface:#181C22;--t-line:#262B32;--t-chipbg:#181C22;--t-chiptext:#A3E635;--t-thumbbg:#1E232A;--t-display:'Space Grotesk',sans-serif;--t-body:'Manrope',sans-serif;--t-price:#A3E635;--t-radius:14px;--t-dishborder:1px solid #23282F;--t-oncat:#101317">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-weight:700">Protein Lab</div><span class="tno">Table 16</span></div>
+          <div class="cats"><span class="cat on">High-protein</span><span class="cat">Bowls</span><span class="cat">Shakes</span></div>
+          <div class="dish"><div class="thumb">🍗</div><div class="info"><div class="dn">Grilled Chicken Bowl</div><div class="dd">42g protein · 520 kcal</div></div><span class="price">₹330</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🥤</div><div class="info"><div class="dn">Whey Shake</div><div class="dd">30g · banana · peanut</div></div><span class="price">₹210</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:11px;font-weight:700;color:var(--t-accent)">◇ MACROS SHOWN</span><button class="cta">Cart · ₹540</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">16</span> Protein Lab</div><div class="de">Techy dark + lime, calorie &amp; macro tags built in. Gym cafes, meal-prep, health-focused QSR.</div><div class="specs"><span class="spec">#101317</span><span class="spec">#A3E635</span><span class="spec">data-rich</span></div><div class="fonts"><b>Space Grotesk</b> + Manrope</div></div>
+      </article>
+    </div>
+
+    <!-- FAMILY 6: SWEET / BAKERY / DESSERT -->
+    <div class="fam-head"><h3>Bakery, Dessert &amp; Sweet</h3><span class="tag">Pastel · soft · charming</span><span class="rule"></span></div>
+    <div class="tgrid">
+
+      <article class="tpl" style="--t-bg:#FDEAF0;--t-text:#5A2A3E;--t-muted:#B77E93;--t-accent:#F26E9A;--t-cta:#F26E9A;--t-onacc:#fff;--t-surface:#fff;--t-line:#F7D3DF;--t-chipbg:#FCDCE7;--t-chiptext:#D84B7C;--t-thumbbg:#FCDCE7;--t-display:'Fredoka',sans-serif;--t-body:'Nunito',sans-serif;--t-price:#F26E9A;--t-radius:18px;--t-thumb:14px;--t-dishborder:1px solid #F8D8E1">
+        <div class="stage">
+          <div class="brandrow"><div class="brand">Gelato Bar</div><span class="tno">Table 14</span></div>
+          <div class="cats"><span class="cat on">Scoops</span><span class="cat">Waffles</span><span class="cat">Sundae</span></div>
+          <div class="dish"><div class="thumb">🍦</div><div class="info"><div class="dn">Pistachio Gelato</div><div class="dd">double scoop · cone</div></div><span class="price">₹180</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🧇</div><div class="info"><div class="dn">Nutella Waffle</div><div class="dd">strawberries · cream</div></div><span class="price">₹240</span><button class="add">+</button></div>
+          <div class="footbar"><span class="veg"></span><button class="cta">Order · ₹420</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">17</span> Gelato Bar</div><div class="de">Sugar-rush pastels, pillowy rounded cards, bouncy motion. Ice cream, dessert parlours, kids' cafes.</div><div class="specs"><span class="spec">#FDEAF0</span><span class="spec">#F26E9A</span><span class="spec">playful</span></div><div class="fonts"><b>Fredoka</b> + Nunito</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#F3E8D8;--t-text:#4A3520;--t-muted:#A08560;--t-accent:#8A5A2B;--t-cta:#4A3520;--t-onacc:#F3E8D8;--t-surface:#FBF4E7;--t-line:#E4D2B6;--t-chipbg:#EEDFC6;--t-chiptext:#8A5A2B;--t-thumbbg:#EEDFC6;--t-display:'DM Serif Display',serif;--t-body:'Karla',sans-serif;--t-price:#8A5A2B;--t-radius:12px;--t-dishborder:1px solid #E9D8BC">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-size:22px">La Boulangerie</div><span class="tno">Table 01</span></div>
+          <div class="cats"><span class="cat on">Breads</span><span class="cat">Pastry</span><span class="cat">Cakes</span></div>
+          <div class="dish"><div class="thumb">🥖</div><div class="info"><div class="dn">Sourdough Loaf</div><div class="dd">48-hour ferment</div></div><span class="price">₹220</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🍰</div><div class="info"><div class="dn">Basque Cheesecake</div><div class="dd">burnt top · slice</div></div><span class="price">₹280</span><button class="add">+</button></div>
+          <div class="footbar"><span class="veg"></span><button class="cta">Basket · ₹500</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">18</span> La Boulangerie</div><div class="de">Warm butter &amp; crust tones, classic French serif. Artisan bakeries, patisseries, brunch spots.</div><div class="specs"><span class="spec">#F3E8D8</span><span class="spec">#8A5A2B</span><span class="spec">classic</span></div><div class="fonts"><b>DM Serif Display</b> + Karla</div></div>
+      </article>
+
+      <article class="tpl" style="--t-bg:#7A1E2B;--t-text:#F6E7C8;--t-muted:#CBA36C;--t-accent:#D4A73C;--t-cta:#D4A73C;--t-onacc:#4A0F17;--t-surface:#8A2432;--t-line:#9E3341;--t-chipbg:#8A2432;--t-chiptext:#EFD9A8;--t-thumbbg:#932A38;--t-display:'Marcellus',serif;--t-body:'Mukta',sans-serif;--t-price:#D4A73C;--t-radius:8px;--t-ls:.02em;--t-dishborder:1px solid #98303E;--t-oncat:#4A0F17">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-size:20px">Rajwada Thali</div><span class="tno">Table 22</span></div>
+          <div class="cats"><span class="cat on">Thali</span><span class="cat">Sweets</span><span class="cat">Sharbat</span></div>
+          <div class="dish"><div class="thumb">🍛</div><div class="info"><div class="dn">Royal Thali · राजसी थाली</div><div class="dd">11 items · unlimited</div></div><span class="price">₹399</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🍮</div><div class="info"><div class="dn">Ghewar · घेवर</div><div class="dd">rabri · saffron</div></div><span class="price">₹120</span><button class="add">+</button></div>
+          <div class="footbar"><span class="veg"></span><button class="cta">बिल देखें · ₹519</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">19</span> Rajwada Thali</div><div class="de">Royal maroon &amp; gold, heritage serif, bilingual. Rajasthani/Gujarati thali houses, wedding caterers, sweet shops.</div><div class="specs"><span class="spec">#7A1E2B</span><span class="spec">#D4A73C</span><span class="spec">heritage</span></div><div class="fonts"><b>Marcellus</b> + Mukta</div></div>
+      </article>
+    </div>
+
+    <!-- FAMILY 7: COASTAL (single, closes at 20) -->
+    <div class="fam-head"><h3>Coastal &amp; Seafood</h3><span class="tag">Breezy · fresh</span><span class="rule"></span></div>
+    <div class="tgrid">
+      <article class="tpl" style="--t-bg:#E4F1F2;--t-text:#123840;--t-muted:#5E8A90;--t-accent:#0E8C93;--t-cta:#0E8C93;--t-onacc:#fff;--t-surface:#fff;--t-line:#CBE3E5;--t-chipbg:#D6EBEC;--t-chiptext:#0E8C93;--t-thumbbg:#D6EBEC;--t-display:'Fraunces',serif;--t-body:'Manrope',sans-serif;--t-price:#0E8C93;--t-radius:16px;--t-dishborder:1px solid #D8EAEB">
+        <div class="stage">
+          <div class="brandrow"><div class="brand" style="font-size:21px">Coastal Catch</div><span class="tno">Table 19</span></div>
+          <div class="cats"><span class="cat on">Fresh catch</span><span class="cat">Curry</span><span class="cat">Coolers</span></div>
+          <div class="dish"><div class="thumb">🦐</div><div class="info"><div class="dn">Prawn Ghee Roast</div><div class="dd">mangalorean · appam</div></div><span class="price">₹420</span><button class="add">+</button></div>
+          <div class="dish"><div class="thumb">🐟</div><div class="info"><div class="dn">Meen Moilee</div><div class="dd">seer fish · coconut</div></div><span class="price">₹380</span><button class="add">+</button></div>
+          <div class="footbar"><span style="font-size:11px;color:var(--t-muted)">◷ Catch of the day</span><button class="cta">Order · ₹800</button></div>
+        </div>
+        <div class="meta"><div class="nm"><span class="no">20</span> Coastal Catch</div><div class="de">Sea-glass teal &amp; sand, light and breezy. Seafood shacks, Goan/coastal restaurants, beach cafes.</div><div class="specs"><span class="spec">#E4F1F2</span><span class="spec">#0E8C93</span><span class="spec">fresh</span></div><div class="fonts"><b>Fraunces</b> + Manrope</div></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= ENGINE ================= -->
+  <section>
+    <div class="callout">
+      <span class="eyebrow">The build strategy · for a solo founder</span>
+      <h2 style="font-size:clamp(24px,3vw,34px);margin:12px 0 14px">Don't build 20 menus. Build one engine, ship 20 themes.</h2>
+      <p class="lead">Every card above is the <b>same component</b> fed a different token set — palette, fonts, radius, shape. That's the whole trick, and it's what keeps this maintainable for one person: adding template #21 is a data file, not a new codebase. Owners pick a theme; the menu data never changes.</p>
+      <div class="flow">
+        <div class="fstep"><div class="fn">01</div><h4>Owner registers</h4><p>Restaurant name, logo, table count.</p></div>
+        <div class="fstep"><div class="fn">02</div><h4>Picks a template</h4><p>From this gallery. Live preview with their own items.</p></div>
+        <div class="fstep"><div class="fn">03</div><h4>Adds the menu</h4><p>Categories, dishes, prices, veg/spice tags, Hindi names.</p></div>
+        <div class="fstep"><div class="fn">04</div><h4>Generates QR</h4><p>One per table, table number baked in, print-ready.</p></div>
+        <div class="fstep"><div class="fn">05</div><h4>Goes live</h4><p>Scan → order → kitchen → WhatsApp bill. Payment toggle optional.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STANDARDS ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Non-negotiables · every template must pass</span>
+      <h2>The quality bar that beats the ₹129 crowd.</h2>
+    </div>
+    <ul class="checklist">
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Loads in under 2s on 3G; images lazy WebP with skeletons</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> 44px+ tap targets, 16px+ body text, thumb-reachable cart</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Bilingual: English + Hindi/regional item names</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Veg / non-veg / Jain / spice indicators standard</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Motion respects <code>prefers-reduced-motion</code></li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Text contrast ≥ 4.5:1 in every palette</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> No app install — works in any phone browser</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Runs at 40 tables or 400 from the same theme</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p style="max-width:60ch">Menu Design Bible · v1 — a working design study, not a mockup. Every template above is live HTML/CSS you can lift straight into the product. Next: pick the 3–4 launch templates and I'll build the first full interactive menu (scan → order → cart) end to end.</p>
+  </footer>
+</div>
+
+<script>
+  // theme toggle: cycle system -> light -> dark
+  (function(){
+    var btn=document.getElementById('themeToggle');
+    var root=document.documentElement;
+    function apply(t){ if(t==='system'){root.removeAttribute('data-theme');} else {root.setAttribute('data-theme',t);} }
+    var cur='system';
+    try{ cur=localStorage.getItem('mdb-theme')||'system'; }catch(e){}
+    apply(cur);
+    btn.addEventListener('click',function(){
+      cur = cur==='system' ? 'light' : cur==='light' ? 'dark' : 'system';
+      apply(cur);
+      try{ localStorage.setItem('mdb-theme',cur); }catch(e){}
+      btn.textContent = cur==='system' ? '◑ Theme' : cur==='light' ? '☀ Light' : '☾ Dark';
+    });
+  })();
+
+  // tiny add-to-cart feedback on every live template button
+  document.querySelectorAll('.tpl .add').forEach(function(b){
+    b.addEventListener('click',function(){
+      if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      b.animate([{transform:'scale(1)'},{transform:'scale(.8)'},{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:280,easing:'ease-out'});
+    });
+  });
+  // category chip toggle within a card
+  document.querySelectorAll('.tpl .cats').forEach(function(row){
+    row.addEventListener('click',function(e){
+      var c=e.target.closest('.cat'); if(!c) return;
+      row.querySelectorAll('.cat').forEach(function(x){x.classList.remove('on')});
+      c.classList.add('on');
+    });
+  });
+</script>

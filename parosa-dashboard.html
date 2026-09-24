@@ -1,0 +1,356 @@
+<title>Parosa Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Cinzel:wght@400;500;600;700&family=Mukta:wght@300;400;500;600;700;800&display=swap">
+<style>
+  :root{
+    color-scheme:light;
+    --parch:#EFE6D1; --parch-2:#E5D8BC; --parch-hi:#F5EFDD; --cream-card:#F8F1DF;
+    --oxblood:#6E1618; --maroon:#8C1C1C; --maroon-deep:#531012;
+    --ink:#3E1012; --ink-2:#79302A; --muted:#9A7C55;
+    --gold:#A9823A; --gold-hi:#CBA24E; --gold-soft:#E7D6A6;
+    --line:#D8C299; --line-gold:#C9A24B; --line-soft:#E6D6B2;
+    /* semantic status (separate from brand accent) */
+    --st-new:#B07A16; --st-new-bg:#F6E6BC;
+    --st-cook:#C25A1E; --st-cook-bg:#F7DCC5;
+    --st-ready:#2E7D46; --st-ready-bg:#D6EBD8;
+    --st-served:#8A7A66; --st-served-bg:#EAE0CC;
+    --pos:#2E7D46; --neg:#B4231C;
+    --display:'Rozha One',Georgia,serif;
+    --caps:'Cinzel',Georgia,serif;
+    --body:'Mukta','Segoe UI',system-ui,sans-serif;
+    --paisley:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%233F0C0E' stroke-width='1' opacity='0.5'%3E%3Ccircle cx='40' cy='40' r='5'/%3E%3Ccircle cx='40' cy='40' r='11'/%3E%3Cellipse cx='40' cy='24' rx='4' ry='8'/%3E%3Cellipse cx='40' cy='56' rx='4' ry='8'/%3E%3Cellipse cx='24' cy='40' rx='8' ry='4'/%3E%3Cellipse cx='56' cy='40' rx='8' ry='4'/%3E%3Ccircle cx='27' cy='27' r='3'/%3E%3Ccircle cx='53' cy='27' r='3'/%3E%3Ccircle cx='27' cy='53' r='3'/%3E%3Ccircle cx='53' cy='53' r='3'/%3E%3Ccircle cx='8' cy='8' r='3'/%3E%3Ccircle cx='72' cy='72' r='3'/%3E%3Ccircle cx='72' cy='8' r='3'/%3E%3Ccircle cx='8' cy='72' r='3'/%3E%3C/g%3E%3C/svg%3E");
+    --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:var(--body);color:var(--ink);background:var(--parch);-webkit-font-smoothing:antialiased;line-height:1.5}
+  body::before{content:"";position:fixed;inset:0;background-image:var(--grain);background-size:180px;opacity:.10;mix-blend-mode:multiply;pointer-events:none;z-index:1}
+  h1,h2,h3,h4{font-family:var(--display);font-weight:400;margin:0;line-height:1.1}
+  p{margin:0}
+  button{font-family:inherit;cursor:pointer}
+  .cap{font-family:var(--caps);letter-spacing:.18em;text-transform:uppercase}
+
+  .app{display:grid;grid-template-columns:248px 1fr;min-height:100vh;position:relative;z-index:2}
+  @media(max-width:840px){.app{grid-template-columns:1fr}}
+
+  /* ============ SIDEBAR ============ */
+  .side{background:var(--oxblood) var(--paisley);background-size:100px;color:var(--parch);
+    border-right:3px solid var(--gold);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  @media(max-width:840px){.side{position:static;height:auto;flex-direction:row;align-items:center;border-right:none;border-bottom:3px solid var(--gold);overflow-x:auto}}
+  .brand{padding:22px 20px 18px;border-bottom:1px solid #ffffff22;display:flex;align-items:center;gap:12px;flex:none}
+  .seal{width:46px;height:46px;flex:none}
+  .brand .wm{font-family:var(--display);font-size:26px;color:var(--parch-hi);line-height:.9}
+  .brand .wm small{display:block;font-family:var(--caps);font-weight:600;font-size:8.5px;letter-spacing:.34em;color:var(--gold-hi);margin-top:3px}
+  .nav{padding:14px 12px;display:flex;flex-direction:column;gap:3px;flex:1;overflow-y:auto}
+  @media(max-width:840px){.nav{flex-direction:row;padding:8px;gap:4px}}
+  .nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:6px;color:var(--gold-soft);
+    text-decoration:none;font-size:14px;font-weight:500;white-space:nowrap;transition:background .15s,color .15s;border:1px solid transparent}
+  .nav a svg{width:18px;height:18px;flex:none;opacity:.85}
+  .nav a:hover{background:#ffffff12;color:var(--parch)}
+  .nav a.on{background:var(--parch-hi);color:var(--oxblood);font-weight:700;border-color:var(--parch);box-shadow:0 4px 12px -4px #0007}
+  .nav a.on svg{opacity:1}
+  .nav .grp{font-family:var(--caps);font-size:9px;letter-spacing:.2em;color:#e8d8a880;padding:14px 12px 6px}
+  @media(max-width:840px){.nav .grp{display:none}}
+  .side .foot{padding:14px;border-top:1px solid #ffffff22;flex:none}
+  @media(max-width:840px){.side .foot{display:none}}
+  .rest{display:flex;align-items:center;gap:10px;background:#ffffff10;border:1px solid #ffffff22;border-radius:8px;padding:9px 11px}
+  .rest .rc{width:34px;height:34px;border-radius:7px;background:var(--gold);color:var(--maroon-deep);display:grid;place-items:center;font-family:var(--display);font-size:19px;flex:none}
+  .rest .rn{font-size:13px;font-weight:700;color:var(--parch);line-height:1.1}
+  .rest .rp{font-size:10px;color:var(--gold-hi)}
+
+  /* ============ MAIN ============ */
+  .main{padding:0 0 40px;min-width:0}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 28px;
+    background:var(--parch-hi);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;flex-wrap:wrap}
+  body::before{}
+  .topbar .hi h1{font-size:26px;color:var(--oxblood)}
+  .topbar .hi p{font-size:12.5px;color:var(--ink-2);margin-top:2px}
+  .topbar .acts{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn{border:1px solid var(--line-gold);background:var(--cream-card);color:var(--maroon);border-radius:7px;
+    padding:9px 14px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px;transition:transform .12s,background .15s}
+  .btn:active{transform:scale(.96)}
+  .btn svg{width:15px;height:15px}
+  .btn.prime{background:var(--oxblood);color:var(--gold-hi);border-color:var(--oxblood)}
+  .btn.prime:hover{background:var(--maroon)}
+
+  .content{padding:24px 28px 0;max-width:1180px}
+  @media(max-width:520px){.content,.topbar{padding-left:16px;padding-right:16px}}
+
+  .note{display:flex;gap:10px;align-items:center;background:var(--gold-soft);border:1px solid var(--line-gold);
+    border-radius:8px;padding:9px 14px;font-size:12.5px;color:var(--ink-2);margin-bottom:22px}
+  .note b{color:var(--maroon)}
+
+  /* KPI tiles */
+  .kpis{display:grid;gap:16px;grid-template-columns:repeat(2,1fr);margin-bottom:8px}
+  @media(min-width:760px){.kpis{grid-template-columns:repeat(4,1fr)}}
+  .kpi{background:var(--cream-card);border:1px solid var(--line);border-top:3px solid var(--oxblood);border-radius:8px;padding:16px 17px;position:relative;box-shadow:0 8px 22px -16px #5e111350}
+  .kpi .kl{font-family:var(--caps);font-size:10px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+  .kpi .kv{font-family:var(--body);font-weight:800;font-size:32px;color:var(--ink);line-height:1;margin:9px 0 6px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .kpi .kd{font-size:11.5px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+  .kpi .kd.up{color:var(--pos)} .kpi .kd.down{color:var(--neg)} .kpi .kd.flat{color:var(--muted)}
+  .kpi .ki{position:absolute;top:14px;right:14px;color:var(--gold);opacity:.55}
+
+  .grid2{display:grid;gap:18px;margin-top:22px}
+  @media(min-width:900px){.grid2{grid-template-columns:1.5fr 1fr}}
+
+  .panel{background:var(--cream-card);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px -20px #5e111360;overflow:hidden}
+  .panel .ph{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--line);background:var(--parch-hi)}
+  .panel .ph h3{font-size:20px;color:var(--oxblood);display:flex;align-items:center;gap:9px}
+  .panel .ph .live{font-family:var(--caps);font-size:9px;letter-spacing:.14em;color:var(--st-ready);display:inline-flex;align-items:center;gap:5px;font-weight:600}
+  .panel .ph .live .d{width:7px;height:7px;border-radius:50%;background:var(--st-ready);box-shadow:0 0 0 3px var(--st-ready-bg);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .panel .ph .see{font-size:12px;color:var(--maroon);font-weight:600}
+  .panel .pb{padding:12px 14px}
+
+  /* order tickets */
+  .ticket{border:1px solid var(--line);border-left:4px solid var(--st-new);border-radius:8px;padding:12px 14px;margin-bottom:11px;background:var(--parch-hi);transition:border-color .2s}
+  .ticket:last-child{margin-bottom:0}
+  .ticket[data-status="cooking"]{border-left-color:var(--st-cook)}
+  .ticket[data-status="ready"]{border-left-color:var(--st-ready)}
+  .ticket[data-status="served"]{border-left-color:var(--st-served);opacity:.72}
+  .ticket .tt{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .ticket .tbl{font-family:var(--display);font-size:19px;color:var(--oxblood)}
+  .ticket .tbl small{font-family:var(--body);font-size:11px;color:var(--muted);margin-left:6px;font-weight:500}
+  .ticket .items{font-size:13px;color:var(--ink);line-height:1.5}
+  .ticket .items b{font-weight:700}
+  .ticket .tf{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:10px}
+  .ticket .amt{font-family:var(--body);font-weight:800;font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .pill{font-family:var(--caps);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:4px 9px;border-radius:100px;white-space:nowrap}
+  .pill.new{color:var(--st-new);background:var(--st-new-bg)}
+  .pill.cooking{color:var(--st-cook);background:var(--st-cook-bg)}
+  .pill.ready{color:var(--st-ready);background:var(--st-ready-bg)}
+  .pill.served{color:var(--st-served);background:var(--st-served-bg)}
+  .adv{border:1px solid var(--line-gold);background:var(--cream-card);color:var(--maroon);border-radius:6px;padding:6px 11px;font-size:12px;font-weight:700}
+  .adv:active{transform:scale(.95)}
+  .adv:disabled{opacity:.4;cursor:default}
+
+  /* bestsellers */
+  .best-list{display:flex;flex-direction:column;gap:12px}
+  .best-item{display:flex;align-items:center;gap:12px}
+  .best-item .rk{font-family:var(--body);font-weight:800;font-size:15px;color:var(--maroon);width:20px;text-align:center;flex:none;font-variant-numeric:tabular-nums}
+  .best-item .bi{flex:1;min-width:0}
+  .best-item .bn{font-size:13.5px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between}
+  .best-item .bn .c{color:var(--muted);font-weight:600;font-size:12px}
+  .bar{height:7px;border-radius:100px;background:var(--parch-2);margin-top:5px;overflow:hidden}
+  .bar span{display:block;height:100%;border-radius:100px;background:linear-gradient(90deg,var(--maroon),var(--gold))}
+
+  /* chart */
+  .chart{padding:8px 4px 0}
+  .bars{display:flex;align-items:flex-end;gap:10px;height:150px;padding:0 6px}
+  .bars .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:flex-end}
+  .bars .bk{width:100%;max-width:34px;background:linear-gradient(180deg,#BE6A5E,#8C2A28);border-radius:4px 4px 0 0;position:relative;transition:height .3s}
+  .bars .col.today .bk{background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
+  .bars .bk .v{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10.5px;font-weight:700;color:var(--ink-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .bars .dl{font-family:var(--caps);font-size:9px;letter-spacing:.06em;color:var(--muted)}
+  .bars .col.today .dl{color:var(--maroon);font-weight:700}
+
+  /* quick links */
+  .qlinks{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:22px}
+  @media(min-width:760px){.qlinks{grid-template-columns:repeat(4,1fr)}}
+  .qlink{background:var(--cream-card);border:1px solid var(--line);border-radius:9px;padding:16px;text-decoration:none;color:var(--ink);
+    display:flex;flex-direction:column;gap:9px;transition:transform .14s,box-shadow .2s,border-color .2s;box-shadow:0 6px 16px -14px #5e111350}
+  .qlink:hover{transform:translateY(-3px);box-shadow:0 12px 26px -16px #5e111370;border-color:var(--line-gold)}
+  .qlink .qi{width:38px;height:38px;border-radius:8px;background:var(--oxblood) var(--paisley);background-size:60px;color:var(--gold-hi);display:grid;place-items:center}
+  .qlink h4{font-family:var(--body);font-weight:700;font-size:14px;color:var(--maroon)}
+  .qlink p{font-size:11.5px;color:var(--ink-2)}
+  .sec-rule{display:flex;align-items:center;gap:12px;color:var(--gold);margin:30px 0 4px}
+  .sec-rule .ln{height:1px;background:linear-gradient(90deg,var(--gold-soft),transparent);flex:1}
+  .sec-rule .t{font-family:var(--caps);font-size:11px;letter-spacing:.16em;color:var(--maroon);text-transform:uppercase}
+
+  /* ============ LOADING SCREEN ============ */
+  .loader{position:fixed;inset:0;z-index:9999;background:var(--parch);background-image:var(--grain);background-size:180px;
+    display:grid;place-items:center;transition:opacity .55s ease}
+  .loader.hide{opacity:0;pointer-events:none}
+  .lstage{display:flex;flex-direction:column;align-items:center}
+  .lring{position:relative;width:138px;height:138px;display:grid;place-items:center;margin-bottom:20px}
+  .lring .rseal{width:96px;height:96px}
+  .lring::before{content:"";position:absolute;inset:0;border-radius:50%;
+    border:3px solid #6e161822;border-top-color:var(--oxblood);border-right-color:var(--maroon);
+    animation:lspin .85s linear infinite}
+  .ltxt{font-family:var(--display);font-size:32px;color:var(--oxblood);line-height:1}
+  .lsub{font-family:var(--caps);font-weight:600;font-size:10px;letter-spacing:.36em;color:var(--muted);text-transform:uppercase;margin-top:8px}
+  @keyframes lspin{to{transform:rotate(360deg)}}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:opacity .3s!important}}
+</style>
+
+<!-- reusable seal logo (SVG) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="seal" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="48" fill="#4A0C0D" stroke="#B58A3C" stroke-width="2.5"/>
+    <circle cx="50" cy="50" r="41" fill="none" stroke="#D8B25E" stroke-width="1" stroke-dasharray="2 3" opacity=".8"/>
+    <path id="tp" d="M50 12 a38 38 0 1 1 -0.1 0" fill="none"/>
+    <text font-family="Cinzel, serif" font-size="8.5" letter-spacing="3" fill="#EAD8A8" font-weight="600">
+      <textPath href="#tp" startOffset="2%">PAROSA · SCAN · SERVE · SAVOUR · </textPath>
+    </text>
+    <text x="50" y="63" text-anchor="middle" font-family="Rozha One, serif" font-size="42" fill="#D8B25E">प</text>
+  </symbol>
+</defs></svg>
+
+<!-- ============ LOADING SCREEN ============ -->
+<div class="loader" id="loader">
+  <div class="lstage">
+    <div class="lring"><svg class="rseal"><use href="#seal"/></svg></div>
+    <div class="ltxt">परोसा</div>
+    <div class="lsub">Parosa</div>
+  </div>
+</div>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="side">
+    <div class="brand">
+      <svg class="seal"><use href="#seal"/></svg>
+      <div class="wm">परोसा<small>Parosa</small></div>
+    </div>
+    <nav class="nav">
+      <span class="grp">Manage</span>
+      <a href="#" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Overview</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5h16M4 12h16M4 19h10"/></svg> Menu &amp; Dishes</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><path d="M14 14h2v2h-2zM18 14h2M14 18h2M18 18h2"/></svg> Tables &amp; QR</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 2l1.5 3h9L18 2M4 7h16l-1.5 13a2 2 0 0 1-2 1.8H7.5a2 2 0 0 1-2-1.8Z"/></svg> Orders</a>
+      <span class="grp">Brand</span>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l2.3 4.7 5.2.8-3.8 3.6.9 5.1L12 15.9 7.4 17.2l.9-5.1L4.5 8.5l5.2-.8Z"/></svg> Templates</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3a9 9 0 0 0-8 13.2L3 21l4.9-1a9 9 0 1 0 4.1-17Z"/></svg> WhatsApp</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg> Payments</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg> Settings</a>
+    </nav>
+    <div class="foot">
+      <div class="rest"><div class="rc">रा</div><div><div class="rn">राज दरबार</div><div class="rp">Parosa Free · 12 tables</div></div></div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="topbar">
+      <div class="hi">
+        <h1>नमस्ते, राज दरबार 🙏</h1>
+        <p>Friday, 4 September 2026 · Here's how your restaurant is doing today.</p>
+      </div>
+      <div class="acts">
+        <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> New dish</button>
+        <button class="btn prime"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M21 3l-9 9M10 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg> View live menu</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="note"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg> <span><b>Demo data</b> — this is a preview of the Parosa owner dashboard in the Virasat theme. Real numbers appear once your restaurant goes live.</span></div>
+
+      <!-- KPIs -->
+      <div class="kpis">
+        <div class="kpi"><div class="kl">Today's Orders</div><div class="kv" id="kOrders">47</div><div class="kd up">▲ 12% <span style="color:var(--muted);font-weight:500">vs yesterday</span></div>
+          <svg class="ki" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2l1.5 3h9L18 2M4 7h16l-1.5 13a2 2 0 0 1-2 1.8H7.5a2 2 0 0 1-2-1.8Z"/></svg></div>
+        <div class="kpi"><div class="kl">Today's Revenue</div><div class="kv">₹18,240</div><div class="kd up">▲ 8% <span style="color:var(--muted);font-weight:500">vs yesterday</span></div>
+          <svg class="ki" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="kpi"><div class="kl">Live Tables</div><div class="kv">6<span style="font-size:19px;color:var(--muted)"> / 12</span></div><div class="kd flat">◷ 3 awaiting food</div>
+          <svg class="ki" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a5 5 0 0 1 10 0v2"/></svg></div>
+        <div class="kpi"><div class="kl">Avg Order Value</div><div class="kv">₹388</div><div class="kd up">▲ 5%</div>
+          <svg class="ki" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 14l3-4 4 3 4-6"/></svg></div>
+      </div>
+
+      <div class="grid2">
+        <!-- live orders -->
+        <div class="panel">
+          <div class="ph"><h3>Live Orders</h3><span class="live"><span class="d"></span> Real-time</span></div>
+          <div class="pb" id="tickets">
+            <div class="ticket" data-status="new">
+              <div class="tt"><span class="tbl">Table 07 <small>· just now</small></span><span class="pill new">New</span></div>
+              <div class="items"><b>1×</b> Tandoori Chicken · <b>2×</b> Butter Naan · <b>1×</b> Dal Makhani</div>
+              <div class="tf"><span class="amt">₹565</span><button class="adv">Start cooking →</button></div>
+            </div>
+            <div class="ticket" data-status="cooking">
+              <div class="tt"><span class="tbl">Table 03 <small>· 6 min ago</small></span><span class="pill cooking">Cooking</span></div>
+              <div class="items"><b>1×</b> Hyderabadi Biryani · <b>1×</b> Sweet Lassi</div>
+              <div class="tf"><span class="amt">₹360</span><button class="adv">Mark ready →</button></div>
+            </div>
+            <div class="ticket" data-status="cooking">
+              <div class="tt"><span class="tbl">Table 11 <small>· 9 min ago</small></span><span class="pill cooking">Cooking</span></div>
+              <div class="items"><b>2×</b> Paneer Tikka · <b>3×</b> Butter Naan · <b>2×</b> Masala Chai</div>
+              <div class="tf"><span class="amt">₹690</span><button class="adv">Mark ready →</button></div>
+            </div>
+            <div class="ticket" data-status="ready">
+              <div class="tt"><span class="tbl">Table 05 <small>· 14 min ago</small></span><span class="pill ready">Ready</span></div>
+              <div class="items"><b>1×</b> Butter Chicken · <b>2×</b> Garlic Naan</div>
+              <div class="tf"><span class="amt">₹430</span><button class="adv">Mark served →</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- bestsellers -->
+        <div class="panel">
+          <div class="ph"><h3>Today's Bestsellers</h3><span class="see">This week ▾</span></div>
+          <div class="pb">
+            <div class="best-list">
+              <div class="best-item"><span class="rk">1</span><div class="bi"><div class="bn"><span>Butter Chicken</span><span class="c">38</span></div><div class="bar"><span style="width:100%"></span></div></div></div>
+              <div class="best-item"><span class="rk">2</span><div class="bi"><div class="bn"><span>Hyderabadi Biryani</span><span class="c">31</span></div><div class="bar"><span style="width:82%"></span></div></div></div>
+              <div class="best-item"><span class="rk">3</span><div class="bi"><div class="bn"><span>Paneer Tikka</span><span class="c">27</span></div><div class="bar"><span style="width:71%"></span></div></div></div>
+              <div class="best-item"><span class="rk">4</span><div class="bi"><div class="bn"><span>Butter Naan</span><span class="c">24</span></div><div class="bar"><span style="width:63%"></span></div></div></div>
+              <div class="best-item"><span class="rk">5</span><div class="bi"><div class="bn"><span>Dal Makhani</span><span class="c">19</span></div><div class="bar"><span style="width:50%"></span></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- chart -->
+      <div class="panel" style="margin-top:18px">
+        <div class="ph"><h3>Revenue · last 7 days</h3><span class="see" style="color:var(--muted)">Total ₹1,08,600</span></div>
+        <div class="pb chart">
+          <div class="bars">
+            <div class="col"><div class="bk" style="height:52%"><span class="v">₹12.4k</span></div><span class="dl">Sat</span></div>
+            <div class="col"><div class="bk" style="height:64%"><span class="v">₹15.1k</span></div><span class="dl">Sun</span></div>
+            <div class="col"><div class="bk" style="height:41%"><span class="v">₹9.8k</span></div><span class="dl">Mon</span></div>
+            <div class="col"><div class="bk" style="height:47%"><span class="v">₹11.2k</span></div><span class="dl">Tue</span></div>
+            <div class="col"><div class="bk" style="height:58%"><span class="v">₹13.9k</span></div><span class="dl">Wed</span></div>
+            <div class="col"><div class="bk" style="height:70%"><span class="v">₹16.8k</span></div><span class="dl">Thu</span></div>
+            <div class="col today"><div class="bk" style="height:76%"><span class="v">₹18.2k</span></div><span class="dl">Today</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- quick links -->
+      <div class="sec-rule"><span class="t">Quick actions</span><span class="ln"></span></div>
+      <div class="qlinks">
+        <a href="#" class="qlink"><span class="qi"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5h16M4 12h16M4 19h10"/></svg></span><h4>Edit menu</h4><p>Add dishes, prices &amp; photos</p></a>
+        <a href="#" class="qlink"><span class="qi"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/></svg></span><h4>Print QR codes</h4><p>One per table, ready to print</p></a>
+        <a href="#" class="qlink"><span class="qi"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3l2.3 4.7 5.2.8-3.8 3.6.9 5.1L12 15.9 7.4 17.2l.9-5.1L4.5 8.5l5.2-.8Z"/></svg></span><h4>Change template</h4><p>You're on “Virasat”</p></a>
+        <a href="#" class="qlink"><span class="qi"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3a9 9 0 0 0-8 13.2L3 21l4.9-1A9 9 0 1 0 12 3Z"/></svg></span><h4>Send broadcast</h4><p>WhatsApp your regulars</p></a>
+      </div>
+      <div style="height:30px"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+  // loading screen: show, then reveal the dashboard
+  (function(){
+    var l=document.getElementById('loader'); if(!l) return;
+    function hide(){ l.classList.add('hide'); setTimeout(function(){ l.hidden=true; }, 600); }
+    if(document.readyState==='complete'){ setTimeout(hide, 800); }
+    else{ window.addEventListener('load', function(){ setTimeout(hide, 800); }); }
+    setTimeout(hide, 3200); // safety fallback
+  })();
+
+  // sidebar active toggle
+  document.querySelectorAll('.nav a').forEach(function(a){
+    a.addEventListener('click',function(e){e.preventDefault();document.querySelectorAll('.nav a').forEach(function(x){x.classList.remove('on')});a.classList.add('on');});
+  });
+  // advance order status
+  var FLOW={new:{next:'cooking',label:'Mark ready →',pill:'Cooking'},
+            cooking:{next:'ready',label:'Mark served →',pill:'Ready'},
+            ready:{next:'served',label:'Served ✓',pill:'Served'},
+            served:{next:null,label:'Completed',pill:'Served'}};
+  var PILLTXT={new:'New',cooking:'Cooking',ready:'Ready',served:'Served'};
+  document.querySelectorAll('.ticket .adv').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var t=btn.closest('.ticket'),s=t.getAttribute('data-status'),f=FLOW[s];
+      if(!f||!f.next)return;
+      t.setAttribute('data-status',f.next);
+      var pill=t.querySelector('.pill');pill.className='pill '+f.next;pill.textContent=PILLTXT[f.next];
+      var nf=FLOW[f.next];btn.textContent=nf.label;
+      if(!nf.next){btn.disabled=true;
+        var k=document.getElementById('kOrders');k.textContent=parseInt(k.textContent)+1;}
+      if(!matchMedia('(prefers-reduced-motion: reduce)').matches){t.animate([{transform:'scale(1)'},{transform:'scale(.99)'},{transform:'scale(1)'}],{duration:200});}
+    });
+  });
+</script>

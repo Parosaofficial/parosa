@@ -1,0 +1,166 @@
+<title>Parosa Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Cinzel:wght@400;500;600;700&family=Mukta:wght@400;500;600;700;800&display=swap">
+<style>
+  :root{color-scheme:light;--parch:#EFE6D1;--parch-2:#E5D8BC;--parch-hi:#F5EFDD;--cream-card:#F8F1DF;--oxblood:#6E1618;--maroon:#8C1C1C;--maroon-deep:#531012;--ink:#3E1012;--ink-2:#79302A;--muted:#9A7C55;--gold:#A9823A;--gold-hi:#CBA24E;--gold-soft:#E7D6A6;--line:#D8C299;--line-gold:#C9A24B;--pos:#2E7D46;
+  --display:'Rozha One',serif;--caps:'Cinzel',serif;--body:'Mukta',system-ui,sans-serif;
+  --paisley:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23D8B25E' stroke-width='1' opacity='0.32'%3E%3Ccircle cx='40' cy='40' r='5'/%3E%3Ccircle cx='40' cy='40' r='11'/%3E%3Cellipse cx='40' cy='24' rx='4' ry='8'/%3E%3Cellipse cx='40' cy='56' rx='4' ry='8'/%3E%3Cellipse cx='24' cy='40' rx='8' ry='4'/%3E%3Cellipse cx='56' cy='40' rx='8' ry='4'/%3E%3Ccircle cx='27' cy='27' r='3'/%3E%3Ccircle cx='53' cy='27' r='3'/%3E%3Ccircle cx='27' cy='53' r='3'/%3E%3Ccircle cx='53' cy='53' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");}
+  *{box-sizing:border-box}html,body{margin:0}body{font-family:var(--body);color:var(--ink);background:var(--parch);-webkit-font-smoothing:antialiased;line-height:1.55;min-height:100vh}
+  h1,h2,h3,h4{font-family:var(--display);font-weight:400;margin:0;line-height:1.08}p{margin:0}button{font-family:inherit;cursor:pointer}
+
+  .loader{position:fixed;inset:0;z-index:9999;background:var(--parch);background-image:var(--grain);background-size:180px;display:grid;place-items:center;transition:opacity .55s}.loader.hide{opacity:0;pointer-events:none}
+  .lring{position:relative;width:130px;height:130px;display:grid;place-items:center;margin-bottom:18px}.lring .rseal{width:90px;height:90px}.lring::before{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid #6e161822;border-top-color:var(--oxblood);border-right-color:var(--maroon);animation:sp .85s linear infinite}
+  .lstage{display:flex;flex-direction:column;align-items:center}.ltxt{font-family:var(--display);font-size:30px;color:var(--oxblood)}.lsub{font-family:var(--caps);font-size:9px;letter-spacing:.34em;color:var(--muted);text-transform:uppercase;margin-top:6px}@keyframes sp{to{transform:rotate(360deg)}}
+
+  .wrap{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+  @media(max-width:860px){.wrap{grid-template-columns:1fr}}
+
+  /* left brand poster */
+  .poster{background:
+      linear-gradient(180deg,#7A1A1C 0%,#531012 100%);
+    position:relative;color:var(--parch);padding:48px 44px;display:flex;flex-direction:column;overflow:hidden;border-right:4px solid var(--gold)}
+  @media(max-width:860px){.poster{padding:34px 26px;border-right:none;border-bottom:4px solid var(--gold)}}
+  .poster::before{content:"";position:absolute;inset:0;background-image:var(--paisley);background-size:92px;opacity:1}
+  .poster::after{content:"";position:absolute;inset:0;background-image:var(--grain);background-size:170px;opacity:.14;mix-blend-mode:overlay}
+  .poster>*{position:relative;z-index:2}
+  .poster .kick{font-family:var(--caps);letter-spacing:.28em;text-transform:uppercase;font-size:11px;color:var(--gold-hi);display:flex;align-items:center;gap:10px}
+  .poster .kick .ln{height:1px;width:34px;background:var(--gold)}
+  .poster .big{margin-top:auto;text-align:center}
+  .poster .seal{width:78px;height:78px;margin:0 auto 6px}
+  .poster .big h1{font-size:clamp(70px,13vw,120px);color:var(--gold-hi);letter-spacing:.01em;text-shadow:0 3px 0 #00000030}
+  .poster .en{font-family:var(--caps);font-weight:700;letter-spacing:.44em;font-size:clamp(15px,2.4vw,22px);color:var(--parch);padding-left:.44em;margin-top:4px}
+  .divi{display:flex;align-items:center;justify-content:center;gap:12px;color:var(--gold);margin:16px 0}
+  .divi .ln{height:1px;width:60px;background:linear-gradient(90deg,transparent,var(--gold))}.divi .ln.r{background:linear-gradient(90deg,var(--gold),transparent)}
+  .poster .tag{text-align:center;font-family:var(--display);font-size:clamp(17px,2.4vw,22px);color:var(--parch-hi)}
+  .poster .feats{margin:auto auto 0;padding-top:26px;display:grid;gap:11px;max-width:340px;width:100%}
+  .poster .ft{display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--parch)}
+  .poster .ft .fi{width:26px;height:26px;border-radius:50%;border:1px solid var(--gold);color:var(--gold-hi);display:grid;place-items:center;flex:none;font-size:12px}
+  .poster .foot{text-align:center;font-size:11px;color:var(--gold-soft);margin-top:24px;font-family:var(--caps);letter-spacing:.18em;text-transform:uppercase}
+
+  /* right auth */
+  .auth{display:flex;align-items:center;justify-content:center;padding:44px 26px;position:relative}
+  .auth::before{content:"";position:absolute;inset:0;background-image:var(--grain);background-size:180px;opacity:.09;mix-blend-mode:multiply;pointer-events:none}
+  .card{width:100%;max-width:400px;position:relative;z-index:2}
+  .tabs{display:flex;background:var(--parch-2);border:1px solid var(--line);border-radius:100px;padding:4px;margin-bottom:26px}
+  .tabs button{flex:1;border:none;background:transparent;font-family:var(--caps);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);padding:10px;border-radius:100px}
+  .tabs button.on{background:var(--oxblood);color:var(--gold-hi)}
+  .ch{text-align:center;margin-bottom:22px}.ch h2{font-size:32px;color:var(--oxblood)}.ch p{font-size:13px;color:var(--ink-2);margin-top:6px}
+
+  .gbtn{width:100%;border:1px solid var(--line-gold);background:var(--cream-card);color:var(--ink);border-radius:10px;padding:12px;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px}
+  .gbtn:hover{background:var(--parch-hi)}
+  .gbtn svg{width:19px;height:19px}
+  .or{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--muted);font-size:11px;font-family:var(--caps);letter-spacing:.14em}.or .ln{flex:1;height:1px;background:var(--line)}
+  .field{margin-bottom:14px}.field label{display:block;font-family:var(--caps);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--maroon);margin-bottom:6px;font-weight:600}
+  .field input,.field select{width:100%;font-family:var(--body);font-size:15px;padding:12px 13px;border:1px solid var(--line);border-radius:9px;background:var(--parch-hi);color:var(--ink)}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px #8c1c1c1a}
+  .prime{width:100%;background:var(--oxblood);color:var(--gold-hi);border:none;border-radius:10px;padding:13px;font-family:var(--caps);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-top:4px;box-shadow:0 8px 20px -8px #4a0c0d}
+  .prime:active{transform:scale(.98)}
+  .small{text-align:center;font-size:12px;color:var(--muted);margin-top:16px}.small a{color:var(--maroon);font-weight:600;text-decoration:none}
+
+  /* stepper */
+  .steps{display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:20px}
+  .steps .s{width:26px;height:4px;border-radius:100px;background:var(--line)}.steps .s.on{background:var(--gold)}
+  .pane{display:none}.pane.on{display:block;animation:fade .3s ease}@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .stepnav{display:flex;gap:10px;margin-top:6px}.stepnav .back{flex:none;background:transparent;border:1px solid var(--line-gold);color:var(--ink-2);border-radius:10px;padding:13px 18px;font-weight:600;font-size:13px}
+  .tstep{display:flex;align-items:center;border:1px solid var(--line-gold);border-radius:9px;overflow:hidden;background:var(--parch-hi);width:fit-content}
+  .tstep button{width:44px;height:46px;border:none;background:transparent;color:var(--maroon);font-size:22px;font-weight:700}.tstep .q{min-width:56px;text-align:center;font-weight:800;font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+
+  .done{text-align:center;padding:8px 0}.done .ds{width:96px;height:96px;margin:0 auto 6px;animation:pop .5s ease}@keyframes pop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+  .done h2{font-size:32px;color:var(--oxblood)}.done p{font-size:13.5px;color:var(--ink-2);margin-top:8px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:opacity .3s!important}}
+</style>
+<svg width="0" height="0" style="position:absolute"><defs><symbol id="seal" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#4A0C0D" stroke="#B58A3C" stroke-width="2.5"/><circle cx="50" cy="50" r="41" fill="none" stroke="#D8B25E" stroke-width="1" stroke-dasharray="2 3" opacity=".8"/><path id="tp" d="M50 12 a38 38 0 1 1 -0.1 0" fill="none"/><text font-family="Cinzel, serif" font-size="8.5" letter-spacing="3" fill="#EAD8A8" font-weight="600"><textPath href="#tp" startOffset="2%">PAROSA · SCAN · SERVE · SAVOUR · </textPath></text><text x="50" y="63" text-anchor="middle" font-family="Rozha One, serif" font-size="42" fill="#D8B25E">प</text></symbol></defs></svg>
+<div class="loader" id="loader"><div class="lstage"><div class="lring"><svg class="rseal"><use href="#seal"/></svg></div><div class="ltxt">परोसा</div><div class="lsub">Parosa</div></div></div>
+
+<div class="wrap">
+  <!-- LEFT POSTER -->
+  <div class="poster">
+    <div class="kick"><span class="ln"></span> Parosa · QR Menu</div>
+    <div class="big">
+      <svg class="seal"><use href="#seal"/></svg>
+      <h1>परोसा</h1>
+      <div class="en">Parosa</div>
+      <div class="divi"><span class="ln"></span>❖<span class="ln r"></span></div>
+      <div class="tag">स्वाद में देसीपन,<br>मेन्यू में पहचान।</div>
+    </div>
+    <div class="feats">
+      <div class="ft"><span class="fi">✦</span> 20+ premium menu templates — not 4</div>
+      <div class="ft"><span class="fi">✦</span> Bill &amp; broadcast on WhatsApp</div>
+      <div class="ft"><span class="fi">✦</span> Live orders straight to the kitchen</div>
+      <div class="ft"><span class="fi">✦</span> A QR per table in one click</div>
+      <div class="ft"><span class="fi">✦</span> Free to start · no app for diners</div>
+    </div>
+    <div class="foot">Scan · Serve · Savour</div>
+  </div>
+
+  <!-- RIGHT AUTH -->
+  <div class="auth">
+    <div class="card">
+      <div class="tabs"><button class="on" id="tSignin">Sign in</button><button id="tCreate">Create restaurant</button></div>
+
+      <!-- SIGN IN -->
+      <div id="signin">
+        <div class="ch"><h2>वापसी पर स्वागत है</h2><p>Sign in to your Parosa dashboard</p></div>
+        <button class="gbtn"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.9a5 5 0 0 1-2.2 3.3v2.8h3.6c2.1-2 3.2-4.9 3.2-8Z"/><path fill="#34A853" d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.8c-1 .7-2.3 1.1-3.6 1.1-2.8 0-5.1-1.9-6-4.4H2.3v2.9A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.2H2.3a11 11 0 0 0 0 9.9L6 14.3Z"/><path fill="#EA4335" d="M12 5.5c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 2.3 7.2L6 10.1c.9-2.6 3.2-4.6 6-4.6Z"/></svg> Continue with Google</button>
+        <div class="or"><span class="ln"></span>OR<span class="ln"></span></div>
+        <div class="field"><label>Email</label><input type="email" value="sahustartup@gmail.com"></div>
+        <div class="field"><label>Password</label><input type="password" value="········"></div>
+        <button class="prime" id="signinBtn">Sign in →</button>
+        <div class="small"><a href="#">Forgot password?</a></div>
+      </div>
+
+      <!-- CREATE (onboarding) -->
+      <div id="create" style="display:none">
+        <div class="steps"><span class="s on" data-i="0"></span><span class="s" data-i="1"></span><span class="s" data-i="2"></span><span class="s" data-i="3"></span></div>
+
+        <div class="pane on" id="p0">
+          <div class="ch"><h2>अपना खाता बनाएँ</h2><p>Step 1 — create your free account</p></div>
+          <button class="gbtn"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.9a5 5 0 0 1-2.2 3.3v2.8h3.6c2.1-2 3.2-4.9 3.2-8Z"/><path fill="#34A853" d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.8c-1 .7-2.3 1.1-3.6 1.1-2.8 0-5.1-1.9-6-4.4H2.3v2.9A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.2H2.3a11 11 0 0 0 0 9.9L6 14.3Z"/><path fill="#EA4335" d="M12 5.5c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 2.3 7.2L6 10.1c.9-2.6 3.2-4.6 6-4.6Z"/></svg> Sign up with Google</button>
+          <div class="or"><span class="ln"></span>OR<span class="ln"></span></div>
+          <div class="field"><label>Email</label><input type="email" placeholder="you@restaurant.com"></div>
+          <button class="prime" data-next="1">Continue →</button>
+        </div>
+
+        <div class="pane" id="p1">
+          <div class="ch"><h2>आपका रेस्टोरेंट</h2><p>Step 2 — name your restaurant</p></div>
+          <div class="field"><label>Name (English)</label><input type="text" placeholder="Raj Darbar" value="Raj Darbar"></div>
+          <div class="field"><label>नाम (हिंदी)</label><input type="text" placeholder="राज दरबार" value="राज दरबार"></div>
+          <div class="field"><label>Cuisine</label><select><option>North Indian · Mughlai</option><option>Multi-cuisine</option><option>South Indian</option><option>Chinese</option><option>Dhaba / roadside</option><option>Cafe · Bakery</option></select></div>
+          <div class="stepnav"><button class="back" data-back="0">Back</button><button class="prime" data-next="2">Continue →</button></div>
+        </div>
+
+        <div class="pane" id="p2">
+          <div class="ch"><h2>कितनी मेज़ें?</h2><p>Step 3 — we'll make a QR for each table</p></div>
+          <div style="display:flex;justify-content:center;margin:8px 0 18px"><div class="tstep"><button id="tmin">−</button><span class="q" id="tval">12</span><button id="tmax">+</button></div></div>
+          <p style="text-align:center;font-size:12.5px;color:var(--muted);margin-bottom:8px">You can change this any time in Tables &amp; QR.</p>
+          <div class="stepnav"><button class="back" data-back="1">Back</button><button class="prime" id="finish">Finish setup →</button></div>
+        </div>
+
+        <div class="pane" id="p3">
+          <div class="done"><svg class="ds"><use href="#seal"/></svg><h2>स्वागत है! 🎉</h2><p><b id="doneName">Raj Darbar</b> is ready on Parosa.<br>Your menu, tables and QR codes are set up.</p>
+          <button class="prime" style="margin-top:22px" id="enter">Enter dashboard →</button></div>
+        </div>
+      </div>
+
+      <div class="small" style="margin-top:22px;color:var(--muted)">By continuing you agree to Parosa's Terms &amp; Privacy.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){var l=document.getElementById('loader');function h(){l.classList.add('hide');setTimeout(function(){l.hidden=true;},600);}if(document.readyState==='complete')setTimeout(h,900);else window.addEventListener('load',function(){setTimeout(h,900);});setTimeout(h,3200);})();
+  var $=function(s){return document.getElementById(s);};
+  // tabs
+  $('tSignin').addEventListener('click',function(){this.classList.add('on');$('tCreate').classList.remove('on');$('signin').style.display='';$('create').style.display='none';});
+  $('tCreate').addEventListener('click',function(){this.classList.add('on');$('tSignin').classList.remove('on');$('signin').style.display='none';$('create').style.display='';goStep(0);});
+  // steps
+  function goStep(i){for(var k=0;k<4;k++){$('p'+k).classList.toggle('on',k===i);}document.querySelectorAll('.steps .s').forEach(function(s){s.classList.toggle('on',parseInt(s.getAttribute('data-i'))<=i);});}
+  document.querySelectorAll('[data-next]').forEach(function(b){b.addEventListener('click',function(){goStep(parseInt(b.getAttribute('data-next')));});});
+  document.querySelectorAll('[data-back]').forEach(function(b){b.addEventListener('click',function(){goStep(parseInt(b.getAttribute('data-back')));});});
+  // tables stepper
+  var tv=12;$('tmin').addEventListener('click',function(){if(tv>1){tv--;$('tval').textContent=tv;}});$('tmax').addEventListener('click',function(){if(tv<60){tv++;$('tval').textContent=tv;}});
+  $('finish').addEventListener('click',function(){goStep(3);});
+  $('enter').addEventListener('click',function(){alert('(Demo) → this opens the Parosa dashboard');});
+  $('signinBtn').addEventListener('click',function(){alert('(Demo) → signing in to the Parosa dashboard');});
+</script>
