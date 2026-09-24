@@ -41,3 +41,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# early scratch prototypes & local DB helpers (kept on disk, not part of the app)
+/*.html
+/*.sql
+/run-sql.mjs
+/save-server.js
+/parosa-auth-config.mjs
