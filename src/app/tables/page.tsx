@@ -5,6 +5,7 @@ import Link from "next/link";
 import { QRCodeCanvas } from "qrcode.react";
 import { Sidebar } from "@/components/Sidebar";
 import { Seal } from "@/components/Logo";
+import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { AppLoading } from "@/components/AppLoading";
 import { setTablesCount } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
@@ -18,11 +19,14 @@ export default function Tables() {
   useEffect(() => { setOrigin(window.location.origin); }, []);
 
   const [count, setCount] = useState(0);
+  const [design, setDesign] = useState<"classic" | "branded">("classic");
   const reviewBox = useRef<HTMLDivElement>(null);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2100); };
 
   useEffect(() => { if (restaurant) setCount(restaurant.tables_count ?? 0); }, [restaurant]);
+  useEffect(() => { try { const d = localStorage.getItem("parosa-standee"); if (d === "branded" || d === "classic") setDesign(d); } catch { /* ignore */ } }, []);
+  const pickDesign = (d: "classic" | "branded") => { setDesign(d); try { localStorage.setItem("parosa-standee", d); } catch { /* ignore */ } };
 
   if (!ready || !restaurant) return <AppLoading label="Loading tables…" />;
 
@@ -70,6 +74,16 @@ export default function Tables() {
             <div className="tb-stepper"><span className="lbl">Tables</span><button onClick={removeTable}>−</button><span className="n">{count}</span><button onClick={addTable}>+</button></div>
           </div>
 
+          {count > 0 && (
+            <div className="tb-designbar">
+              <span className="l">QR standee design</span>
+              <div className="tb-seg">
+                <button className={design === "classic" ? "on" : ""} onClick={() => pickDesign("classic")}>Classic <i>logo &amp; name in a row</i></button>
+                <button className={design === "branded" ? "on" : ""} onClick={() => pickDesign("branded")}>Branded <i>your logo on top, Parosa below</i></button>
+              </div>
+            </div>
+          )}
+
           {/* Review QR — the link itself lives in Settings */}
           <div className="db-panel">
             <div className="db-ph"><h3>Reviews · Rate us QR</h3><span className="tag">★ Get 5-star reviews</span></div>
@@ -105,14 +119,29 @@ export default function Tables() {
               <button className="db-btn prime" onClick={addTable}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add your first table</button>
             </div>
           ) : (
-            <div className="tb-grid">
+            <div className={`tb-grid tb-${design}`}>
               {tables.map((n) => (
                 <div key={n} className="tb-standee">
-                  <div className="tb-top"><Seal size={26} /><span className="tb-bn">{restaurant.name}</span></div>
-                  <div className="tb-scan">Scan to order</div>
-                  <div className="tb-qbox"><QRCodeCanvas value={`${BASE}/${n}`} size={130} fgColor="#4A0C0D" bgColor="#FBF4E2" level="M" /></div>
-                  <div className="tb-tno">Table {n}</div>
-                  <div className="tb-noapp">No app needed</div>
+                  {design === "classic" ? (
+                    <>
+                      <div className="tb-top"><RestaurantLogo restaurant={restaurant} size={30} /><span className="tb-bn">{restaurant.name}</span></div>
+                      <div className="tb-scan">Scan to order</div>
+                      <div className="tb-qbox"><QRCodeCanvas value={`${BASE}/${n}`} size={130} fgColor="#4A0C0D" bgColor="#FBF4E2" level="M" /></div>
+                      <div className="tb-tno">Table {n}</div>
+                      <div className="tb-brandfoot"><Seal size={15} /><span>Powered by <b>Parosa</b></span></div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="tb-hero">
+                        <RestaurantLogo restaurant={restaurant} size={54} />
+                        <span className="tb-bn">{restaurant.name}</span>
+                        <span className="tb-scan">Scan to order · Table {n}</span>
+                      </div>
+                      <div className="tb-qbox"><QRCodeCanvas value={`${BASE}/${n}`} size={130} fgColor="#4A0C0D" bgColor="#FBF4E2" level="M" /></div>
+                      <div className="tb-noapp">No app needed — opens in the browser</div>
+                      <div className="tb-brandband"><Seal size={22} /><div><b>परोसा · PAROSA</b><i>Scan · Serve · Savour</i></div></div>
+                    </>
+                  )}
                   <div className="tb-row">
                     <button onClick={() => showToast(`Table ${n} QR → PNG (live app)`)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3v11M8 10l4 4 4-4M5 20h14" /></svg>PNG</button>
                     <button onClick={() => showToast(`Table ${n} QR → printer (live app)`)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9V3h12v6M6 18H4V10h16v8h-2M6 14h12v6H6z" /></svg>Print</button>

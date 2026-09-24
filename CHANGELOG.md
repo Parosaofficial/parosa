@@ -4,6 +4,17 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.7.1 - 24 Sep 2026
+The dhaba's own logo on the table QR, and a second standee design.
+- **Fixed:** the table QR standee showed the Parosa seal, not the restaurant's
+  uploaded logo. It now shows the dhaba's own logo (a monogram if none is set).
+- **Two standee designs**, picked from a toggle above the grid (choice remembered):
+  - **Classic** - logo and name in a row on top, QR, table number, and a small
+    "Powered by Parosa" line at the bottom.
+  - **Branded** - the restaurant's logo large and centred with its name on top,
+    the QR below, then a maroon "परोसा · PAROSA · Scan · Serve · Savour" band at
+    the foot. Your identity up top, our branding underneath.
+
 ## v0.7.0 - 24 Sep 2026
 Clear legal pages, a support address, and a POS built for a phone.
 - **Terms and Privacy rewritten** in plain English. Each page now opens with an
