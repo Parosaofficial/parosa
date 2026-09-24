@@ -9,7 +9,7 @@ import "./landing.css";
 
 /* ------------------------------------------------------------------ content */
 
-const CONTACT_EMAIL = "sahustartup@gmail.com";
+const CONTACT_EMAIL = "support.parosa@gmail.com";
 // Opens a pre-filled Gmail compose window (works signed-in on desktop and mobile web).
 const SALES_MAIL =
   "https://mail.google.com/mail/?view=cm&fs=1" +

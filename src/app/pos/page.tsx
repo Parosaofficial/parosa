@@ -26,6 +26,8 @@ export default function POS() {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [placing, setPlacing] = useState(false);
   const [doneNo, setDoneNo] = useState<string | null>(null);
+  const [custOpen, setCustOpen] = useState(false); // phone: customer fields fold away
+  const [cartOpen, setCartOpen] = useState(false);  // phone: the order opens as a sheet
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2200); };
 
@@ -77,11 +79,12 @@ export default function POS() {
         phone: phone.trim() || undefined, customerName: custName.trim() || undefined, staffName: staff.staff_name,
       });
       setDoneNo(order.order_no ?? "");
+      setCartOpen(false);
     } catch { showToast("Could not place order — try again"); }
     finally { setPlacing(false); }
   };
 
-  const newOrder = () => { setDoneNo(null); setCart({}); setTable(""); setPhone(""); setCustName(""); setSearch(""); };
+  const newOrder = () => { setDoneNo(null); setCartOpen(false); setCart({}); setTable(""); setPhone(""); setCustName(""); setSearch(""); };
   const logout = () => { clearStaffSession(); router.replace("/login/staff"); };
 
   if (!ready || !staff) return <AppLoading label="Opening POS…" />;
@@ -94,8 +97,8 @@ export default function POS() {
           <div><div className="rn">{staff.restaurant_name}</div><div className="sub">POS · Take orders</div></div>
         </div>
         <div className="pos-who">
-          <span className="chip">👤 {staff.staff_name}</span>
-          <button className="pos-out" onClick={logout} title="Log out">
+          <span className="chip"><i>{staff.staff_name.trim().slice(0, 1).toUpperCase()}</i>{staff.staff_name}</span>
+          <button className="pos-out" onClick={logout} title="Log out" aria-label="Log out">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
           </button>
         </div>
@@ -107,12 +110,15 @@ export default function POS() {
         <div className="pos-grid">
           {/* LEFT — order details + menu */}
           <div className="pos-main">
-            <div className="pos-card pos-cust">
+            <div className={`pos-card pos-cust${custOpen ? " open" : ""}`}>
               <div className="pos-row3">
                 <div className="pos-f"><label>Table</label><input className="pos-tbl" inputMode="numeric" placeholder="e.g. 5" value={table} onChange={(e) => setTable(e.target.value)} /></div>
-                <div className="pos-f grow"><label>Customer phone</label><div className="pos-inline"><input inputMode="numeric" placeholder="98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} onKeyDown={(e) => e.key === "Enter" && lookup()} /><button onClick={lookup} disabled={looking || !phone.trim()}>{looking ? "…" : "Find"}</button></div></div>
-                <div className="pos-f grow"><label>Customer name</label><input placeholder="Name (saved for next time)" value={custName} onChange={(e) => setCustName(e.target.value)} /></div>
+                <div className="pos-f grow pos-conly"><label>Customer phone <span className="opt">· optional</span></label><div className="pos-inline"><input inputMode="numeric" placeholder="98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} onKeyDown={(e) => e.key === "Enter" && lookup()} /><button onClick={lookup} disabled={looking || !phone.trim()}>{looking ? "…" : "Find"}</button></div></div>
+                <div className="pos-f grow pos-conly"><label>Customer name <span className="opt">· optional</span></label><input placeholder="Name (saved for next time)" value={custName} onChange={(e) => setCustName(e.target.value)} /></div>
               </div>
+              <button className="pos-custmore" onClick={() => setCustOpen((o) => !o)}>
+                {custOpen ? "Hide customer details" : custName || phone ? `Customer · ${custName || phone}` : "+ Add customer details"}
+              </button>
             </div>
 
             <div className="pos-menuhd">
@@ -128,21 +134,36 @@ export default function POS() {
               ) : shown.map((d) => {
                 const q = cart[d.id] || 0;
                 return (
-                  <button key={d.id} className={`pos-dish${q > 0 ? " in" : ""}`} onClick={() => add(d.id)}>
-                    <span className={`pos-vd${d.is_veg ? "" : " nv"}`} />
-                    <span className="dn">{d.name}</span>
-                    <span className="pr">₹{d.price}</span>
-                    {q > 0 && <span className="qb">{q}</span>}
-                  </button>
+                  <div key={d.id} className={`pos-dish${q > 0 ? " in" : ""}`}>
+                    <button className="pos-dishtap" onClick={() => add(d.id)} aria-label={`Add ${d.name}`}>
+                      <span className={`pos-vd${d.is_veg ? "" : " nv"}`} />
+                      <span className="dn">{d.name}</span>
+                      <span className="pr">₹{d.price}</span>
+                    </button>
+                    {q > 0 ? (
+                      <div className="pos-dishq">
+                        <button onClick={() => dec(d.id)} aria-label={`Remove one ${d.name}`}>−</button>
+                        <span>{q}</span>
+                        <button onClick={() => add(d.id)} aria-label={`Add one ${d.name}`}>+</button>
+                      </div>
+                    ) : (
+                      <span className="pos-dishadd" aria-hidden="true">+</span>
+                    )}
+                  </div>
                 );
               })}
             </div>
           </div>
 
           {/* RIGHT — running order */}
-          <aside className="pos-cartcol">
+          <aside className={`pos-cartcol${cartOpen ? " open" : ""}`}>
+            <div className="pos-sheetback" onClick={() => setCartOpen(false)} />
             <div className="pos-card pos-cart">
-              <div className="pos-cart-hd"><h3>Current order</h3>{count > 0 && <button className="clear" onClick={() => setCart({})}>Clear</button>}</div>
+              <div className="pos-cart-hd">
+                <h3>Current order{table ? <em> · Table {table}</em> : null}</h3>
+                {count > 0 && <button className="clear" onClick={() => setCart({})}>Clear</button>}
+                <button className="pos-sheetx" onClick={() => setCartOpen(false)} aria-label="Close">×</button>
+              </div>
               <div className="pos-cart-list">
                 {cartLines.length === 0 ? (
                   <div className="pos-empty">Tap dishes to add them here.</div>
@@ -162,6 +183,7 @@ export default function POS() {
                 </div>
               )}
               <button className="pos-place" onClick={place} disabled={placing || count === 0}>{placing ? "Placing…" : `Place order · ₹${grand}`}</button>
+              <button className="pos-sheetadd" onClick={() => setCartOpen(false)}>← Add more dishes</button>
             </div>
           </aside>
         </div>
@@ -171,7 +193,7 @@ export default function POS() {
       {!loading && count > 0 && (
         <div className="pos-bottombar">
           <div><b>{count} item{count > 1 ? "s" : ""}</b><span>₹{grand}</span></div>
-          <button onClick={place} disabled={placing}>{placing ? "Placing…" : "Place order →"}</button>
+          <button onClick={() => setCartOpen(true)}>Review order →</button>
         </div>
       )}
 

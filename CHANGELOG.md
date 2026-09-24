@@ -4,6 +4,25 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.7.0 - 24 Sep 2026
+Clear legal pages, a support address, and a POS built for a phone.
+- **Terms and Privacy rewritten** in plain English. Each page now opens with an
+  "In short" summary, then says exactly what happens: 0% commission, your content
+  stays yours, food and payment are between you and your customer, row-level
+  security keeps every restaurant's data apart, and how to get your data shown,
+  corrected, exported or deleted. Added sections on governing law, what we will
+  never do, your customers' data and what happens if Parosa ever shuts down.
+- **One support address everywhere:** support.parosa@gmail.com, on both legal
+  pages, in their footers and on the landing page.
+- **Today's staff code** sits in a plain cream card now - the patterned maroon
+  background is gone.
+- **Staff POS rebuilt for phones.** Compact header, the table number always
+  visible with the customer fields folded behind "+ Add customer details",
+  a full-width search, two dishes across with a - 1 + stepper right on the tile,
+  and a running total bar that opens the order as a bottom sheet where staff
+  review, adjust and place it. Desktop is unchanged.
+- Fixed: "+ New order" on the order-placed screen was maroon on maroon.
+
 ## v0.6.1 - 23 Sep 2026
 Same category pills everywhere, and a header that gets out of the way.
 - Every design now uses the Parosa category strip: soft rounded boxes, the one

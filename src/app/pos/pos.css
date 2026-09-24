@@ -1,12 +1,14 @@
 /* Parosa — Staff POS (order-taking) */
 .pos { min-height: 100vh; background: var(--parch); color: var(--ink); display: flex; flex-direction: column; }
 .pos-top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--oxblood) var(--paisley); background-size: 80px; color: var(--parch); border-bottom: 2px solid var(--gold); }
-.pos-brand { display: flex; align-items: center; gap: 11px; }
-.pos-brand .rn { font-family: var(--font-display); font-size: 20px; color: var(--parch-hi); line-height: 1; }
+.pos-brand { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; }
+.pos-brand > div { min-width: 0; }
+.pos-brand .rn { font-family: var(--font-display); font-size: 20px; color: var(--parch-hi); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pos-brand .sub { font-family: var(--font-caps); font-size: 8px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-hi); margin-top: 3px; }
 .pos-lg { width: 36px; height: 36px; border-radius: 9px; background: #ffffff22; }
 .pos-who { display: flex; align-items: center; gap: 10px; }
-.pos-who .chip { background: #ffffff1c; border: 1px solid #ffffff33; border-radius: 100px; padding: 6px 12px; font-size: 12.5px; font-weight: 600; }
+.pos-who .chip { display: inline-flex; align-items: center; gap: 8px; background: #ffffff1c; border: 1px solid #ffffff33; border-radius: 100px; padding: 5px 13px 5px 5px; font-size: 12.5px; font-weight: 600; max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pos-who .chip i { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--gold); color: var(--maroon-deep); font-style: normal; font-weight: 800; font-size: 12px; display: grid; place-items: center; }
 .pos-out { width: 34px; height: 34px; border-radius: 8px; border: 1px solid #ffffff33; background: #ffffff14; color: var(--gold-hi); display: grid; place-items: center; cursor: pointer; }
 .pos-out svg { width: 16px; height: 16px; }
 
@@ -15,6 +17,7 @@
 
 .pos-cust { margin-bottom: 14px; }
 .pos-row3 { display: grid; grid-template-columns: 90px 1fr 1fr; gap: 12px; }
+.pos-f label .opt { font-family: var(--font-body, inherit); letter-spacing: 0; text-transform: none; font-weight: 400; color: var(--muted); }
 .pos-f label { display: block; font-family: var(--font-caps); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--maroon); margin-bottom: 6px; font-weight: 700; }
 .pos-f input { width: 100%; font-size: 15px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); }
 .pos-f input:focus { outline: none; border-color: var(--maroon); box-shadow: 0 0 0 3px #8c1c1c1a; }
@@ -33,20 +36,28 @@
 .pos-search input { border: none; outline: none; background: transparent; font-size: 14px; width: 100%; color: var(--ink); }
 
 .pos-dishes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-.pos-dish { position: relative; text-align: left; background: var(--parch-hi); border: 1px solid var(--line); border-radius: 12px; padding: 12px 12px 10px; cursor: pointer; transition: border-color .12s, transform .1s; display: flex; flex-direction: column; gap: 6px; min-height: 78px; }
+.pos-dish { position: relative; background: var(--parch-hi); border: 1px solid var(--line); border-radius: 12px; transition: border-color .12s; display: flex; flex-direction: column; min-height: 78px; overflow: hidden; }
+.pos-dishtap { flex: 1; text-align: left; background: transparent; border: none; padding: 12px 12px 10px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; font: inherit; color: inherit; }
+.pos-dishtap:active { transform: scale(.97); }
+.pos-dishadd { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 8px; background: #fff; border: 1px solid var(--line-gold); color: var(--maroon); font-size: 16px; font-weight: 700; line-height: 22px; text-align: center; pointer-events: none; }
+.pos-dishq { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line-gold); background: #fff; }
+.pos-dishq button { flex: 1; height: 38px; border: none; background: transparent; color: var(--maroon); font-size: 19px; font-weight: 700; cursor: pointer; }
+.pos-dishq button:active { background: var(--parch-hi); }
+.pos-dishq span { flex: none; min-width: 34px; text-align: center; font-weight: 800; font-size: 14px; color: var(--oxblood); }
 .pos-dish:hover { border-color: var(--line-gold); }
-.pos-dish:active { transform: scale(.97); }
 .pos-dish.in { border-color: var(--oxblood); box-shadow: 0 0 0 2px #6e161822; }
 .pos-vd { width: 13px; height: 13px; border: 1.5px solid var(--veg); border-radius: 3px; position: relative; }
 .pos-vd::after { content: ""; position: absolute; inset: 2.5px; border-radius: 50%; background: var(--veg); }
 .pos-vd.nv { border-color: var(--nonveg); } .pos-vd.nv::after { background: var(--nonveg); }
 .pos-dish .dn { font-family: var(--font-display); font-size: 16px; color: var(--oxblood); line-height: 1.1; flex: 1; }
 .pos-dish .pr { font-weight: 800; font-size: 14px; color: var(--ink); }
-.pos-dish .qb { position: absolute; top: 8px; right: 8px; min-width: 22px; height: 22px; border-radius: 11px; background: var(--oxblood); color: var(--gold-hi); font-size: 12px; font-weight: 800; display: grid; place-items: center; }
 
 /* cart */
 .pos-cartcol { position: sticky; top: 78px; }
-.pos-cart-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.pos-cart-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.pos-cart-hd h3 { flex: 1; min-width: 0; }
+.pos-cart-hd h3 em { font-family: var(--font-caps); font-style: normal; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.pos-sheetback, .pos-sheetx, .pos-sheetadd, .pos-custmore { display: none; }
 .pos-cart-hd h3 { font-family: var(--font-display); font-size: 20px; color: var(--oxblood); }
 .pos-cart-hd .clear { border: none; background: transparent; color: var(--nonveg); font-size: 12px; font-weight: 700; cursor: pointer; }
 .pos-cart-list { display: flex; flex-direction: column; max-height: 46vh; overflow-y: auto; }
@@ -73,18 +84,66 @@
 .pos-done .tick { width: 84px; height: 84px; border-radius: 50%; background: var(--pos); color: #fff; font-size: 44px; display: grid; place-items: center; margin-bottom: 16px; box-shadow: 0 14px 30px -10px #000; }
 .pos-done h2 { font-family: var(--font-display); font-size: 34px; color: var(--gold-hi); }
 .pos-done p { font-size: 14px; color: var(--gold-soft); margin: 10px 0 24px; }
-.pos-done .pos-place { max-width: 300px; }
+.pos-done .pos-place { max-width: 300px; background: var(--gold); color: var(--maroon-deep); }
 
 .pos-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); z-index: 70; background: var(--maroon-deep); color: var(--gold-soft); font-size: 13.5px; font-weight: 600; padding: 11px 18px; border-radius: 10px; box-shadow: 0 14px 30px -12px #000; opacity: 0; pointer-events: none; transition: transform .25s, opacity .25s; }
 .pos-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (max-width: 860px) {
-  .pos-grid { grid-template-columns: 1fr; padding: 12px; }
-  .pos-cartcol { position: static; }
-  .pos-cart-list { max-height: none; }
-  .pos-cart .pos-place { display: none; } /* use sticky bar instead */
-  .pos-bottombar { display: flex; position: sticky; bottom: 0; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--maroon-deep); color: var(--parch); border-top: 2px solid var(--gold); z-index: 30; }
-  .pos-bottombar b { font-size: 14px; } .pos-bottombar span { display: block; font-size: 12px; color: var(--gold-soft); }
-  .pos-bottombar button { border: none; background: var(--gold); color: var(--maroon-deep); font-family: var(--font-caps); font-weight: 700; font-size: 13px; padding: 12px 18px; border-radius: 10px; cursor: pointer; }
-  .pos-row3 { grid-template-columns: 1fr; }
+  /* ---------- phone: the POS staff actually hold in one hand ---------- */
+  .pos-top { padding: 9px 12px; }
+  .pos-brand { gap: 9px; }
+  .pos-brand .rn { font-size: 16px; }
+  .pos-brand .sub { font-size: 7.5px; letter-spacing: .14em; }
+  .pos-who { flex: none; }
+  .pos-grid { grid-template-columns: 1fr; padding: 12px 12px 0; gap: 0; }
+
+  /* table stays out; the rest of the customer fields fold away */
+  .pos-cust { margin-bottom: 12px; padding: 12px; }
+  .pos-row3 { grid-template-columns: 1fr; gap: 10px; }
+  .pos-cust:not(.open) .pos-conly { display: none; }
+  .pos-f input { font-size: 16px; padding: 12px; }   /* 16px stops iOS zooming on focus */
+  .pos-custmore { display: block; width: 100%; margin-top: 10px; padding: 9px; border: 1px dashed var(--line-gold); border-radius: 9px; background: transparent; color: var(--maroon); font-family: var(--font-caps); font-weight: 700; font-size: 12px; letter-spacing: .04em; cursor: pointer; }
+
+  .pos-menuhd { gap: 8px; margin-bottom: 10px; }
+  .pos-search { order: -1; width: 100%; min-width: 0; padding: 10px 12px; }
+  .pos-search input { font-size: 16px; }
+  .pos-cats { gap: 8px; margin: 0 -12px; padding: 0 12px; }
+  .pos-pill { padding: 9px 16px 7px; border-radius: 100px; }
+
+  .pos-dishes { grid-template-columns: 1fr 1fr; gap: 9px; padding-bottom: 96px; }
+  .pos-dishtap { padding: 11px 11px 9px; }
+  .pos-dish .dn { font-size: 15px; }
+
+  /* the order becomes a bottom sheet */
+  .pos-cartcol { position: fixed; inset: 0; z-index: 50; pointer-events: none; }
+  .pos-cartcol .pos-card { position: absolute; left: 0; right: 0; bottom: 0; max-height: 86vh; display: flex; flex-direction: column; border-radius: 18px 18px 0 0; border-bottom: none; padding: 14px 14px calc(14px + env(safe-area-inset-bottom)); transform: translateY(102%); transition: transform .26s cubic-bezier(.2,.8,.25,1); box-shadow: 0 -18px 40px -22px #5e1113aa; }
+  .pos-sheetback { display: block; position: absolute; inset: 0; background: #2a0b0c66; opacity: 0; transition: opacity .26s; }
+  .pos-cartcol.open { pointer-events: auto; }
+  .pos-cartcol.open .pos-card { transform: translateY(0); }
+  .pos-cartcol.open .pos-sheetback { opacity: 1; }
+  .pos-cart-hd { padding-top: 4px; }
+  .pos-cart-list { flex: 1; max-height: none; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .pos-cline { padding: 11px 0; }
+  .pos-step button { width: 34px; height: 34px; font-size: 18px; }
+  .pos-sheetx { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-gold); background: var(--parch-hi); color: var(--maroon); font-size: 21px; line-height: 1; cursor: pointer; }
+  .pos-cart .pos-place { display: block; padding: 16px; font-size: 15px; }
+  .pos-sheetadd { display: block; width: 100%; margin-top: 8px; padding: 10px; border: none; background: transparent; color: var(--maroon); font-size: 13px; font-weight: 700; cursor: pointer; }
+
+  /* running total bar */
+  .pos-bottombar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 14px calc(11px + env(safe-area-inset-bottom)); background: var(--maroon-deep); color: var(--parch); border-top: 2px solid var(--gold); }
+  .pos-bottombar b { font-size: 14.5px; } .pos-bottombar span { display: block; font-size: 12px; color: var(--gold-soft); }
+  .pos-bottombar button { border: none; background: var(--gold); color: var(--maroon-deep); font-family: var(--font-caps); font-weight: 700; font-size: 13px; padding: 13px 20px; border-radius: 10px; cursor: pointer; }
+
+  .pos-done { padding: 24px; }
+  .pos-done h2 { font-size: 28px; }
+}
+
+/* narrow phones: the staff name shrinks to an initial so the brand stays readable */
+@media (max-width: 430px) {
+  .pos-who .chip { padding: 0; background: transparent; border: none; font-size: 0; gap: 0; }
+  .pos-who .chip i { width: 30px; height: 30px; font-size: 13px; }
+}
+@media (max-width: 330px) {
+  .pos-dishes { grid-template-columns: 1fr; }
 }

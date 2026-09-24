@@ -18,9 +18,38 @@
 .lgl-prose h2 { font-family: var(--font-display); font-weight: 400; font-size: 22px; color: var(--oxblood); margin: 30px 0 8px; }
 .lgl-prose p, .lgl-prose li { font-size: 15px; line-height: 1.7; color: var(--ink-2); }
 .lgl-prose p { margin: 0 0 12px; }
-.lgl-prose ul { margin: 0 0 14px; padding-left: 20px; }
-.lgl-prose li { margin-bottom: 6px; }
+.lgl-prose ul { margin: 0 0 14px; padding-left: 22px; list-style: disc; }
+.lgl-prose li { margin-bottom: 7px; }
+.lgl-prose li::marker { color: var(--gold); }
 .lgl-prose b { color: var(--ink); }
 .lgl-note { margin-top: 34px; padding: 14px 16px; background: var(--parch-hi); border: 1px solid var(--line); border-radius: 10px; font-size: 12.5px; color: var(--muted); line-height: 1.55; }
 .lgl-home { display: inline-block; margin-top: 24px; font-family: var(--font-caps); font-weight: 700; font-size: 12.5px; letter-spacing: .04em; color: var(--maroon); text-decoration: none; }
 .lgl-foot { border-top: 1px solid var(--line); padding: 22px; text-align: center; font-size: 12px; color: var(--muted); }
+
+/* ---- plain-English summary before the long version ---- */
+.lgl-tldr { background: var(--parch-hi); border: 1px solid var(--line-gold); border-left: 4px solid var(--gold); border-radius: 12px; padding: 18px 20px 16px; margin: 0 0 34px; }
+.lgl-tldr h2 { font-family: var(--font-caps); font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--maroon); margin: 0 0 10px; }
+.lgl-tldr ul { margin: 0; padding-left: 20px; list-style: disc; }
+.lgl-tldr li { font-size: 14.5px; line-height: 1.65; color: var(--ink); margin-bottom: 7px; }
+.lgl-tldr li::marker { color: var(--gold); }
+.lgl-tldr .fine { font-size: 12px; color: var(--muted); margin: 10px 0 0; line-height: 1.5; }
+
+/* numbered headings read as steps, not decoration */
+.lgl-prose h2 { scroll-margin-top: 80px; }
+.lgl-prose h2 + p, .lgl-prose h2 + ul { margin-top: 0; }
+
+/* ---- "still not clear?" card ---- */
+.lgl-help { display: flex; flex-direction: column; gap: 4px; margin-top: 36px; padding: 18px 20px; border-radius: 12px; background: var(--cream-card); border: 1px solid var(--line-gold); }
+.lgl-help b { font-family: var(--font-display); font-weight: 400; font-size: 20px; color: var(--oxblood); }
+.lgl-help span { font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+.lgl-help a { margin-top: 6px; font-weight: 700; font-size: 14.5px; color: var(--maroon); text-decoration: none; word-break: break-all; }
+.lgl-help a:hover { text-decoration: underline; }
+
+.lgl-foot a { color: var(--maroon); text-decoration: none; }
+.lgl-foot a:hover { text-decoration: underline; }
+
+@media (max-width: 560px) {
+  .lgl-body { padding: 30px 20px 48px; }
+  .lgl-tldr { padding: 16px 16px 14px; }
+  .lgl-prose p, .lgl-prose li { font-size: 15.5px; }
+}
