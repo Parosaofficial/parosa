@@ -13,7 +13,7 @@ export type TemplateDef = {
   blurb: string;
   /** Who it suits best — shown on the Templates page. */
   best: string;
-  /** The two Parosa signature designs. */
+  /** Parosa's own signature design. */
   flagship?: boolean;
   swatches: [string, string, string];
   /** Dark designs only take a theme's brand colours, never its light tints. */
@@ -49,32 +49,10 @@ export const themeById = (id?: string | null) => THEMES.find((t) => t.id === id)
 
 const SANS = "var(--font-mukta), system-ui, -apple-system, sans-serif";
 const ARCHIVO = "var(--font-archivo), system-ui, sans-serif";
-const CINZEL = "var(--font-cinzel), Georgia, serif";
 const ROZHA = "var(--font-rozha), Georgia, serif";
 
 export const TEMPLATES: TemplateDef[] = [
-  /* ---------------- FLAGSHIP 0b — Transparent (glass) ---------------- */
-  {
-    id: "transparent",
-    name: "Transparent",
-    hi: "पारदर्शी",
-    blurb: "Frosted glass cards on a soft gradient. Round photos, a price chip and a two-across grid.",
-    best: "Cafes, juice bars, modern kitchens",
-    swatches: ["#E9ECF7", "#FFFFFF", "#1B1D28"],
-    vars: {
-      "--m-bg": "#E9ECF6", "--m-surface": "rgba(255,255,255,.62)", "--m-surface-2": "rgba(255,255,255,.45)",
-      "--m-chrome": "#1B1D28", "--m-chrome-ink": "#FFFFFF",
-      "--m-accent": "#1B1D28", "--m-accent-ink": "#FFFFFF",
-      "--m-ink": "#171923", "--m-ink-2": "#7B8094", "--m-muted": "#9AA0B4",
-      "--m-line": "rgba(255,255,255,.75)",
-      "--m-radius": "24px", "--m-radius-sm": "18px",
-      "--m-shadow": "0 18px 40px -26px rgba(40,45,80,.45)",
-      "--m-font-display": SANS, "--m-font-body": SANS,
-      "--oxblood": "#1B1D28", "--gold-hi": "#8C93B5", "--font-display": SANS,
-    },
-  },
-
-  /* ---------------- FLAGSHIP 0 — the Parosa design ---------------- */
+  /* 1 — Parosa: our signature design (default for new restaurants) */
   {
     id: "parosa",
     name: "Parosa",
@@ -96,93 +74,70 @@ export const TEMPLATES: TemplateDef[] = [
     },
   },
 
-  /* ---------------- FLAGSHIP 1 — the face of Parosa ---------------- */
+  /* 2 — Transparent: frosted glass, two-across grid */
   {
-    id: "aurora",
-    name: "Aurora",
-    hi: "ऑरोरा",
-    blurb: "Parosa's signature. Soft, warm and effortless — the one we'd put our name on.",
-    best: "Signature · any restaurant",
-    flagship: true,
-    swatches: ["#5C1A17", "#E08A2B", "#FCF8F3"],
+    id: "transparent",
+    name: "Transparent",
+    hi: "पारदर्शी",
+    blurb: "Frosted glass cards on a soft gradient. Round photos, a price chip and a two-across grid.",
+    best: "Cafes, juice bars, modern kitchens",
+    swatches: ["#E9ECF7", "#FFFFFF", "#1B1D28"],
     vars: {
-      "--m-bg": "#FCF8F3", "--m-surface": "#FFFFFF", "--m-surface-2": "#F6EEE4",
-      "--m-chrome": "#5C1A17", "--m-chrome-ink": "#FFF4E8",
-      "--m-accent": "#E08A2B", "--m-accent-ink": "#3A1D06",
-      "--m-ink": "#241713", "--m-ink-2": "#6B564C", "--m-muted": "#A5948A",
-      "--m-line": "#EFE4DA",
-      "--m-radius": "22px", "--m-radius-sm": "14px",
-      "--m-shadow": "0 14px 34px -20px rgba(70,35,20,.45)",
-      "--m-font-display": ARCHIVO, "--m-font-body": SANS,
-      "--oxblood": "#5C1A17", "--gold-hi": "#E08A2B", "--font-display": ARCHIVO,
-    },
-  },
-
-  /* ---------------- FLAGSHIP 2 — dark, luxe ---------------- */
-  {
-    id: "noir",
-    name: "Noir",
-    hi: "नॉयर",
-    blurb: "Parosa after dark. A fine-dining menu card — full-bleed hero, gold hairlines, quiet luxury.",
-    best: "Signature · fine dining & bars",
-    flagship: true,
-    swatches: ["#12100E", "#D9A441", "#F4EBDD"],
-    dark: true,
-    vars: {
-      "--m-bg": "#12100E", "--m-surface": "#1B1815", "--m-surface-2": "#241F1A",
-      "--m-chrome": "#0C0A09", "--m-chrome-ink": "#F4EBDD",
-      "--m-accent": "#D9A441", "--m-accent-ink": "#14100B",
-      "--m-ink": "#F4EBDD", "--m-ink-2": "#C3B4A1", "--m-muted": "#8C7E6D",
-      "--m-line": "#332B24",
-      "--m-radius": "16px", "--m-radius-sm": "12px",
-      "--m-shadow": "0 20px 44px -22px rgba(0,0,0,.85)",
-      "--m-font-display": CINZEL, "--m-font-body": SANS,
-      "--oxblood": "#0C0A09", "--gold-hi": "#D9A441", "--font-display": CINZEL,
-    },
-  },
-
-  /* ---------------- Photo-first grid ---------------- */
-  {
-    id: "gallery",
-    name: "Gallery",
-    blurb: "Big, appetising photos in a two-up grid. Let the food do the selling.",
-    best: "Cafés & places with great photos",
-    swatches: ["#1A1A1A", "#FF5A1F", "#F7F7F5"],
-    vars: {
-      "--m-bg": "#F6F6F4", "--m-surface": "#FFFFFF", "--m-surface-2": "#EFEFEC",
-      "--m-chrome": "#1A1A1A", "--m-chrome-ink": "#FFFFFF",
-      "--m-accent": "#FF5A1F", "--m-accent-ink": "#FFFFFF",
-      "--m-ink": "#191919", "--m-ink-2": "#4A4A4A", "--m-muted": "#8A8A8A",
-      "--m-line": "#E8E8E6",
-      "--m-radius": "18px", "--m-radius-sm": "12px",
-      "--m-shadow": "0 12px 28px -18px rgba(0,0,0,.35)",
-      "--m-font-display": ARCHIVO, "--m-font-body": SANS,
-      "--oxblood": "#1A1A1A", "--gold-hi": "#FF5A1F", "--font-display": ARCHIVO,
-    },
-  },
-
-  /* ---------------- Fast, text-first ---------------- */
-  {
-    id: "express",
-    name: "Express",
-    hi: "एक्सप्रेस",
-    blurb: "No photos needed. A crisp price list built for speed — order in seconds.",
-    best: "Dhabas, QSR & busy counters",
-    swatches: ["#B3160F", "#1A1A1A", "#FFFDF7"],
-    vars: {
-      "--m-bg": "#FFFDF7", "--m-surface": "#FFFFFF", "--m-surface-2": "#FBF3E6",
-      "--m-chrome": "#B3160F", "--m-chrome-ink": "#FFF3E0",
-      "--m-accent": "#B3160F", "--m-accent-ink": "#FFFFFF",
-      "--m-ink": "#1A1A1A", "--m-ink-2": "#454545", "--m-muted": "#8C8C8C",
-      "--m-line": "#EDE4D4",
-      "--m-radius": "10px", "--m-radius-sm": "8px",
-      "--m-shadow": "0 8px 20px -16px rgba(0,0,0,.3)",
+      "--m-bg": "#E9ECF6", "--m-surface": "rgba(255,255,255,.62)", "--m-surface-2": "rgba(255,255,255,.45)",
+      "--m-chrome": "#1B1D28", "--m-chrome-ink": "#FFFFFF",
+      "--m-accent": "#1B1D28", "--m-accent-ink": "#FFFFFF",
+      "--m-ink": "#171923", "--m-ink-2": "#7B8094", "--m-muted": "#9AA0B4",
+      "--m-line": "rgba(255,255,255,.75)",
+      "--m-radius": "24px", "--m-radius-sm": "18px",
+      "--m-shadow": "0 18px 40px -26px rgba(40,45,80,.45)",
       "--m-font-display": SANS, "--m-font-body": SANS,
-      "--oxblood": "#B3160F", "--gold-hi": "#FFFFFF", "--font-display": SANS,
+      "--oxblood": "#1B1D28", "--gold-hi": "#8C93B5", "--font-display": SANS,
     },
   },
 
-  /* ---------------- Heritage ---------------- */
+  /* 3 — Café: animated, colour-drenched, high-contrast */
+  {
+    id: "cafe",
+    name: "Café",
+    hi: "कैफ़े",
+    blurb: "Bold, juicy and animated — big floating product shots, a colour-drenched backdrop and chunky type. Made for shakes, coffee and desserts.",
+    best: "Cafés, shake & juice bars, dessert parlours",
+    swatches: ["#E0004D", "#FFE3EC", "#FF6A1A"],
+    vars: {
+      "--m-bg": "#FFF1F5", "--m-surface": "#FFFFFF", "--m-surface-2": "#FFE3EC",
+      "--m-chrome": "#C8003F", "--m-chrome-ink": "#FFFFFF",
+      "--m-accent": "#E0004D", "--m-accent-ink": "#FFFFFF",
+      "--m-ink": "#1A0710", "--m-ink-2": "#5E3A48", "--m-muted": "#A07D8B",
+      "--m-line": "#F6D2DE",
+      "--m-radius": "26px", "--m-radius-sm": "20px",
+      "--m-shadow": "0 22px 44px -26px rgba(160,0,60,.45)",
+      "--m-font-display": ARCHIVO, "--m-font-body": SANS,
+      "--oxblood": "#C8003F", "--gold-hi": "#FF6A1A", "--font-display": ARCHIVO,
+    },
+  },
+
+  /* 4 — Food Truck: street-loud ticket cards */
+  {
+    id: "foodtruck",
+    name: "Food Truck",
+    hi: "फ़ूड ट्रक",
+    blurb: "Street-loud. Mustard and black, stencil headings, ticket-stub dish cards and giant price tags you read from the queue.",
+    best: "Food trucks, stalls, QSR counters",
+    swatches: ["#FFC300", "#141414", "#E63B1F"],
+    vars: {
+      "--m-bg": "#FFF6D6", "--m-surface": "#FFFFFF", "--m-surface-2": "#FFE58A",
+      "--m-chrome": "#141414", "--m-chrome-ink": "#FFC300",
+      "--m-accent": "#E63B1F", "--m-accent-ink": "#FFFFFF",
+      "--m-ink": "#141414", "--m-ink-2": "#3D3A33", "--m-muted": "#7A735F",
+      "--m-line": "#141414",
+      "--m-radius": "14px", "--m-radius-sm": "10px",
+      "--m-shadow": "4px 4px 0 #141414",
+      "--m-font-display": ARCHIVO, "--m-font-body": SANS,
+      "--oxblood": "#141414", "--gold-hi": "#FFC300", "--font-display": ARCHIVO,
+    },
+  },
+
+  /* 5 — Virasat: heritage card */
   {
     id: "virasat",
     name: "Virasat",
@@ -206,8 +161,11 @@ export const TEMPLATES: TemplateDef[] = [
 
 /** Older/removed template ids degrade to the closest surviving design. */
 const ALIASES: Record<string, string> = {
-  masala: "virasat", tandoor: "express", blanc: "gallery",
-  midnight: "noir", gelato: "gallery", bento: "gallery", coastal: "aurora",
+  // retired in v0.9.0
+  aurora: "parosa", noir: "parosa", gallery: "cafe", express: "foodtruck",
+  // older still
+  masala: "virasat", tandoor: "foodtruck", blanc: "cafe",
+  midnight: "parosa", gelato: "cafe", bento: "cafe", coastal: "parosa",
 };
 
 export const templateById = (id?: string | null) => {

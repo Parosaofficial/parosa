@@ -177,70 +177,7 @@
 @media (prefers-reduced-motion: reduce) { .pm-app *, .pm-app *::before { animation: none !important; transition-duration: .01ms !important; } }
 
 /* ============================================================
-   TEMPLATE 2 — NOIR · fine-dining editorial (flagship)
-   ============================================================ */
-[data-tpl="noir"] .pm-hero { grid-template-columns: 1fr; padding: 0; background: var(--m-surface); position: relative; min-height: 230px; align-items: end; }
-[data-tpl="noir"] .pm-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: var(--m-radius); }
-[data-tpl="noir"] .pm-hero-in { position: relative; z-index: 2; order: 0; padding: 20px; background: linear-gradient(to top, rgba(8,7,6,.94) 22%, rgba(8,7,6,.55) 62%, transparent); border-radius: var(--m-radius); width: 100%; }
-[data-tpl="noir"] .pm-hero h2 { font-size: 28px; font-weight: 400; letter-spacing: .01em; }
-[data-tpl="noir"] .pm-hero.noimg { min-height: 0; }
-[data-tpl="noir"] .pm-hero.noimg .pm-hero-in { background: none; }
-[data-tpl="noir"] .pm-sechead { justify-content: center; margin-bottom: 18px; gap: 14px; }
-[data-tpl="noir"] .pm-sechead::before { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--m-line)); }
-[data-tpl="noir"] .pm-sechead h3 { flex: none; font-weight: 400; font-size: 14px; letter-spacing: .22em; text-transform: uppercase; color: var(--m-accent); }
-[data-tpl="noir"] .pm-sechead .ln { background: linear-gradient(90deg, var(--m-line), transparent); }
-[data-tpl="noir"] .pm-sechead .cnt { display: none; }
-[data-tpl="noir"] .pm-list { gap: 0; }
-[data-tpl="noir"] .pm-dish { grid-template-columns: 1fr 76px; grid-template-areas: "mid thumb"; background: transparent; box-shadow: none; border: 0; border-bottom: 1px solid var(--m-line); border-radius: 0; padding: 18px 2px; }
-[data-tpl="noir"] .pm-dish.in { box-shadow: none; border-color: var(--m-accent); }
-[data-tpl="noir"] .pm-mid { grid-area: mid; }
-[data-tpl="noir"] .pm-thumb { grid-area: thumb; border-radius: 10px; }
-[data-tpl="noir"] .pm-dish.noimg { grid-template-columns: 1fr; grid-template-areas: "mid"; }
-[data-tpl="noir"] .pm-dn { font-weight: 400; font-size: 19px; letter-spacing: .01em; }
-[data-tpl="noir"] .pm-price { color: var(--m-accent); }
-[data-tpl="noir"] .pm-dd { font-style: italic; }
-
-/* ============================================================
-   TEMPLATE 3 — GALLERY · photo-first grid
-   ============================================================ */
-[data-tpl="gallery"] .pm-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-[data-tpl="gallery"] .pm-dish { grid-template-columns: 1fr; gap: 0; padding: 0; overflow: hidden; }
-[data-tpl="gallery"] .pm-thumb { border-radius: 0; aspect-ratio: 1; }
-[data-tpl="gallery"] .pm-mid { padding: 11px 12px 12px; }
-[data-tpl="gallery"] .pm-dd { display: none; }
-[data-tpl="gallery"] .pm-dn { font-size: 14.5px; }
-[data-tpl="gallery"] .pm-dbot { padding-top: 8px; }
-[data-tpl="gallery"] .pm-add { padding: 8px 14px; font-size: 11.5px; }
-[data-tpl="gallery"] .pm-stepper button { width: 28px; height: 28px; font-size: 16px; }
-[data-tpl="gallery"] .pm-hero { grid-template-columns: 1fr 104px; }
-[data-tpl="gallery"] .pm-hero.noimg { grid-template-columns: 1fr; }
-/* a photo-less tile in the photo grid: give the text room so the row stays even */
-[data-tpl="gallery"] .pm-dish.noimg .pm-mid { padding: 16px 12px; min-height: 108px; justify-content: center; }
-[data-tpl="gallery"] .pm-dish.noimg .pm-dd { display: -webkit-box; }
-
-/* ============================================================
-   TEMPLATE 4 — EXPRESS · fast price list, no photos
-   ============================================================ */
-[data-tpl="express"] .pm-hero { display: none; }
-[data-tpl="express"] .pm-thumb { display: none; }
-[data-tpl="express"] .pm-list { gap: 0; }
-[data-tpl="express"] .pm-dish { grid-template-columns: 1fr; background: transparent; box-shadow: none; border: 0; border-bottom: 1px dashed var(--m-line); border-radius: 0; padding: 12px 2px; }
-[data-tpl="express"] .pm-dish.in { box-shadow: none; background: color-mix(in srgb, var(--m-accent) 7%, transparent); border-radius: 8px; }
-[data-tpl="express"] .pm-mid { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "name price" "desc action"; column-gap: 14px; align-items: center; }
-[data-tpl="express"] .pm-dtop { grid-area: name; align-items: center; }
-[data-tpl="express"] .pm-dtop::after { content: ""; flex: 1; border-bottom: 1px dotted var(--m-line); margin-left: 4px; }
-[data-tpl="express"] .pm-dd { grid-area: desc; margin: 2px 0 0; -webkit-line-clamp: 1; }
-[data-tpl="express"] .pm-dbot { display: contents; }
-[data-tpl="express"] .pm-price { grid-area: price; justify-self: end; font-size: 17px; }
-[data-tpl="express"] .pm-add, [data-tpl="express"] .pm-stepper, [data-tpl="express"] .pm-soldout { grid-area: action; justify-self: end; margin-top: 4px; }
-[data-tpl="express"] .pm-add { border-radius: 8px; padding: 7px 14px; }
-[data-tpl="express"] .pm-stepper { border-radius: 8px; }
-[data-tpl="express"] .pm-stepper button { width: 30px; height: 30px; }
-[data-tpl="express"] .pm-sechead h3 { font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--m-accent); }
-[data-tpl="express"] .pm-dn { font-weight: 700; font-size: 15px; }
-
-/* ============================================================
-   TEMPLATE 5 — VIRASAT · heritage card
+   VIRASAT · heritage card
    ============================================================ */
 [data-tpl="virasat"] .pm-app, [data-tpl="virasat"] .pm-body { background: var(--m-bg); }
 [data-tpl="virasat"] .pm-dish { grid-template-columns: 92px 1fr; border: 1px solid color-mix(in srgb, var(--m-accent) 55%, transparent); background: var(--m-surface); }
@@ -257,7 +194,7 @@
    "Our Specialties" intro and a closing India banner.
    ============================================================ */
 /* the extra pieces belong to this design only */
-.pm-cartbtn, .pm-intro, .pm-banner { display: none; }
+.pm-cartbtn, .pm-intro, .pm-banner, .pm-cafehead, .pm-ticker { display: none; }
 
 [data-tpl="parosa"] .pm-top { background: color-mix(in srgb, var(--m-bg) 92%, transparent); }
 [data-tpl="parosa"] .pm-head { display: grid; grid-template-columns: 48px 1fr auto auto; align-items: center; gap: 10px; padding: 14px 16px 10px; }
@@ -385,3 +322,141 @@
 @media (prefers-reduced-motion: reduce) {
   .pm-logo > span, .pm-head, .pm-id .rn, .pm-id .tb { transition: none; }
 }
+
+/* ============================================================
+   CAFÉ · bold, juicy, animated
+   Colour-drenched drifting backdrop, chunky Archivo type, a floating hero
+   shot and tall two-across product cards.
+   ============================================================ */
+@keyframes cafe-drift { 0% { background-position: 0% 0%, 100% 20%, 50% 100%, 0 0; } 50% { background-position: 30% 20%, 70% 0%, 40% 80%, 0 0; } 100% { background-position: 0% 0%, 100% 20%, 50% 100%, 0 0; } }
+@keyframes cafe-float { 0%, 100% { transform: translateY(0) scale(1.02) rotate(-1.5deg); } 50% { transform: translateY(-8px) scale(1.05) rotate(1.5deg); } }
+@keyframes cafe-in { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes cafe-shine { from { transform: translateX(-120%) skewX(-18deg); } to { transform: translateX(320%) skewX(-18deg); } }
+
+[data-tpl="cafe"] {
+  background:
+    radial-gradient(60% 40% at 15% 0%, color-mix(in srgb, var(--m-accent) 26%, transparent), transparent 70%),
+    radial-gradient(50% 35% at 100% 18%, color-mix(in srgb, var(--gold-hi) 30%, transparent), transparent 70%),
+    radial-gradient(70% 40% at 50% 100%, color-mix(in srgb, var(--m-accent) 18%, transparent), transparent 70%),
+    var(--m-bg);
+  background-size: 160% 160%, 160% 160%, 160% 160%, auto;
+  animation: cafe-drift 18s ease-in-out infinite;
+}
+[data-tpl="cafe"] .pm-top { background: color-mix(in srgb, var(--m-bg) 70%, transparent); border-bottom: none; }
+[data-tpl="cafe"] .pm-id .rn { font-weight: 900; font-size: 21px; letter-spacing: -.03em; font-style: italic; text-transform: uppercase; }
+[data-tpl="cafe"] .pm-icon { border: none; background: #fff; border-radius: 50%; box-shadow: 0 8px 18px -10px rgba(120,0,40,.5); }
+[data-tpl="cafe"] .pm-vsw { border: none; background: #fff; border-radius: 100px; box-shadow: 0 8px 18px -10px rgba(120,0,40,.5); }
+[data-tpl="cafe"] .pm-cartbtn { display: grid; place-items: center; position: relative; width: 38px; height: 38px; flex: none; border: none; border-radius: 50%; background: #fff; color: var(--m-ink); cursor: pointer; box-shadow: 0 8px 18px -10px rgba(120,0,40,.5); }
+[data-tpl="cafe"] .pm-cartbtn svg { width: 19px; height: 19px; }
+[data-tpl="cafe"] .pm-cartbtn .n { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 100px; background: var(--m-accent); color: var(--m-accent-ink); font-size: 11px; font-weight: 800; display: grid; place-items: center; animation: pm-pop .3s cubic-bezier(.2,.8,.25,1.6); }
+[data-tpl="cafe"] .pm-pill:not(.on) { background: #fff; box-shadow: 0 6px 14px -10px rgba(120,0,40,.45); color: var(--m-ink); }
+[data-tpl="cafe"] .pm-pill.on { background: var(--m-accent); border-color: var(--m-accent); color: var(--m-accent-ink); box-shadow: 0 10px 20px -10px var(--m-accent); }
+
+[data-tpl="cafe"] .pm-cafehead { display: block; margin: 6px 2px 18px; animation: cafe-in .6s cubic-bezier(.2,.8,.25,1) both; }
+[data-tpl="cafe"] .pm-cafehead .k { font-size: 11px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-hi); }
+[data-tpl="cafe"] .pm-cafehead h2 { display: block; font-family: var(--m-font-display); font-weight: 900; font-size: 38px; line-height: .98; letter-spacing: -.035em; color: var(--m-ink); margin-top: 6px; }
+[data-tpl="cafe"] .pm-cafehead .k::after { content: ""; display: inline-block; width: 18px; height: 14px; margin-left: 8px; vertical-align: -2px; transform: rotate(-20deg); background:
+    linear-gradient(var(--gold-hi), var(--gold-hi)) 0 100% / 3px 10px no-repeat,
+    linear-gradient(var(--gold-hi), var(--gold-hi)) 100% 60% / 12px 3px no-repeat; }
+[data-tpl="cafe"] .pm-id .tb, [data-tpl="foodtruck"] .pm-id .tb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[data-tpl="cafe"] .pm-vsw .lbl, [data-tpl="foodtruck"] .pm-vsw .lbl { display: none; }
+[data-tpl="cafe"] .pm-vsw, [data-tpl="foodtruck"] .pm-vsw { padding: 0 11px; }
+
+/* hero: a floating product shot on a soft tinted card */
+[data-tpl="cafe"] .pm-hero { grid-template-columns: 1fr; gap: 0; padding: 0; overflow: hidden; position: relative; color: var(--m-ink);
+  background: linear-gradient(165deg, color-mix(in srgb, var(--m-accent) 20%, #fff), #fff 70%); box-shadow: var(--m-shadow); }
+[data-tpl="cafe"] .pm-hero-img { width: 100%; height: 230px; border-radius: 0; box-shadow: none; background-size: cover; animation: cafe-float 5s ease-in-out infinite; transform-origin: 50% 80%; }
+[data-tpl="cafe"] .pm-hero-in { order: 0; padding: 16px 18px 18px; }
+[data-tpl="cafe"] .pm-hero .flag { color: var(--m-accent); }
+[data-tpl="cafe"] .pm-hero h2 { font-weight: 900; font-size: 28px; letter-spacing: -.03em; }
+[data-tpl="cafe"] .pm-hero p { opacity: 1; color: var(--m-ink-2); }
+[data-tpl="cafe"] .pm-hero .pr { color: var(--m-ink); font-size: 24px; font-weight: 900; }
+[data-tpl="cafe"] .pm-hero::after { content: ""; position: absolute; top: 0; left: 0; width: 40%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent); animation: cafe-shine 4.5s ease-in-out 1.2s infinite; pointer-events: none; }
+
+[data-tpl="cafe"] .pm-sechead h3 { font-weight: 900; font-size: 22px; letter-spacing: -.03em; }
+[data-tpl="cafe"] .pm-sechead .ln { height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--m-accent), transparent); opacity: .35; }
+
+/* tall two-across product cards */
+[data-tpl="cafe"] .pm-list { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+[data-tpl="cafe"] .pm-dish { display: flex; flex-direction: column; gap: 0; padding: 10px; border: none; background: #fff; border-radius: 24px; animation: cafe-in .55s cubic-bezier(.2,.8,.25,1) both; transition: transform .2s cubic-bezier(.2,.8,.25,1.4); }
+[data-tpl="cafe"] .pm-dish:active { transform: scale(.97); }
+[data-tpl="cafe"] .pm-dish.in { box-shadow: 0 0 0 2.5px var(--m-accent), var(--m-shadow); }
+[data-tpl="cafe"] .pm-thumb { width: 100%; aspect-ratio: 1; border-radius: 18px; background-color: color-mix(in srgb, var(--m-accent) 12%, #fff); transition: transform .4s cubic-bezier(.2,.8,.25,1); }
+[data-tpl="cafe"] .pm-dish.in .pm-thumb { transform: scale(1.04) rotate(-1.5deg); }
+[data-tpl="cafe"] .pm-dish.noimg { padding-top: 16px; background: linear-gradient(170deg, color-mix(in srgb, var(--m-accent) 14%, #fff), #fff 60%); }
+[data-tpl="cafe"] .pm-mid { padding: 10px 4px 2px; flex: 1; }
+[data-tpl="cafe"] .pm-dn { font-weight: 800; font-size: 15.5px; letter-spacing: -.02em; }
+[data-tpl="cafe"] .pm-dd { -webkit-line-clamp: 2; font-size: 11.5px; }
+[data-tpl="cafe"] .pm-dbot { padding-top: 10px; gap: 6px; }
+[data-tpl="cafe"] .pm-price { font-weight: 900; font-size: 17px; }
+[data-tpl="cafe"] .pm-add { padding: 9px 14px; font-size: 12px; box-shadow: 0 10px 18px -10px var(--m-accent); white-space: nowrap; }
+[data-tpl="cafe"] .pm-add span { margin-left: 3px; }
+[data-tpl="cafe"] .pm-stepper { background: var(--m-accent); }
+[data-tpl="cafe"] .pm-stepper button { width: 28px; height: 30px; font-size: 16px; color: var(--m-accent-ink); }
+[data-tpl="cafe"] .pm-stepper .q { color: var(--m-accent-ink); min-width: 16px; }
+[data-tpl="cafe"] .pm-cartbar { background: var(--m-ink); box-shadow: 0 20px 40px -14px var(--m-accent); }
+
+/* ============================================================
+   FOOD TRUCK · street-loud
+   Black + mustard, a scrolling "now serving" ticker, ticket-stub
+   cards with hard offset shadows and slapped-on price tags.
+   ============================================================ */
+@keyframes ft-run { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes ft-stamp { 0% { transform: scale(1.4) rotate(-12deg); opacity: 0; } 70% { transform: scale(.95) rotate(-5deg); opacity: 1; } 100% { transform: scale(1) rotate(-6deg); } }
+
+[data-tpl="foodtruck"] { background:
+    repeating-linear-gradient(135deg, transparent 0 22px, rgba(20,20,20,.035) 22px 44px),
+    var(--m-bg); }
+[data-tpl="foodtruck"] .pm-top { background: var(--m-chrome); border-bottom: 3px solid #141414; backdrop-filter: none; -webkit-backdrop-filter: none; }
+[data-tpl="foodtruck"] .pm-id .rn { color: var(--m-chrome-ink); font-weight: 900; text-transform: uppercase; letter-spacing: .01em; font-size: 20px; }
+[data-tpl="foodtruck"] .pm-id .tb { color: color-mix(in srgb, var(--m-chrome-ink) 70%, transparent); }
+[data-tpl="foodtruck"] .pm-icon { background: transparent; border: 2px solid var(--m-chrome-ink); color: var(--m-chrome-ink); border-radius: 10px; }
+[data-tpl="foodtruck"] .pm-icon.on { background: var(--m-chrome-ink); color: #141414; }
+[data-tpl="foodtruck"] .pm-vsw { background: transparent; border: 2px solid var(--m-chrome-ink); border-radius: 10px; }
+[data-tpl="foodtruck"] .pm-vsw .lbl { color: var(--m-chrome-ink); }
+[data-tpl="foodtruck"] .pm-cartbtn { display: grid; place-items: center; position: relative; width: 38px; height: 38px; flex: none; border: 2px solid var(--m-chrome-ink); border-radius: 10px; background: var(--m-chrome-ink); color: #141414; cursor: pointer; }
+[data-tpl="foodtruck"] .pm-cartbtn svg { width: 19px; height: 19px; }
+[data-tpl="foodtruck"] .pm-cartbtn .n { position: absolute; top: -7px; right: -7px; min-width: 19px; height: 19px; padding: 0 4px; border-radius: 100px; background: var(--m-accent); color: #fff; border: 2px solid #141414; font-size: 10.5px; font-weight: 900; display: grid; place-items: center; }
+[data-tpl="foodtruck"] .pm-search input { border: 2px solid var(--m-chrome-ink); }
+[data-tpl="foodtruck"] .pm-pill { font-family: var(--m-font-display); font-weight: 800; text-transform: uppercase; letter-spacing: .03em; font-size: 12.5px; border: 2px solid var(--m-chrome-ink); background: transparent; color: var(--m-chrome-ink); border-radius: 10px; }
+[data-tpl="foodtruck"] .pm-pill.on { background: var(--m-chrome-ink); color: #141414; border-color: var(--m-chrome-ink); }
+
+/* the ticker */
+[data-tpl="foodtruck"] .pm-ticker { display: block; overflow: hidden; margin: -16px -16px 18px; background: var(--m-accent); color: #fff; border-bottom: 3px solid #141414; padding: 8px 0; }
+[data-tpl="foodtruck"] .pm-ticker .run { display: flex; width: max-content; animation: ft-run 22s linear infinite; }
+[data-tpl="foodtruck"] .pm-ticker span { font-family: var(--m-font-display); font-weight: 900; font-size: 12.5px; letter-spacing: .12em; white-space: nowrap; }
+
+/* hero = today's special, stamped */
+[data-tpl="foodtruck"] .pm-hero { background: #141414; color: #fff; border-radius: 16px; border: 3px solid #141414; box-shadow: 6px 6px 0 var(--m-accent); position: relative; overflow: visible; margin-top: 8px; }
+[data-tpl="foodtruck"] .pm-hero .flag { color: var(--gold-hi); }
+[data-tpl="foodtruck"] .pm-hero h2 { font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; }
+[data-tpl="foodtruck"] .pm-hero .pr { color: var(--gold-hi); font-weight: 900; }
+[data-tpl="foodtruck"] .pm-hero-img { border: 3px solid var(--gold-hi); border-radius: 12px; box-shadow: none; }
+[data-tpl="foodtruck"] .pm-hero::before { content: "TODAY'S SPECIAL"; position: absolute; top: -13px; right: 14px; z-index: 2; background: var(--gold-hi); color: #141414; font-family: var(--m-font-display); font-weight: 900; font-size: 11px; letter-spacing: .1em; padding: 5px 10px; border: 2px solid #141414; border-radius: 6px; animation: ft-stamp .6s cubic-bezier(.2,.8,.25,1.4) .3s both; }
+[data-tpl="foodtruck"] .pm-hero .pm-add { background: var(--gold-hi); color: #141414; }
+
+[data-tpl="foodtruck"] .pm-sechead h3 { font-weight: 900; font-size: 24px; text-transform: uppercase; letter-spacing: -.01em; background: linear-gradient(transparent 55%, var(--gold-hi) 55%); padding: 0 4px; }
+[data-tpl="foodtruck"] .pm-sechead .ln { height: 0; border-top: 2px dashed #141414; background: none; }
+[data-tpl="foodtruck"] .pm-sechead .cnt { color: #141414; font-weight: 900; }
+
+/* ticket-stub cards: notches cut into both sides */
+[data-tpl="foodtruck"] .pm-list { gap: 16px; }
+[data-tpl="foodtruck"] .pm-dish { background: #fff; border: 2.5px solid #141414; border-radius: 14px; box-shadow: 4px 4px 0 #141414; }
+[data-tpl="foodtruck"] .pm-dish::before, [data-tpl="foodtruck"] .pm-dish::after { content: ""; position: absolute; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: var(--m-bg); border: 2.5px solid #141414; }
+[data-tpl="foodtruck"] .pm-dish::before { left: -10px; clip-path: inset(0 0 0 50%); }
+[data-tpl="foodtruck"] .pm-dish::after { right: -10px; clip-path: inset(0 50% 0 0); }
+[data-tpl="foodtruck"] .pm-dish.in { box-shadow: 4px 4px 0 var(--m-accent); }
+[data-tpl="foodtruck"] .pm-thumb { border: 2.5px solid #141414; border-radius: 10px; }
+[data-tpl="foodtruck"] .pm-dn { font-weight: 900; text-transform: uppercase; font-size: 15.5px; letter-spacing: 0; }
+[data-tpl="foodtruck"] .pm-dd { color: var(--m-ink-2); }
+[data-tpl="foodtruck"] .pm-dbot { border-top: 2px dashed #141414; padding-top: 10px; margin-top: 10px; }
+[data-tpl="foodtruck"] .pm-price { display: inline-block; background: var(--m-accent); color: #fff; font-weight: 900; font-size: 17px; padding: 3px 10px; border: 2px solid #141414; border-radius: 6px; transform: rotate(-3deg); box-shadow: 2px 2px 0 #141414; }
+[data-tpl="foodtruck"] .pm-add { background: var(--gold-hi); color: #141414; border: 2.5px solid #141414; border-radius: 10px; box-shadow: 3px 3px 0 #141414; text-transform: uppercase; font-weight: 900; transition: transform .1s, box-shadow .1s; }
+[data-tpl="foodtruck"] .pm-add:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #141414; }
+[data-tpl="foodtruck"] .pm-stepper { background: #141414; border-radius: 10px; }
+[data-tpl="foodtruck"] .pm-stepper button, [data-tpl="foodtruck"] .pm-stepper .q { color: var(--gold-hi); }
+[data-tpl="foodtruck"] .pm-cartbar { background: var(--gold-hi); color: #141414; border: 3px solid #141414; border-radius: 16px; box-shadow: 5px 5px 0 #141414; }
+[data-tpl="foodtruck"] .pm-cartbar .cb { background: #141414; color: var(--gold-hi); }
+[data-tpl="foodtruck"] .pm-cartbar .go { background: #141414; color: var(--gold-hi); border-radius: 10px; }
+[data-tpl="foodtruck"] .pm-endnote { color: #141414; font-weight: 700; }
+[data-tpl="foodtruck"] .pm-logo > span { box-shadow: 0 0 0 2px var(--m-chrome-ink) !important; }

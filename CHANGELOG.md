@@ -4,6 +4,21 @@ Every release is pushed to GitHub (`main`), deploys automatically to
 **https://parosa.vercel.app**, and is tagged `vX.Y.Z` in git.
 Minor version = new features / redesigns · patch = fixes.
 
+## v0.9.0 - 2 Oct 2026
+Five templates, two of them new.
+- The template list is now exactly five: **Parosa** (our signature, default),
+  **Transparent**, **Café** (new), **Food Truck** (new) and **Virasat**.
+- **Café** - bold and juicy for shake bars, coffee and dessert places: a
+  colour-drenched backdrop that slowly drifts, chunky Archivo type, a big
+  "Fresh today" opener (uses your tagline if you have one), a floating hero
+  shot with a light sheen, and tall two-across product cards that pop in.
+- **Food Truck** - street-loud: black and mustard header, a scrolling red
+  "Now serving" ticker, a stamped "Today's special", ticket-stub dish cards
+  with hard shadows and slapped-on price tags you can read from the queue.
+- Both take every colour theme, like the others.
+- Retired Aurora, Noir, Gallery and Express. Restaurants that were on them move
+  automatically: Aurora and Noir to Parosa, Gallery to Café, Express to Food Truck.
+
 ## v0.8.0 - 24 Sep 2026
 Manage each table QR, and download it for real.
 - Every table QR card now has an **On/Off switch** and a **delete** button. Turn a

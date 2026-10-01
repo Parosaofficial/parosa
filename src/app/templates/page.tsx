@@ -10,16 +10,16 @@ import "../dash.css";
 import "./templates.css";
 
 const DEMO: Record<string, { dish: string; pr: string }> = {
-  aurora: { dish: "Butter Chicken", pr: "₹340" },
-  noir: { dish: "Coal-fired Lamb", pr: "₹740" },
-  gallery: { dish: "Truffle Pasta", pr: "₹460" },
-  express: { dish: "Chole Bhature", pr: "₹120" },
+  parosa: { dish: "Butter Chicken", pr: "₹280" },
+  transparent: { dish: "Green Salad", pr: "₹180" },
+  cafe: { dish: "Berry Shake", pr: "₹199" },
+  foodtruck: { dish: "Loaded Fries", pr: "₹149" },
   virasat: { dish: "तंदूरी चिकन", pr: "₹320" },
 };
 
 export default function Templates() {
   const { restaurant, ready, reload } = useOwner();
-  const [current, setCurrent] = useState("aurora");
+  const [current, setCurrent] = useState("parosa");
   const [colour, setColour] = useState("default");
   const [saving, setSaving] = useState("");
   const [toast, setToast] = useState("");
@@ -65,7 +65,7 @@ export default function Templates() {
     <div className="db-app">
       <Sidebar restaurant={restaurant} />
       <main className="db-main">
-        <div className="db-topbar"><div><h1>Menu Templates</h1><p>Five designs — each a different layout, not just a colour. Preview any on your real menu, then apply.</p></div></div>
+        <div className="db-topbar"><div><h1>Menu Templates</h1><p>Five designs — each a different layout, not just a colour. Preview any on your real menu, then apply, then pick its colours below.</p></div></div>
         <div className="db-content">
           <div className="db-note">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>

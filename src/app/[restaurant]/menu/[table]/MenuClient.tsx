@@ -199,6 +199,20 @@ export function MenuClient({
 
       {/* ---------- body ---------- */}
       <main className="pm-body">
+        {/* Café: a big punchy opener. Food Truck: a scrolling "now serving" ticker. Hidden on other designs. */}
+        {!query && (
+          <div className="pm-cafehead">
+            <span className="k">Fresh today</span>
+            <h2>{restaurant.tagline || <>Pop open<br />the flavour</>}</h2>
+          </div>
+        )}
+        <div className="pm-ticker" aria-hidden="true">
+          <div className="run">
+            {[0, 1].map((i) => (
+              <span key={i}>NOW SERVING ★ TABLE {table} ★ ORDER RIGHT FROM YOUR PHONE ★ HOT &amp; FRESH ★ {restaurant.name.toUpperCase()} ★&nbsp;</span>
+            ))}
+          </div>
+        </div>
         {!query && (
           <div className="pm-intro">
             <div className="pm-introtx">
