@@ -1,0 +1,126 @@
+/* Parosa signup — big, calm, one-column registration (3 steps) */
+.su-page{
+  min-height:100vh;background:#FBF6EA;color:var(--ink);font-family:var(--font-body);
+  padding:72px 20px 56px;position:relative;
+}
+.su-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px}
+
+/* progress dashes, top-left */
+.su-progress{position:absolute;top:30px;left:32px;display:flex;gap:7px;align-items:center}
+.su-progress span{height:6px;width:12px;border-radius:99px;background:#DDD3C0;transition:width .25s,background .25s}
+.su-progress span.done{background:var(--maroon)}
+.su-progress span.now{width:44px;background:var(--oxblood)}
+
+.su-col{max-width:500px;margin:0 auto;animation:su-in .3s cubic-bezier(.2,.8,.25,1)}
+@keyframes su-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.su-col{animation:none}}
+.su-brand{display:flex;margin-bottom:22px}
+
+.su-h1{font-family:var(--font-body);font-weight:800;font-size:clamp(30px,6vw,38px);line-height:1.12;letter-spacing:-.015em;color:#1F1414}
+.su-sub{font-size:18px;color:#6B5F57;margin-top:10px;margin-bottom:30px;line-height:1.45}
+
+/* fields */
+.su-field{margin-bottom:22px}
+.su-field>label{display:block;font-size:16px;font-weight:700;color:#1F1414;margin-bottom:9px}
+.su-field .opt{font-weight:500;color:#8A7E74}
+.su-field input[type=text],.su-field input[type=email],.su-field input[type=password],.su-field input[type=tel],.su-field textarea{
+  width:100%;font-family:var(--font-body);font-size:19px;color:#1F1414;
+  background:#F1EEE8;border:2px solid transparent;border-radius:14px;padding:15px 18px;min-height:60px;
+  transition:border-color .15s,background .15s;
+}
+.su-field textarea{resize:vertical;line-height:1.4;min-height:84px}
+.su-field input::placeholder,.su-field textarea::placeholder{color:#9C938B}
+.su-field input:focus,.su-field textarea:focus{outline:none;background:#fff;border-color:var(--maroon)}
+.su-row{display:grid;gap:0 14px}
+@media(min-width:480px){.su-row{grid-template-columns:1fr 1fr}}
+
+.su-phone{display:flex;align-items:stretch;background:#F1EEE8;border-radius:14px;border:2px solid transparent;transition:border-color .15s,background .15s}
+.su-phone:focus-within{background:#fff;border-color:var(--maroon)}
+.su-phone span{display:flex;align-items:center;padding:0 4px 0 18px;font-size:19px;font-weight:600;color:#6B5F57}
+.su-phone input[type=tel]{background:transparent!important;border:none!important}
+
+/* business type tiles */
+.su-types{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.su-types button{
+  display:flex;align-items:center;gap:10px;min-height:58px;padding:12px 16px;
+  font-family:var(--font-body);font-size:17px;font-weight:600;color:#1F1414;text-align:left;
+  background:#F1EEE8;border:2px solid transparent;border-radius:14px;cursor:pointer;transition:border-color .15s,background .15s;
+}
+.su-types button:hover{background:#ECE7DE}
+.su-types button.on{background:#FFF;border-color:var(--oxblood);color:var(--oxblood)}
+.su-types .ic{font-size:22px;line-height:1}
+
+.su-divider{display:flex;align-items:center;gap:12px;margin:32px 0 20px;color:#8A7E74;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.su-divider::before,.su-divider::after{content:"";flex:1;height:1px;background:#E3DACB}
+
+/* location */
+.su-locate{
+  width:100%;min-height:62px;display:flex;align-items:center;justify-content:center;gap:12px;
+  font-family:var(--font-body);font-size:19px;font-weight:600;color:var(--maroon);
+  background:#fff;border:2px solid #E7C9C6;border-radius:14px;cursor:pointer;transition:background .15s,border-color .15s;
+}
+.su-locate:hover{background:#FFF7F6;border-color:var(--maroon)}
+.su-locate:disabled{cursor:progress;opacity:.8}
+.su-locate svg{width:22px;height:22px}
+.su-hint{font-size:14.5px;color:#7A6E66;margin-top:10px;line-height:1.5}
+
+.su-pinned{background:#EFFBF3;border:1.5px solid #B9E6C8;border-radius:14px;padding:16px 18px;margin:-4px 0 18px}
+.su-pinned .hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.su-pinned .hd span{font-size:13px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#14853B}
+.su-pinned .hd em{font-style:normal;font-size:12px;font-weight:700;color:#14853B;background:#D6F3E0;border-radius:99px;padding:3px 10px}
+.su-pinned .ln{font-size:17px;font-weight:600;color:#1F3A2A;line-height:1.4}
+.su-pinned .ln2{font-size:15.5px;color:#3C6B4E;margin-top:3px}
+
+.su-edit{border:1.5px dashed #DCCFBB;border-radius:16px;padding:18px 18px 0;background:#FFFDF8}
+.su-edit-hd{font-size:14px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--maroon);margin-bottom:14px}
+.su-edit .su-field>label{font-size:15px}
+.su-edit .su-field input,.su-edit .su-field textarea{font-size:18px;min-height:56px;padding:13px 16px}
+
+.su-link{display:inline-flex;background:none;border:none;padding:0;font-family:var(--font-body);font-size:16px;font-weight:700;color:var(--maroon);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.su-link.muted{color:#8A7E74}
+
+.su-warn{background:#FFF6E5;border:1.5px solid #F2D9A4;color:#7A4D00;font-size:15px;font-weight:600;padding:12px 14px;border-radius:12px;margin:0 0 16px;line-height:1.45}
+.su-err{background:#FDECEC;border:1.5px solid #F0B9B6;color:#A3221C;font-size:15px;font-weight:600;padding:12px 14px;border-radius:12px;margin:4px 0 14px;line-height:1.45}
+
+/* logo */
+.su-field>.su-drop{display:flex;margin:0;font-size:inherit;font-weight:inherit;flex-direction:column;align-items:center;gap:6px;padding:34px 20px;background:#fff;border:2px dashed #DCC6A3;border-radius:18px;cursor:pointer;text-align:center;transition:border-color .15s,background .15s}
+.su-drop:hover{border-color:var(--maroon);background:#FFFCF6}
+.su-drop svg{width:38px;height:38px;color:var(--maroon);margin-bottom:6px}
+.su-drop b{font-size:19px;color:#1F1414}
+.su-drop span{font-size:14.5px;color:#7A6E66}
+.su-logo-pv{display:flex;align-items:center;gap:18px;background:#fff;border:1.5px solid #E3DACB;border-radius:18px;padding:16px}
+.su-logo-pv .img{width:96px;height:96px;flex:none;border-radius:16px;background:#F1EEE8 center/cover no-repeat;border:1px solid #E3DACB}
+.su-logo-pv .meta{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0}
+.su-logo-pv b{font-size:19px;color:#1F1414;overflow-wrap:anywhere}
+
+.su-check{display:flex;gap:12px;align-items:flex-start;margin:26px 0 18px;font-size:16px;line-height:1.5;color:#3E3530;cursor:pointer}
+.su-check input{width:22px;height:22px;flex:none;margin-top:2px;accent-color:var(--oxblood);cursor:pointer}
+.su-check a{color:var(--maroon);font-weight:700}
+
+/* buttons */
+.su-prime{
+  flex:1;width:100%;min-height:62px;display:flex;align-items:center;justify-content:center;gap:10px;
+  font-family:var(--font-body);font-size:20px;font-weight:700;color:#fff;
+  background:linear-gradient(180deg,#9A2A2C,var(--oxblood));border:none;border-radius:14px;cursor:pointer;
+  box-shadow:0 14px 28px -14px #6e1618;margin-top:8px;transition:filter .15s,transform .05s;
+}
+.su-prime:hover{filter:brightness(1.07)}
+.su-prime:active{transform:scale(.99)}
+.su-prime:disabled{opacity:.55;cursor:not-allowed;filter:none;box-shadow:none}
+.su-prime svg{width:22px;height:22px}
+.su-nav{display:flex;gap:12px;align-items:stretch;margin-top:8px}
+.su-nav .su-prime{margin-top:0}
+.su-back{min-height:62px;padding:0 24px;font-family:var(--font-body);font-size:17px;font-weight:600;color:#5A4E46;background:#fff;border:1.5px solid #E3DACB;border-radius:14px;cursor:pointer}
+.su-back:disabled{opacity:.5;cursor:default}
+.su-alt{text-align:center;font-size:16px;color:#6B5F57;margin-top:20px}
+.su-alt a{color:var(--maroon);font-weight:700}
+
+.su-spin{width:26px;height:26px;border-radius:50%;border:3px solid #E3D3B5;border-top-color:var(--oxblood);animation:su-spin .8s linear infinite;display:inline-block}
+.su-spin.sm{width:20px;height:20px;border-width:2.5px}
+@keyframes su-spin{to{transform:rotate(360deg)}}
+
+@media(max-width:560px){
+  .su-page{padding:64px 16px 40px}
+  .su-progress{top:24px;left:16px}
+  .su-sub{font-size:17px;margin-bottom:24px}
+}

@@ -58,36 +58,50 @@ export async function createRestaurant(input: {
   gstin?: string;
   gstinUrl?: string | null;
   fssai?: string;
+  area?: string;
+  district?: string;
+  state?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   fssaiUrl?: string | null;
   notes?: string;
 }): Promise<Restaurant> {
-  const { data, error } = await supabase
-    .from("restaurants")
-    .insert({
-      owner_id: input.ownerId,
-      slug: input.slug,
-      name: input.name,
-      owner_name: input.ownerName || null,
-      owner_email: input.ownerEmail || null,
-      phone: input.phone || null,
-      whatsapp: input.phone || null,
-      address: input.address || null,
-      city: input.city || null,
-      pincode: input.pincode || null,
-      type: input.type || null,
-      visitors: input.visitors || null,
-      plan: input.plan || "basic",
-      logo_url: input.logoUrl || null,
-      gstin: input.gstin || null,
-      gstin_url: input.gstinUrl || null,
-      fssai: input.fssai || null,
-      fssai_url: input.fssaiUrl || null,
-      description: input.notes || null,
-      template: "parosa", // our signature design
-      tables_count: 0,
-    })
-    .select()
-    .single();
+  const row: Record<string, unknown> = {
+    owner_id: input.ownerId,
+    slug: input.slug,
+    name: input.name,
+    owner_name: input.ownerName || null,
+    owner_email: input.ownerEmail || null,
+    phone: input.phone || null,
+    whatsapp: input.phone || null,
+    address: input.address || null,
+    city: input.city || null,
+    pincode: input.pincode || null,
+    type: input.type || null,
+    visitors: input.visitors || null,
+    plan: input.plan || "basic",
+    logo_url: input.logoUrl || null,
+    gstin: input.gstin || null,
+    gstin_url: input.gstinUrl || null,
+    fssai: input.fssai || null,
+    fssai_url: input.fssaiUrl || null,
+    description: input.notes || null,
+    template: "parosa", // our signature design
+    tables_count: 0,
+  };
+  // GPS location columns arrive with migration 0011.
+  const location = {
+    area: input.area || null,
+    district: input.district || null,
+    state: input.state || null,
+    latitude: input.latitude ?? null,
+    longitude: input.longitude ?? null,
+  };
+  let { data, error } = await supabase.from("restaurants").insert({ ...row, ...location }).select().single();
+  // Database not migrated yet ("column not found") — still create the restaurant.
+  if (error?.code === "PGRST204" || error?.code === "42703") {
+    ({ data, error } = await supabase.from("restaurants").insert(row).select().single());
+  }
   if (error) throw error;
   return data as Restaurant;
 }

@@ -29,6 +29,11 @@ export type Restaurant = {
   address: string | null;
   city: string | null;
   pincode: string | null;
+  area?: string | null; // GPS signup fields (0011)
+  district?: string | null;
+  state?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   tagline: string | null;
   description: string | null;
   template: string | null;
