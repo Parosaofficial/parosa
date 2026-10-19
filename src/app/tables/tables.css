@@ -70,3 +70,9 @@
 .tb-dl{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:700;padding:7px 4px;border-radius:6px;border:1px solid var(--line-gold);background:var(--oxblood);color:var(--gold-hi);cursor:pointer}
 .tb-dl svg{width:13px;height:13px}
 .tb-dl:active{transform:scale(.97)}
+
+/* ---- Heritage: the Parosa tent card, drawn by src/lib/standee.ts ---- */
+.tb-grid.tb-heritage{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.tb-heritage .tb-standee{padding:10px 10px 12px}
+.tb-hcard{line-height:0;border-radius:8px;overflow:hidden;box-shadow:0 10px 22px -14px #4a0c0d80}
+.tb-hcard svg{width:100%;height:auto;display:block}

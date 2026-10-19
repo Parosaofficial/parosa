@@ -11,6 +11,7 @@ import { AppLoading } from "@/components/AppLoading";
 import { setTablesCount } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
 import { reviewLinkOf } from "@/lib/upi";
+import { standeePng, standeeSvg } from "@/lib/standee";
 import "../dash.css";
 import "./tables.css";
 
@@ -64,13 +65,15 @@ function drawLogo(ctx: CanvasRenderingContext2D, cx: number, top: number, size: 
   }
 }
 
+type Design = "heritage" | "classic" | "branded";
+
 export default function Tables() {
   const { restaurant, ready } = useOwner();
   const [origin, setOrigin] = useState("https://parosa.app");
   useEffect(() => { setOrigin(window.location.origin); }, []);
 
   const [count, setCount] = useState(0);
-  const [design, setDesign] = useState<"classic" | "branded">("classic");
+  const [design, setDesign] = useState<Design>("heritage");
   const [hidden, setHidden] = useState<number[]>([]); // deleted table numbers (device-local)
   const [paused, setPaused] = useState<number[]>([]); // turned-off table numbers (device-local)
   const reviewBox = useRef<HTMLDivElement>(null);
@@ -78,7 +81,7 @@ export default function Tables() {
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2100); };
 
   useEffect(() => { if (restaurant) setCount(restaurant.tables_count ?? 0); }, [restaurant]);
-  useEffect(() => { try { const d = localStorage.getItem("parosa-standee"); if (d === "branded" || d === "classic") setDesign(d); } catch { /* ignore */ } }, []);
+  useEffect(() => { try { const d = localStorage.getItem("parosa-standee"); if (d === "branded" || d === "classic" || d === "heritage") setDesign(d); } catch { /* ignore */ } }, []);
   useEffect(() => {
     if (!restaurant) return;
     try {
@@ -87,7 +90,7 @@ export default function Tables() {
     } catch { /* ignore */ }
   }, [restaurant]);
 
-  const pickDesign = (d: "classic" | "branded") => { setDesign(d); try { localStorage.setItem("parosa-standee", d); } catch { /* ignore */ } };
+  const pickDesign = (d: Design) => { setDesign(d); try { localStorage.setItem("parosa-standee", d); } catch { /* ignore */ } };
 
   if (!ready || !restaurant) return <AppLoading label="Loading tables…" />;
 
@@ -126,6 +129,7 @@ export default function Tables() {
 
   /* ---------- build a printable standee PNG for one table ---------- */
   const buildPng = async (n: number): Promise<string> => {
+    if (design === "heritage") return standeePng(`${BASE}/${n}`, n, document.querySelector(".db-app") ?? document.body);
     const qrDataUrl = await QRCode.toDataURL(`${BASE}/${n}`, { margin: 1, width: 520, color: { dark: "#4A0C0D", light: "#FBF4E2" } });
     const qrImg = await loadImage(qrDataUrl);
     let logoImg: HTMLImageElement | null = null;
@@ -236,6 +240,7 @@ export default function Tables() {
             <div className="tb-designbar">
               <span className="l">QR standee design</span>
               <div className="tb-seg">
+                <button className={design === "heritage" ? "on" : ""} onClick={() => pickDesign("heritage")}>Heritage <i>the Parosa tent card</i></button>
                 <button className={design === "classic" ? "on" : ""} onClick={() => pickDesign("classic")}>Classic <i>logo &amp; name in a row</i></button>
                 <button className={design === "branded" ? "on" : ""} onClick={() => pickDesign("branded")}>Branded <i>your logo on top, Parosa below</i></button>
               </div>
@@ -286,7 +291,9 @@ export default function Tables() {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /></svg>
                   </button>
                   {off && <span className="tb-offtag">Off</span>}
-                  {design === "classic" ? (
+                  {design === "heritage" ? (
+                    <div className="tb-hcard" dangerouslySetInnerHTML={{ __html: standeeSvg(`${BASE}/${n}`, n) }} />
+                  ) : design === "classic" ? (
                     <>
                       <div className="tb-top"><RestaurantLogo restaurant={restaurant} size={30} /><span className="tb-bn">{restaurant.name}</span></div>
                       <div className="tb-scan">Scan to order</div>
