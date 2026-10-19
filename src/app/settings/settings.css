@@ -30,19 +30,6 @@
 .set-plancur{width:100%;border:none;background:var(--oxblood);color:var(--gold-hi);border-radius:8px;padding:9px;font-family:var(--font-caps);font-weight:700;font-size:11.5px;letter-spacing:.04em;cursor:default}
 @media(max-width:620px){.set-plans{grid-template-columns:1fr}}
 
-/* ---- profile completeness warning ---- */
-.set-warn{background:#fdecec;border:1px solid #f0b9b6;border-left:4px solid #e0362e;border-radius:12px;margin-bottom:18px;overflow:hidden}
-.set-warn-hd{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;background:transparent;border:none;cursor:pointer;text-align:left}
-.set-warn-hd .ic{width:26px;height:26px;flex:none;border-radius:50%;background:#e0362e;color:#fff;font-weight:800;display:grid;place-items:center;font-size:16px}
-.set-warn-hd .tx{flex:1}
-.set-warn-hd .tx b{display:block;font-size:14px;color:#a3221c}
-.set-warn-hd .tx span{font-size:12.5px;color:#b5564f}
-.set-warn-hd .chev{color:#a3221c;font-size:11px}
-.set-warn-list{padding:2px 16px 14px 54px;display:flex;flex-direction:column;gap:12px}
-.set-warn-item{display:flex;gap:10px;align-items:flex-start}
-.set-warn-item .dot{width:7px;height:7px;border-radius:50%;background:#e0362e;margin-top:6px;flex:none}
-.set-warn-item b{display:block;font-size:13.5px;color:var(--ink)}
-.set-warn-item span{font-size:12.5px;color:var(--ink-2);line-height:1.45}
 .set-logoempty{width:52px;height:52px;border-radius:10px;border:1.5px dashed var(--line-gold);display:grid;place-items:center;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;text-align:center}
 
 /* Get paid & get reviews */
@@ -60,3 +47,53 @@
 .set-verify .t.muted{color:var(--muted)}
 .set-test{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-caps);font-weight:700;font-size:11.5px;letter-spacing:.04em;padding:9px 14px;border-radius:8px;background:var(--oxblood);color:var(--gold-hi);text-decoration:none}
 @media (max-width:760px){.set-collect{grid-template-columns:1fr;gap:0}.set-verify{margin-top:4px}}
+
+/* ---- simple type: Settings uses the plain body font everywhere ---- */
+.set-simple .db-topbar h1{font-family:var(--font-body);font-weight:800;font-size:24px;letter-spacing:-.01em;line-height:1.15}
+.set-simple .db-topbar p{font-size:13px}
+.set-simple .db-field label{font-family:var(--font-body);font-size:13.5px;font-weight:700;letter-spacing:0;text-transform:none;color:var(--ink)}
+.set-simple .db-field input,.set-simple .db-field textarea,.set-simple .set-timegrid input[type=time]{font-size:15px}
+.set-simple .set-lbl-note{font-weight:500}
+.set-simple .set-planname,.set-simple .set-planprice{font-family:var(--font-body);font-weight:800}
+.set-simple .set-planbtn,.set-simple .set-plancur,.set-simple .set-test,.set-simple .set-planpop{font-family:var(--font-body);letter-spacing:0;text-transform:none;font-size:13px}
+.set-wrap{max-width:860px;animation:set-in .25s cubic-bezier(.2,.8,.25,1)}
+@keyframes set-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.set-wrap{animation:none}}
+
+/* ---- settings home: small tiles ---- */
+.set-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.set-tile{display:flex;align-items:center;gap:12px;min-height:64px;padding:11px 12px 11px 11px;text-align:left;background:var(--cream-card);border:1px solid var(--line);border-radius:12px;cursor:pointer;font-family:var(--font-body);transition:border-color .15s,background .15s,box-shadow .15s}
+.set-tile:hover{border-color:var(--line-gold);background:#fffaf0;box-shadow:0 8px 20px -16px #5e1113}
+.set-tile:focus-visible{outline:2px solid var(--maroon);outline-offset:2px}
+.set-tile .ic{width:38px;height:38px;flex:none;border-radius:10px;display:grid;place-items:center;color:var(--oxblood)}
+.set-tile .ic svg{width:19px;height:19px}
+.set-tile .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.set-tile .tx b{font-size:14.5px;font-weight:700;color:var(--ink)}
+.set-tile .tx span{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set-tile .add{flex:none;font-size:11px;font-weight:700;color:#A3221C;background:#FDECEC;border:1px solid #F0B9B6;border-radius:99px;padding:2px 9px}
+.set-tile .chev{width:16px;height:16px;flex:none;color:var(--muted)}
+.set-todo{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);margin:0 2px 12px}
+.set-todo .dot{width:8px;height:8px;border-radius:50%;background:#e0362e;flex:none}
+.set-todo b{color:#A3221C}
+
+/* ---- section header ---- */
+.set-crumb{display:flex;align-items:center;gap:12px}
+.set-crumb p{margin:0 0 1px;font-size:12px;font-weight:600;color:var(--muted)}
+.set-backbtn{width:36px;height:36px;flex:none;display:grid;place-items:center;border-radius:10px;border:1px solid var(--line);background:var(--cream-card);color:var(--oxblood);cursor:pointer}
+.set-backbtn:hover{border-color:var(--line-gold)}
+.set-backbtn svg{width:18px;height:18px}
+
+/* ---- address & location ---- */
+.set-locate{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;min-height:46px;font-family:var(--font-body);font-size:15px;font-weight:700;color:var(--maroon);background:#fff;border:1.5px solid #E7C9C6;border-radius:10px;cursor:pointer}
+.set-locate:hover{border-color:var(--maroon);background:#FFF7F6}
+.set-locate:disabled{opacity:.75;cursor:progress}
+.set-locate svg{width:18px;height:18px}
+.set-gps{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#EFFBF3;border:1px solid #B9E6C8;border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:13px}
+.set-gps span{font-weight:700;color:#14853B}
+.set-gps b{font-weight:600;color:#1F3A2A}
+.set-geoerr{background:#FFF6E5;border:1px solid #F2D9A4;color:#7A4D00;font-size:13px;font-weight:600;padding:10px 12px;border-radius:10px;margin-bottom:14px;line-height:1.45}
+
+/* ---- account ---- */
+.set-dangerrow{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.set-dangerrow .tt{font-weight:700;font-size:14px;color:var(--nonveg)}
+.set-dangerrow .ts{font-size:12px;color:var(--muted)}
