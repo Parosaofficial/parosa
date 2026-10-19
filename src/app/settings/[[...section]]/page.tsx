@@ -13,6 +13,8 @@ import { missingProfile } from "@/lib/profile";
 import { geoMessage, pinCurrentAddress } from "@/lib/geo";
 import { cleanUpi, isValidReviewUrl, isValidUpi, upiLink } from "@/lib/upi";
 import { Dialog } from "@/components/Dialog";
+import Link from "next/link";
+import { SUPPORT_EMAIL } from "@/components/LegalShell";
 import type { Hours, Restaurant } from "@/lib/types";
 import "../../dash.css";
 import "../settings.css";
@@ -121,7 +123,6 @@ export default function Settings() {
 
   const sections = sectionsFor(restaurant);
   const current = sections.find((s) => s.id === open) ?? null;
-  const missingCount = sections.reduce((n, s) => n + s.missing.length, 0);
   const go = (id: SectionId | null) => {
     window.history.pushState(null, "", id ? `/settings/${id}` : "/settings");
     window.scrollTo({ top: 0 });
@@ -219,6 +220,28 @@ export default function Settings() {
     account: restaurant.owner_email ?? "Sign out or delete",
   };
 
+  // Setup checklist on the home screen — each item opens the section that fixes it.
+  const checklist: { done: boolean; yes: string; todo: string; to: SectionId }[] = [
+    { done: !!restaurant.logo_url, yes: "Logo uploaded", todo: "Upload your logo", to: "profile" },
+    { done: !!restaurant.address, yes: "Address added", todo: "Add your address", to: "location" },
+    { done: !!restaurant.phone, yes: "Phone number added", todo: "Add a phone number", to: "contact" },
+    { done: !!restaurant.upi_id, yes: "UPI ID added", todo: "Add your UPI ID", to: "payments" },
+    { done: !!restaurant.google_review_url, yes: "Google review link added", todo: "Add Google review link", to: "payments" },
+    { done: !!restaurant.gstin, yes: "GSTIN added", todo: "Add GSTIN", to: "licences" },
+    { done: !!restaurant.fssai, yes: "FSSAI number added", todo: "Add FSSAI number", to: "licences" },
+  ];
+  const doneCount = checklist.filter((c) => c.done).length;
+  const pct = Math.round((doneCount / checklist.length) * 100);
+  const menuUrl = typeof window === "undefined" ? `/${restaurant.slug}/menu/1` : `${window.location.origin}/${restaurant.slug}/menu/1`;
+  const place = [restaurant.type, [restaurant.city || restaurant.district, restaurant.state].filter(Boolean).join(", ")].filter(Boolean).join(" · ");
+  const shareMenu = async () => {
+    try {
+      if (navigator.share) { await navigator.share({ title: restaurant.name, text: `See our menu — ${restaurant.name}`, url: menuUrl }); return; }
+      await navigator.clipboard.writeText(menuUrl);
+      showToast("Menu link copied ✓");
+    } catch { /* share sheet closed */ }
+  };
+
   return (
     <div className="db-app">
       <Sidebar restaurant={restaurant} />
@@ -232,19 +255,41 @@ export default function Settings() {
               <div><p>Settings</p><h1>{current.title}</h1></div>
             </div>
           ) : (
-            <div><h1>Settings</h1><p>Tap a box to change it.</p></div>
+            <div><h1>Settings</h1><p>Your business, payments and account.</p></div>
           )}
           {current?.save && (
             <div className="db-acts"><button className="db-btn prime" onClick={save} disabled={busy}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5" /></svg> {busy ? "Saving…" : "Save"}</button></div>
           )}
         </div>
 
-        <div className="db-content set-wrap" key={open ?? "home"}>
+        <div className={`db-content set-wrap${current ? "" : " home"}`} key={open ?? "home"}>
           {!current && (
             <>
-              {missingCount > 0 && (
-                <p className="set-todo"><span className="dot" />{missingCount} thing{missingCount > 1 ? "s" : ""} left to finish — look for the <b>Add</b> tags.</p>
-              )}
+              <section className="set-hero">
+                <div className="who">
+                  {restaurant.logo_url
+                    ? <span className="lg" style={{ backgroundImage: `url(${restaurant.logo_url})` }} />
+                    : <span className="lg empty">{restaurant.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</span>}
+                  <div className="nm">
+                    <b>{restaurant.name}</b>
+                    {place && <span>{place}</span>}
+                    <a href={menuUrl} target="_blank" rel="noopener noreferrer">{menuUrl.replace(/^https?:\/\//, "").replace(/\/1$/, "")}</a>
+                  </div>
+                </div>
+                <div className="prog">
+                  <div className="pt"><b>Profile {pct}% complete</b><span>{pct === 100 ? "All set" : `${checklist.length - doneCount} left`}</span></div>
+                  <div className="set-bar"><i style={{ width: `${pct}%` }} /></div>
+                </div>
+                <div className="acts">
+                  <a className="db-btn" href={menuUrl} target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></svg> View menu
+                  </a>
+                  <button className="db-btn prime" onClick={shareMenu}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" /></svg> Share menu
+                  </button>
+                </div>
+              </section>
+
               <div className="set-tiles">
                 {sections.map((s) => (
                   <button key={s.id} className="set-tile" onClick={() => go(s.id)}>
@@ -254,6 +299,33 @@ export default function Settings() {
                     <Chevron />
                   </button>
                 ))}
+              </div>
+
+              <div className="set-bottom">
+                <section className="set-card set-check">
+                  <h3>{doneCount === checklist.length ? "You're all set up ✓" : "Finish setting up"}</h3>
+                  <ul>
+                    {checklist.map((c) => (
+                      <li key={c.yes}>
+                        <button className={c.done ? "done" : ""} onClick={() => go(c.to)}>
+                          <span className="mk" aria-hidden>{c.done ? "✓" : ""}</span>{c.done ? c.yes : c.todo}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+                <section className="set-card set-links">
+                  <h3>Quick links</h3>
+                  <Link href="/tables">Download table QRs</Link>
+                  <Link href="/menu-editor">Edit menu &amp; dishes</Link>
+                  <Link href="/templates">Change menu design</Link>
+                </section>
+                <section className="set-card set-links">
+                  <h3>Need help?</h3>
+                  <a href={`mailto:${SUPPORT_EMAIL}`}>Email support</a>
+                  <span className="mail">{SUPPORT_EMAIL}</span>
+                  <Link href="/terms" target="_blank">Terms &amp; privacy</Link>
+                </section>
               </div>
             </>
           )}
