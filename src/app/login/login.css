@@ -1,138 +1,62 @@
-/* Parosa login — simple, centred partner portal (Virasat theme) */
+/* Parosa sign-in (owner + staff) — deep maroon + white, plain Mukta like Settings and Signup.
+   The curly Rozha font is kept only for the परोसा wordmark. */
 .lg-page{
-  min-height:100vh;background:#F5EFDD;position:relative;overflow:hidden;
-  display:flex;align-items:flex-start;justify-content:center;
-  padding:clamp(18px,3.4vh,40px) 20px clamp(18px,3vh,34px);
+  --oxblood:#5C0F14; --maroon:#6E1418; --ink:#24090B; --ink-2:#6E5557; --muted:#8C7476;
+  --line:#E3D3D4; --soft:#F7ECEC;
+  min-height:100vh;background:#FAF7F7;color:var(--ink);font-family:var(--font-body);
+  display:flex;align-items:center;justify-content:center;padding:32px 16px;position:relative;
 }
-.lg-page::after{content:"";position:absolute;inset:0;background-image:var(--grain);background-size:180px;opacity:.08;mix-blend-mode:multiply;pointer-events:none}
+.lg-bloom,.lg-tag-tr,.lg-tag-br{display:none}
 
-/* faint decorative blooms */
-.lg-bloom{position:absolute;color:#C9A24B;pointer-events:none;z-index:0}
-.lg-bloom.tl{top:-96px;left:-84px;width:330px;height:330px;opacity:.10}
-.lg-bloom.r{top:32%;right:-150px;width:400px;height:400px;opacity:.09}
-.lg-bloom.bl{bottom:-120px;left:-70px;width:300px;height:300px;opacity:.07}
-@media(max-width:720px){.lg-bloom.r{display:none}}
+.lg-card{position:relative;width:100%;max-width:440px;background:#fff;border:1px solid #EEE3E3;border-radius:22px;padding:30px 28px 24px;box-shadow:0 30px 60px -40px #3F080C66}
+.lg-logo{display:flex;flex-direction:column;align-items:center;text-align:center}
+.lg-wm{font-family:var(--font-rozha),Georgia,serif;font-size:32px;color:var(--oxblood);line-height:1;margin-top:8px}
+.lg-en{font-weight:700;letter-spacing:.32em;font-size:12px;color:var(--maroon);padding-left:.32em;margin-top:4px}
+.lg-portal{font-size:14px;color:var(--ink-2);margin-top:6px;font-weight:500}
+.lg-div{display:none}
 
-/* corner taglines */
-.lg-tag-tr{position:absolute;top:26px;right:34px;text-align:right;font-size:12.5px;color:var(--ink-2);line-height:1.5;z-index:2}
-.lg-tag-tr .u{display:block;margin-left:auto;width:34px;height:2px;background:var(--gold);margin-top:9px}
-.lg-tag-br{position:absolute;bottom:30px;right:34px;text-align:right;font-family:var(--font-caps);font-size:10.5px;letter-spacing:.24em;color:var(--muted);line-height:2;z-index:2}
-.lg-tag-br .u{display:block;margin-left:auto;width:34px;height:2px;background:var(--gold);margin-top:8px}
-@media(max-width:820px){.lg-tag-tr,.lg-tag-br{display:none}}
-
-/* card */
-.lg-card{position:relative;z-index:2;width:100%;max-width:436px;text-align:center;margin-block:auto}
-.lg-logo{display:flex;flex-direction:column;align-items:center}
-.lg-wm{font-family:var(--font-display);font-size:34px;color:var(--oxblood);line-height:1;margin-top:6px}
-.lg-en{font-family:var(--font-caps);font-weight:700;letter-spacing:.42em;font-size:11.5px;color:var(--maroon);padding-left:.42em;margin-top:5px}
-.lg-portal{font-size:13px;color:var(--ink-2);margin-top:8px;font-weight:500}
-.lg-div{display:flex;align-items:center;justify-content:center;gap:9px;color:var(--gold);margin:10px 0 0}
-.lg-div .ln{height:1px;width:28px;background:var(--line-gold)}
+/* Owner / Staff switch */
+.lg-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--soft);border-radius:14px;padding:5px;margin:22px 0 4px}
+.lg-tabs button{display:flex;align-items:center;gap:10px;text-align:left;border:none;background:transparent;border-radius:10px;padding:10px 12px;cursor:pointer;font-family:var(--font-body);transition:background .15s}
+.lg-tabs button:hover{background:#ffffffa6}
+.lg-tabs button.on{background:var(--oxblood);box-shadow:0 8px 18px -12px #3F080C}
+.lg-tabs button svg{width:22px;height:22px;flex:none;color:var(--oxblood)}
+.lg-tabs button.on svg{color:#fff}
+.lg-tabs button span{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+.lg-tabs button b{font-weight:800;font-size:16px;color:var(--ink)}
+.lg-tabs button i{font-style:normal;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lg-tabs button.on b{color:#fff}
+.lg-tabs button.on i{color:#E9CFD0}
 
 .lg-switch{animation:lg-in .3s cubic-bezier(.2,.8,.25,1)}
-@keyframes lg-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes lg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.lg-switch{animation:none}}
 
-.lg-welcome{font-family:var(--font-body);font-weight:700;font-size:clamp(26px,4.4vw,32px);letter-spacing:-.01em;color:var(--ink);margin-top:12px;line-height:1.15}
-.lg-h2{font-family:var(--font-body);font-weight:700;font-size:25px;color:var(--oxblood);margin-top:12px}
-.lg-sub{font-size:13.5px;color:var(--ink-2);margin-top:6px}
+.lg-welcome{font-weight:800;font-size:28px;letter-spacing:-.01em;color:var(--ink);margin:20px 0 0;line-height:1.15}
+.lg-sub{font-size:15.5px;color:var(--ink-2);margin:4px 0 20px}
 
-.lg-gbtn{width:100%;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:14px;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;margin-top:22px;box-shadow:0 3px 8px -5px rgba(94,17,19,.35);transition:background .15s}
-.lg-gbtn:hover{background:var(--parch-hi)}
-.lg-gbtn svg{width:19px;height:19px}
-
-.lg-or{display:flex;align-items:center;gap:12px;margin:18px 2px;color:var(--muted);font-size:11px;font-family:var(--font-caps);letter-spacing:.16em}
-.lg-or .ln{flex:1;height:1px;background:var(--line)}
-
-.lg-field{margin-bottom:11px;text-align:left}
-.lg-field label{display:block;font-family:var(--font-caps);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--maroon);margin-bottom:5px;font-weight:600}
-.lg-field input,.lg-field select{width:100%;font-family:var(--font-body);font-size:15px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
-.lg-field input:focus,.lg-field select:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px #8c1c1c1a}
+.lg-field{margin-bottom:16px;text-align:left}
+.lg-field label{display:block;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:7px}
+.lg-field input{width:100%;font-family:var(--font-body);font-size:17px;padding:13px 16px;min-height:54px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+.lg-field input::placeholder{color:#A8969A}
+.lg-field input:focus{outline:none;border-color:var(--oxblood);box-shadow:0 0 0 3px #5C0F1418}
 .lg-inp{position:relative}
-.lg-inp svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);width:18px;height:18px}
-.lg-inp input{padding-left:42px}
+.lg-inp svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted);width:19px;height:19px}
+.lg-inp input{padding-left:44px}
 
-.lg-prime{width:100%;background:var(--oxblood);color:var(--gold-hi);border:none;border-radius:12px;padding:13px;font-family:var(--font-caps);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:14px;cursor:pointer;margin-top:6px;box-shadow:0 12px 26px -12px #4a0c0d;transition:filter .15s}
-.lg-prime:hover{filter:brightness(1.06)}
+.lg-prime{width:100%;min-height:54px;margin-top:6px;border:none;border-radius:12px;background:var(--oxblood);color:#fff;font-family:var(--font-body);font-size:17px;font-weight:700;cursor:pointer;transition:background .15s,transform .05s}
+.lg-prime:hover{background:#7A1A20}
 .lg-prime:active{transform:scale(.99)}
-.lg-prime:disabled{opacity:.6;cursor:progress;filter:none}
-.lg-back:disabled{opacity:.5;cursor:default}
-.lg-err{margin-top:14px;background:#fdecec;border:1px solid #f0b9b6;color:#a3221c;font-size:13px;font-weight:600;padding:10px 12px;border-radius:9px;line-height:1.45}
+.lg-prime:disabled{opacity:.6;cursor:progress}
+.lg-err{margin-top:12px;background:#FDECEC;border:1px solid #F0B9B6;color:#A3221C;font-size:14px;font-weight:600;padding:10px 12px;border-radius:10px;line-height:1.45}
 
-.lg-alt{font-size:13.5px;color:var(--ink-2);margin-top:14px}
-.lg-alt a{color:var(--maroon);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.lg-terms{font-size:11.5px;color:var(--muted);margin-top:14px}
+.lg-alt{font-size:15px;color:var(--ink-2);margin-top:16px;text-align:center}
+.lg-alt a{color:var(--oxblood);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.lg-muted,.lg-muted a{color:var(--muted)!important}
+.lg-terms{font-size:13px;color:var(--muted);margin-top:18px;text-align:center}
 .lg-terms a{color:var(--ink-2);text-decoration:underline;text-underline-offset:2px}
 
-/* create wizard */
-.lg-steps{display:flex;align-items:center;gap:6px;justify-content:center;margin:16px 0 4px}
-.lg-steps .s{width:24px;height:4px;border-radius:100px;background:var(--line)}
-.lg-steps .s.on{background:var(--gold)}
-.lg-stepnav{display:flex;gap:10px;margin-top:8px}
-.lg-back{flex:none;background:transparent;border:1px solid var(--line);color:var(--ink-2);border-radius:12px;padding:15px 20px;font-weight:600;font-size:13px;cursor:pointer}
-.lg-frow{display:grid;gap:14px}
-@media(min-width:520px){.lg-frow.two{grid-template-columns:1fr 1fr}}
-.lg-cuisine{display:inline-block;font-weight:600;font-size:14px;color:var(--maroon);background:#fff;border:1px solid var(--line-gold);border-radius:10px;padding:11px 15px}
-.lg-drop{display:block;border:1.5px dashed var(--line-gold);border-radius:12px;padding:16px;text-align:center;background:#fff;cursor:pointer}
-.lg-drop b{display:block;color:var(--maroon);font-size:13px}
-.lg-drop span{font-size:11.5px;color:var(--muted)}
-.lg-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.lg-thumb{width:46px;height:46px;border-radius:8px;background-size:cover;background-position:center;border:1px solid var(--line-gold)}
-.lg-choices{display:flex;gap:8px;flex-wrap:wrap}
-.lg-choice{border:1px solid var(--line);background:#fff;color:var(--ink-2);border-radius:9px;padding:10px 14px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--font-body)}
-.lg-choice.on{background:var(--oxblood);color:var(--gold-hi);border-color:var(--oxblood)}
-.lg-field textarea{width:100%;font-family:var(--font-body);font-size:15px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);resize:vertical;min-height:70px}
-.lg-field textarea:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px #8c1c1c1a}
-.lg-logopreview{display:flex;align-items:center;gap:12px}
-.lg-logopreview .pv{width:60px;height:60px;border-radius:12px;background-size:cover;background-position:center;border:1px solid var(--line-gold);flex:none}
-.lg-done h2{font-family:var(--font-body);font-weight:700;font-size:27px;color:var(--oxblood);margin-top:14px}
-.lg-done p{font-size:13.5px;color:var(--ink-2);margin-top:8px}
-
-/* ---- plan selector (signup step 3) ---- */
-.lg-billing{display:flex;gap:6px;background:var(--parch-hi);border:1px solid var(--line);border-radius:10px;padding:4px;margin:16px 0 14px}
-.lg-billing button{flex:1;border:none;background:transparent;border-radius:7px;padding:9px 8px;font-family:var(--font-caps);font-weight:700;font-size:11.5px;letter-spacing:.03em;color:var(--ink-2);cursor:pointer}
-.lg-billing button.on{background:var(--oxblood);color:var(--gold-hi)}
-.lg-plans{display:flex;flex-direction:column;gap:10px}
-.lg-plan{position:relative;text-align:left;display:grid;grid-template-columns:1fr auto;grid-template-areas:"name price" "blurb blurb";gap:2px 8px;background:var(--cream-card);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
-.lg-plan:hover{border-color:var(--line-gold)}
-.lg-plan.on{border-color:var(--oxblood);box-shadow:0 0 0 3px #6e161822}
-.lg-plan .pn{grid-area:name;font-family:var(--font-body);font-weight:700;font-size:18px;color:var(--oxblood);line-height:1.1}
-.lg-plan .pp{grid-area:price;font-family:var(--font-body);font-weight:700;font-size:21px;color:var(--maroon-deep);text-align:right;line-height:1.1}
-.lg-plan .pp small{font-family:var(--font-body);font-size:12px;color:var(--muted);font-weight:600}
-.lg-plan .py{grid-area:price;grid-row:2;font-size:10.5px;color:var(--muted);text-align:right}
-.lg-plan .pb{grid-area:blurb;font-size:12.5px;color:var(--ink-2);margin-top:2px}
-.lg-plan .pcheck{position:absolute;top:12px;left:-9px;display:none}
-.lg-plan .pop-tag{position:absolute;top:-9px;right:14px;background:var(--gold-hi);color:#4a0c0d;font-family:var(--font-caps);font-weight:700;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
-.lg-planfoot{font-size:11.5px;color:var(--muted);text-align:center;margin:12px 0 2px}
-
-.lg-staffcta{display:flex;align-items:center;gap:12px;margin-top:20px}
-.lg-staffcta .ln{flex:1;height:1px;background:var(--line)}
-.lg-staffcta a{font-family:var(--font-caps);font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--maroon);cursor:pointer;white-space:nowrap;text-decoration:none}
-.lg-staffcta a:hover{color:var(--oxblood)}
-
-/* Owner / Staff chooser box */
-.lg-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--parch-hi);border:1px solid var(--line);border-radius:14px;padding:5px;margin:14px 0 2px}
-.lg-tabs button{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid transparent;background:transparent;border-radius:10px;padding:9px 12px;cursor:pointer;transition:background .15s,border-color .15s}
-.lg-tabs button:hover{background:#ffffff70}
-.lg-tabs button.on{background:var(--oxblood);border-color:var(--oxblood);box-shadow:0 8px 20px -12px #6e1618}
-.lg-tabs button svg{width:22px;height:22px;flex:none;color:var(--maroon)}
-.lg-tabs button.on svg{color:var(--gold-hi)}
-.lg-tabs button span{display:flex;flex-direction:column;line-height:1.15;min-width:0}
-.lg-tabs button b{font-family:var(--font-body);font-weight:700;font-size:15.5px;letter-spacing:.005em;color:var(--oxblood)}
-.lg-tabs button i{font-style:normal;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lg-tabs button.on b{color:var(--gold-hi)}
-.lg-tabs button.on i{color:var(--gold-soft)}
-.lg-muted a,.lg-muted{color:var(--muted)!important}
-
-/* short viewports: shave a little more so the sign-in card fits without scrolling */
-@media(max-height:780px){
-  .lg-logo .pseal,.lg-logo>svg{width:52px;height:52px}
-  .lg-wm{font-size:29px}
-  .lg-portal{margin-top:6px;font-size:12.5px}
-  .lg-div{margin:8px 0 0}
-  .lg-tabs{margin:11px 0 2px}
-  .lg-welcome{margin-top:9px}
-  .lg-field{margin-bottom:9px}
-  .lg-alt{margin-top:11px}
-  .lg-terms{margin-top:11px}
+@media(max-width:480px){
+  .lg-page{align-items:flex-start;padding-top:20px}
+  .lg-card{border:none;box-shadow:none;padding:18px 4px;background:transparent}
 }

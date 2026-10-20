@@ -9,7 +9,7 @@ import { deleteRestaurant, updateRestaurant, uploadPhoto } from "@/lib/db";
 import { signOutOwner } from "@/lib/auth";
 import { useOwner } from "@/lib/useOwner";
 import { PLANS, planById } from "@/lib/plans";
-import { missingProfile } from "@/lib/profile";
+import { missingProfile, setupChecklist } from "@/lib/profile";
 import { geoMessage, pinCurrentAddress } from "@/lib/geo";
 import { cleanUpi, isValidReviewUrl, isValidUpi, upiLink } from "@/lib/upi";
 import { Dialog } from "@/components/Dialog";
@@ -221,15 +221,7 @@ export default function Settings() {
   };
 
   // Setup checklist on the home screen — each item opens the section that fixes it.
-  const checklist: { done: boolean; yes: string; todo: string; to: SectionId }[] = [
-    { done: !!restaurant.logo_url, yes: "Logo uploaded", todo: "Upload your logo", to: "profile" },
-    { done: !!restaurant.address, yes: "Address added", todo: "Add your address", to: "location" },
-    { done: !!restaurant.phone, yes: "Phone number added", todo: "Add a phone number", to: "contact" },
-    { done: !!restaurant.upi_id, yes: "UPI ID added", todo: "Add your UPI ID", to: "payments" },
-    { done: !!restaurant.google_review_url, yes: "Google review link added", todo: "Add Google review link", to: "payments" },
-    { done: !!restaurant.gstin, yes: "GSTIN added", todo: "Add GSTIN", to: "licences" },
-    { done: !!restaurant.fssai, yes: "FSSAI number added", todo: "Add FSSAI number", to: "licences" },
-  ];
+  const checklist = setupChecklist(restaurant);
   const doneCount = checklist.filter((c) => c.done).length;
   const pct = Math.round((doneCount / checklist.length) * 100);
   const menuUrl = typeof window === "undefined" ? `/${restaurant.slug}/menu/1` : `${window.location.origin}/${restaurant.slug}/menu/1`;

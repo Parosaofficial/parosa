@@ -16,10 +16,10 @@ export function Placeholder({ hi, en }: { hi: string; en: string }) {
         <div className="flex justify-center">
           <Seal size={72} />
         </div>
-        <h1 className="mt-4 text-gold-hi" style={{ fontFamily: "var(--font-display)", fontSize: 52 }}>
+        <h1 className="mt-4 text-gold-hi" style={{ fontFamily: "var(--font-body)", fontSize: 52 }}>
           {hi}
         </h1>
-        <p className="text-parch" style={{ fontFamily: "var(--font-caps)", letterSpacing: "0.2em", fontSize: 13 }}>
+        <p className="text-parch" style={{ fontFamily: "var(--font-body)", letterSpacing: "0.2em", fontSize: 13 }}>
           {en}
         </p>
         <div

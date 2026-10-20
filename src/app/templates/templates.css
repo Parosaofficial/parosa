@@ -3,8 +3,8 @@
 .tp-card { position: relative; background: var(--cream-card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 26px -20px #5e111360; transition: border-color .18s, transform .18s, box-shadow .2s; }
 .tp-card:hover { transform: translateY(-3px); border-color: var(--line-gold); box-shadow: 0 20px 40px -24px #5e111399; }
 .tp-card.active { border-color: var(--oxblood); box-shadow: 0 0 0 2px #6e161826, 0 16px 34px -22px #5e1113aa; }
-.tp-badge { position: absolute; top: 10px; right: 10px; z-index: 3; background: var(--oxblood); color: var(--gold-hi); font-family: var(--font-caps); font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 9px; border-radius: 100px; }
-.tp-flag { position: absolute; top: 10px; right: 10px; z-index: 3; background: var(--gold-hi); color: var(--maroon-deep); font-family: var(--font-caps); font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 9px; border-radius: 100px; }
+.tp-badge { position: absolute; top: 10px; right: 10px; z-index: 3; background: var(--oxblood); color: var(--gold-hi); font-family:var(--font-body); font-size:12.5px; font-weight: 700; padding: 4px 9px; border-radius: 100px; }
+.tp-flag { position: absolute; top: 10px; right: 10px; z-index: 3; background: var(--gold-hi); color: var(--maroon-deep); font-family:var(--font-body); font-size:12.5px; font-weight: 700; padding: 4px 9px; border-radius: 100px; }
 
 /* ---- mini menu preview ---- */
 .tp-prev { padding: 0 0 12px; border-bottom: 1px solid var(--line); min-height: 196px; }
@@ -34,14 +34,14 @@
 
 /* ---- meta ---- */
 .tp-meta { padding: 14px 15px 15px; display: flex; flex-direction: column; flex: 1; }
-.tp-tn { font-family: var(--font-display); font-size: 21px; color: var(--oxblood); display: flex; align-items: center; gap: 7px; }
+.tp-tn { font-family:var(--font-body); font-size: 21px; color: var(--oxblood); display: flex; align-items: center; gap: 7px; }
 .tp-star { color: var(--gold); font-size: 13px; }
-.tp-tb { font-family: var(--font-caps); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 3px; }
+.tp-tb { font-family:var(--font-body); font-size:12.5px; color: var(--muted); font-weight: 700; margin-top: 3px; }
 .tp-blurb { font-size: 12.5px; line-height: 1.5; color: var(--ink-2); margin: 9px 0 0; }
 .tp-dots { display: flex; gap: 5px; margin: 12px 0 14px; }
 .tp-dot2 { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #00000014; }
 .tp-row-btns { display: flex; gap: 8px; margin-top: auto; }
-.tp-row-btns button { flex: 1; font-family: var(--font-caps); font-weight: 700; font-size: 11.5px; letter-spacing: .04em; padding: 10px; border-radius: 8px; border: 1px solid var(--line-gold); background: var(--parch-hi); color: var(--maroon); cursor: pointer; transition: background .15s; }
+.tp-row-btns button { flex: 1; font-family:var(--font-body); font-weight: 700; font-size:12.5px; padding: 10px; border-radius: 8px; border: 1px solid var(--line-gold); background: var(--parch-hi); color: var(--maroon); cursor: pointer; transition: background .15s; }
 .tp-row-btns button:hover { background: var(--parch); }
 .tp-row-btns button.apply { background: var(--oxblood); color: var(--gold-hi); border-color: var(--oxblood); }
 .tp-row-btns button.apply:hover { filter: brightness(1.08); }
@@ -50,7 +50,7 @@
 /* ---- colour theme picker ---- */
 .tp-colours { background: var(--cream-card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px 18px; margin-bottom: 20px; }
 .tp-chd { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
-.tp-chd h3 { font-family: var(--font-display); font-size: 20px; color: var(--oxblood); }
+.tp-chd h3 { font-family:var(--font-body); font-size: 20px; color: var(--oxblood); }
 .tp-chd p { font-size: 13px; color: var(--ink-2); margin-top: 3px; max-width: 52ch; }
 .tp-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 10px; }
 .tp-sw { position: relative; display: flex; align-items: center; gap: 11px; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; transition: border-color .18s, box-shadow .18s, transform .18s; }

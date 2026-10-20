@@ -34,10 +34,10 @@ export function Seal({
       <path id={top} d={`M ${50 - R},50 A ${R},${R} 0 0 1 ${50 + R},50`} fill="none" />
       <path id={bot} d={`M ${50 - R},50 A ${R},${R} 0 0 0 ${50 + R},50`} fill="none" />
 
-      <text fontFamily="var(--font-caps)" fontSize="7" fontWeight="600" letterSpacing="0.9" fill="#EAD8A8" textAnchor="middle">
+      <text fontFamily="var(--font-cinzel), Georgia, serif" fontSize="7" fontWeight="600" letterSpacing="0.9" fill="#EAD8A8" textAnchor="middle">
         <textPath href={`#${top}`} startOffset="50%">PAROSA · SCAN</textPath>
       </text>
-      <text fontFamily="var(--font-caps)" fontSize="7" fontWeight="600" letterSpacing="0.9" fill="#EAD8A8" textAnchor="middle">
+      <text fontFamily="var(--font-cinzel), Georgia, serif" fontSize="7" fontWeight="600" letterSpacing="0.9" fill="#EAD8A8" textAnchor="middle">
         <textPath href={`#${bot}`} startOffset="50%">SERVE · SAVOUR</textPath>
       </text>
 
@@ -46,7 +46,7 @@ export function Seal({
       <rect x={50 + R - 2} y="48" width="4" height="4" fill="#D8B25E" transform={`rotate(45 ${50 + R} 50)`} />
 
       {/* central प */}
-      <text x="50" y="63" textAnchor="middle" fontFamily="var(--font-display)" fontSize="42" fill="#D8B25E">
+      <text x="50" y="63" textAnchor="middle" fontFamily="var(--font-rozha), Georgia, serif" fontSize="42" fill="#D8B25E">
         प
       </text>
     </svg>

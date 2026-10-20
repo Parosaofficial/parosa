@@ -14,7 +14,7 @@
   animation: pd-pop .2s cubic-bezier(.2,.9,.3,1.15);
 }
 @keyframes pd-pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
-.pd-modal h3 { font-family: var(--font-display, Georgia, serif); font-size: 23px; color: var(--oxblood, #6e1618); margin: 0 0 8px; line-height: 1.1; }
+.pd-modal h3 { font-family:var(--font-body); font-size: 23px; color: var(--oxblood, #6e1618); margin: 0 0 8px; line-height: 1.1; }
 .pd-modal h3.danger { color: var(--nonveg, #b4231c); }
 .pd-modal p { font-size: 13.5px; line-height: 1.55; color: var(--ink-2, #79302a); margin: 0 0 14px; }
 .pd-modal input {
@@ -31,8 +31,8 @@
 .pd-cancel:hover { background: var(--parch-hi, #f5efdd); }
 .pd-ok {
   background: var(--oxblood, #6e1618); color: var(--gold-hi, #cba24e); border: none;
-  border-radius: 10px; padding: 11px 20px; font-family: var(--font-caps, Georgia, serif);
-  font-weight: 700; letter-spacing: .04em; font-size: 13px; cursor: pointer;
+  border-radius: 10px; padding: 11px 20px; font-family:var(--font-body);
+  font-weight: 700; font-size: 13px; cursor: pointer;
 }
 .pd-ok:hover { filter: brightness(1.07); }
 .pd-ok.danger { background: var(--nonveg, #b4231c); color: #fff; }

@@ -12,3 +12,18 @@ export function missingProfile(r: Restaurant): ProfileIssue[] {
   if (!r.fssai) out.push({ key: "fssai", label: "FSSAI licence", hint: "Food businesses must display the FSSAI number on bills." });
   return out;
 }
+
+/** The "Finish setting up" list (Settings home + Overview). `to` is the Settings section that fixes it. */
+export type SetupStep = { done: boolean; yes: string; todo: string; to: "profile" | "location" | "contact" | "payments" | "licences" };
+
+export function setupChecklist(r: Restaurant): SetupStep[] {
+  return [
+    { done: !!r.logo_url, yes: "Logo uploaded", todo: "Upload your logo", to: "profile" },
+    { done: !!r.address, yes: "Address added", todo: "Add your address", to: "location" },
+    { done: !!r.phone, yes: "Phone number added", todo: "Add a phone number", to: "contact" },
+    { done: !!r.upi_id, yes: "UPI ID added", todo: "Add your UPI ID", to: "payments" },
+    { done: !!r.google_review_url, yes: "Google review link added", todo: "Add Google review link", to: "payments" },
+    { done: !!r.gstin, yes: "GSTIN added", todo: "Add GSTIN", to: "licences" },
+    { done: !!r.fssai, yes: "FSSAI number added", todo: "Add FSSAI number", to: "licences" },
+  ];
+}

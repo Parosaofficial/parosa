@@ -11,7 +11,7 @@
 .cu-stats { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); margin-bottom: 18px; }
 @media (min-width: 900px) { .cu-stats { grid-template-columns: repeat(4, 1fr); } }
 .cu-stat { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 15px 17px; box-shadow: 0 10px 26px -20px #5e111340; }
-.cu-stat .l { font-family: var(--font-caps); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.cu-stat .l { font-family:var(--font-body); font-size:12.5px; color: var(--muted); font-weight: 700; }
 .cu-stat .v { font-family: var(--font-body); font-weight: 800; font-size: 26px; line-height: 1.1; color: var(--ink); margin-top: 7px; }
 .cu-stat .v.pos { color: var(--pos); }
 .cu-stat .s { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
@@ -30,7 +30,7 @@
 .cu-search input { font-family: var(--font-body); font-size: 13.5px; padding: 10px 12px 10px 34px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); width: 250px; max-width: 52vw; }
 .cu-search input:focus { outline: none; border-color: var(--maroon); box-shadow: 0 0 0 3px #8c1c1c1a; }
 .cu-search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--muted); pointer-events: none; }
-.cu-sort { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-caps); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.cu-sort { display: inline-flex; align-items: center; gap: 7px; font-family:var(--font-body); font-size:12.5px; color: var(--muted); font-weight: 700; }
 .cu-sort select { font-family: var(--font-body); font-size: 13.5px; font-weight: 600; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); cursor: pointer; letter-spacing: 0; text-transform: none; }
 .cu-sort select:focus { outline: none; border-color: var(--maroon); box-shadow: 0 0 0 3px #8c1c1c1a; }
 
@@ -49,8 +49,8 @@
 .cu-id b { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cu-id i { font-style: normal; font-size: 12.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cu-id i span { color: var(--ink-2); font-weight: 600; }
-.cu-tag { font-style: normal; flex: none; font-family: var(--font-caps); font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 100px; }
-.cu-tag.regular { background: #F3E3BE; color: #7A5410; }
+.cu-tag { font-style: normal; flex: none; font-family:var(--font-body); font-size:12.5px; font-weight: 700; padding: 3px 8px; border-radius: 100px; }
+.cu-tag.regular { background: #F7ECEC; color: #7A5410; }
 .cu-tag.repeat { background: #DFEEDF; color: #2E6B34; }
 .cu-tag.new { background: #EDE3F1; color: #6A3E77; }
 
@@ -90,7 +90,7 @@
 .cu-empty { background: var(--cream-card); border: 1.5px dashed var(--line-gold); border-radius: 18px; padding: 44px 26px 36px; text-align: center; max-width: 620px; margin: 24px auto; }
 .cu-empty-ic { width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 50%; background: var(--parch-hi); border: 1px solid var(--line-gold); color: var(--maroon); display: grid; place-items: center; }
 .cu-empty-ic svg { width: 30px; height: 30px; }
-.cu-empty h3 { font-family: var(--font-display); font-size: 25px; color: var(--maroon-deep); margin-bottom: 8px; }
+.cu-empty h3 { font-family:var(--font-body); font-size: 25px; color: var(--maroon-deep); margin-bottom: 8px; }
 .cu-empty p { font-size: 14px; color: var(--ink-2); line-height: 1.65; max-width: 440px; margin: 0 auto; }
 .cu-steps { list-style: none; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 0; margin: 22px 0 0; }
 .cu-steps li { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); border-radius: 100px; padding: 8px 14px 8px 8px; font-size: 12.5px; color: var(--ink-2); font-weight: 600; }

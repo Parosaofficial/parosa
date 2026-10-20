@@ -162,7 +162,7 @@ export default function Orders() {
           <div className="or-bar">
             <div className="or-tabs">
               {(["upcoming", "completed", "all"] as const).map((f) => (
-                <button key={f} className={filter === f ? "on" : ""} onClick={() => setFilter(f)}>{f}</button>
+                <button key={f} className={filter === f ? "on" : ""} onClick={() => setFilter(f)}>{f[0].toUpperCase() + f.slice(1)}</button>
               ))}
             </div>
             <div className="or-search">
@@ -183,7 +183,7 @@ export default function Orders() {
                 <div className="or-c-items">{aggregate(o.items).map((i) => `${i.qty}× ${i.name}`).join(" · ") || "—"}</div>
                 <div className="or-c-amt">₹{o.total}</div>
                 <div className="or-pills">
-                  <span className={`or-pill ${o.status}`}>{o.status}</span>
+                  <span className={`or-pill ${o.status}`}>{o.status[0].toUpperCase() + o.status.slice(1)}</span>
                   <span className={`or-pay ${o.payment_status}`}>{o.payment_status === "paid" ? `Paid · ${o.payment_method}` : "Unpaid"}</span>
                 </div>
                 <button className="or-view" onClick={() => { setPayVia("Online"); setExpanded(null); setBill(o); }}>View bill</button>

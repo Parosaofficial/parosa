@@ -21,7 +21,7 @@ export function AppLoading({ label = "Loading…" }: { label?: string }) {
             animation: "appspin .8s linear infinite",
           }}
         />
-        <p style={{ marginTop: 14, fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--muted)", fontFamily: "var(--font-caps)" }}>
+        <p style={{ marginTop: 14, fontSize: 14, fontWeight: 600, color: "var(--muted)", fontFamily: "var(--font-body)" }}>
           {label}
         </p>
       </div>
