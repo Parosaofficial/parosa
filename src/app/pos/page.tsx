@@ -6,6 +6,7 @@ import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { AppLoading } from "@/components/AppLoading";
 import { createOrder, getMenu, staffCustomerLookup } from "@/lib/db";
 import { clearStaffSession, useStaff } from "@/lib/useStaff";
+import { rewardText, staffLoyalty, staffRedeem, type StaffLoyalty } from "@/lib/loyalty";
 import type { Category, Dish, Restaurant } from "@/lib/types";
 import "./pos.css";
 
@@ -21,6 +22,8 @@ export default function POS() {
   const [phone, setPhone] = useState("");
   const [custName, setCustName] = useState("");
   const [looking, setLooking] = useState(false);
+  const [stamps, setStamps] = useState<StaffLoyalty | null>(null); // the guest's stamp card, after "Find"
+  const [redeeming, setRedeeming] = useState(false);
   const [activeCat, setActiveCat] = useState("");
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -60,11 +63,28 @@ export default function POS() {
     if (!staff || !phone.trim()) return;
     setLooking(true);
     try {
-      const name = await staffCustomerLookup(staff.restaurant_id, staff.code, phone);
-      if (name) { setCustName(name); showToast(`Welcome back, ${name}`); }
+      const [name, card] = await Promise.all([
+        staffCustomerLookup(staff.restaurant_id, staff.code, phone),
+        staffLoyalty(staff.restaurant_id, staff.code, phone),
+      ]);
+      setStamps(card && card.enabled ? card : null);
+      if (card && card.enabled && card.stamps >= card.goal) showToast(`🎁 Reward ready${name ? ` for ${name}` : ""}!`);
+      else if (name) { setCustName(name); showToast(`Welcome back, ${name}`); }
       else showToast("New customer — add their name");
+      if (name) setCustName(name);
     } catch { /* ignore */ }
     finally { setLooking(false); }
+  };
+
+  const giveReward = async () => {
+    if (!staff || !stamps) return;
+    setRedeeming(true);
+    try {
+      const left = await staffRedeem(staff.restaurant_id, staff.code, phone);
+      setStamps({ ...stamps, stamps: left });
+      showToast(`Reward given — ${rewardText(stamps.reward)} 🎉`);
+    } catch { showToast("Could not redeem — try again"); }
+    finally { setRedeeming(false); }
   };
 
   const place = async () => {
@@ -84,7 +104,7 @@ export default function POS() {
     finally { setPlacing(false); }
   };
 
-  const newOrder = () => { setDoneNo(null); setCartOpen(false); setCart({}); setTable(""); setPhone(""); setCustName(""); setSearch(""); };
+  const newOrder = () => { setStamps(null); setDoneNo(null); setCartOpen(false); setCart({}); setTable(""); setPhone(""); setCustName(""); setSearch(""); };
   const logout = () => { clearStaffSession(); router.replace("/login/staff"); };
 
   if (!ready || !staff) return <AppLoading label="Opening POS…" />;
@@ -113,9 +133,19 @@ export default function POS() {
             <div className={`pos-card pos-cust${custOpen ? " open" : ""}`}>
               <div className="pos-row3">
                 <div className="pos-f"><label>Table</label><input className="pos-tbl" inputMode="numeric" placeholder="e.g. 5" value={table} onChange={(e) => setTable(e.target.value)} /></div>
-                <div className="pos-f grow pos-conly"><label>Customer phone <span className="opt">· optional</span></label><div className="pos-inline"><input inputMode="numeric" placeholder="98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} onKeyDown={(e) => e.key === "Enter" && lookup()} /><button onClick={lookup} disabled={looking || !phone.trim()}>{looking ? "…" : "Find"}</button></div></div>
+                <div className="pos-f grow pos-conly"><label>Customer phone <span className="opt">· optional</span></label><div className="pos-inline"><input inputMode="numeric" placeholder="98765 43210" value={phone} onChange={(e) => { setPhone(e.target.value); setStamps(null); }} onKeyDown={(e) => e.key === "Enter" && lookup()} /><button onClick={lookup} disabled={looking || !phone.trim()}>{looking ? "…" : "Find"}</button></div></div>
                 <div className="pos-f grow pos-conly"><label>Customer name <span className="opt">· optional</span></label><input placeholder="Name (saved for next time)" value={custName} onChange={(e) => setCustName(e.target.value)} /></div>
               </div>
+              {stamps && (
+                <div className={`pos-stamps${stamps.stamps >= stamps.goal ? " ready" : ""}`}>
+                  <span className="dots">{Array.from({ length: Math.min(stamps.goal, 12) }, (_, i) => <i key={i} className={i < Math.min(stamps.stamps, stamps.goal) ? "on" : ""} />)}</span>
+                  {stamps.stamps >= stamps.goal ? (
+                    <><b>Reward ready · {rewardText(stamps.reward)}</b><button onClick={giveReward} disabled={redeeming}>{redeeming ? "…" : "Give reward"}</button></>
+                  ) : (
+                    <b>{stamps.stamps}/{stamps.goal} stamps · {stamps.goal - stamps.stamps} more to {rewardText(stamps.reward)}</b>
+                  )}
+                </div>
+              )}
               <button className="pos-custmore" onClick={() => setCustOpen((o) => !o)}>
                 {custOpen ? "Hide customer details" : custName || phone ? `Customer · ${custName || phone}` : "+ Add customer details"}
               </button>

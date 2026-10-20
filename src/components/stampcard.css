@@ -1,0 +1,32 @@
+/* Parosa — stamp card (shared by the owner preview and the guest card page) */
+.sc-card { position: relative; overflow: hidden; border-radius: 22px; padding: 18px 18px 16px; color: #FFF4E6;
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(203,162,78,.28), transparent 55%),
+    linear-gradient(150deg, #7A1A1C, #4A0C0D 75%);
+  box-shadow: 0 24px 48px -26px rgba(74,12,13,.75), inset 0 0 0 1px rgba(216,178,94,.35); }
+.sc-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background: var(--paisley); background-size: 90px; mix-blend-mode: soft-light; }
+.sc-head { position: relative; z-index: 1; display: flex; align-items: center; gap: 11px; }
+.sc-head > span:first-child { box-shadow: 0 0 0 2px rgba(216,178,94,.6) !important; }
+.sc-id { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.15; }
+.sc-id b { font-family: var(--font-display); font-weight: 400; font-size: 19px; color: #FFF4E6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-id span { font-family: var(--font-caps); font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: #D8B25E; margin-top: 3px; }
+.sc-count { font-family: var(--font-display); font-size: 30px; color: #E9C77A; line-height: 1; }
+.sc-count i { font-style: normal; font-size: 16px; color: rgba(255,244,230,.55); }
+
+.sc-grid { position: relative; z-index: 1; display: grid; gap: 10px; margin: 18px 2px 16px; }
+.sc-dot { aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; border: 2px dashed rgba(216,178,94,.55); color: rgba(255,244,230,.5); background: rgba(0,0,0,.12); }
+.sc-dot em { font-style: normal; font-weight: 700; font-size: 12px; }
+.sc-dot svg { width: 52%; height: 52%; }
+.sc-dot.gift { border-style: solid; border-color: #D8B25E; color: #D8B25E; }
+.sc-dot.on { border: none; background: radial-gradient(circle at 35% 30%, #F3D58C, #C99A3E 70%); color: #4A0C0D; box-shadow: 0 6px 12px -6px rgba(0,0,0,.6), inset 0 0 0 2px rgba(255,255,255,.25); transform: rotate(-8deg); }
+.sc-dot.on.pop { animation: sc-stamp .55s cubic-bezier(.2,.8,.25,1.5) .25s both; }
+@keyframes sc-stamp { 0% { transform: scale(2.2) rotate(-30deg); opacity: 0; } 60% { transform: scale(.9) rotate(-4deg); opacity: 1; } 100% { transform: scale(1) rotate(-8deg); } }
+
+.sc-foot { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 2px; padding-top: 12px; border-top: 1px dashed rgba(216,178,94,.45); }
+.sc-foot b { font-size: 15px; font-weight: 800; color: #FFF4E6; }
+.sc-foot span { font-size: 12.5px; color: rgba(255,244,230,.75); }
+.sc-card.ready { box-shadow: 0 24px 48px -22px rgba(201,154,62,.8), inset 0 0 0 2px #D8B25E; }
+.sc-card.ready .sc-foot b { color: #F3D58C; }
+
+@media (prefers-reduced-motion: reduce) { .sc-dot.on.pop { animation: none; } }

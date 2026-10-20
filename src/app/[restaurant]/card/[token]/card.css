@@ -1,0 +1,33 @@
+/* Parosa — guest stamp card page */
+.cd-page { max-width: 460px; margin: 0 auto; min-height: 100dvh; padding: 34px 18px 40px; color: #241713;
+  font-family: var(--font-mukta), system-ui, sans-serif;
+  background: radial-gradient(90% 50% at 50% 0%, #F6E7CE, transparent 70%), #FBF6EC; }
+.cd-kick { font-family: var(--font-cinzel), serif; font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #B58A3C; margin: 0; }
+.cd-h1 { font-family: var(--font-rozha), Georgia, serif; font-weight: 400; font-size: 30px; line-height: 1.12; color: #4A0C0D; margin: 6px 0 20px; }
+.cd-h1 em { font-style: normal; color: #B5432E; }
+
+.cd-fresh { margin-top: 14px; padding: 11px 14px; border-radius: 12px; background: #E8F5E9; color: #1F6B2A; font-weight: 700; font-size: 13.5px; text-align: center; animation: cd-in .4s ease both; }
+.cd-claim { margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: #FFF4D9; border: 1.5px solid #D8B25E; display: flex; flex-direction: column; gap: 3px; animation: cd-pulse 2s ease-in-out infinite; }
+.cd-claim b { font-size: 15.5px; color: #4A0C0D; }
+.cd-claim span { font-size: 13px; color: #6A554B; }
+.cd-paused { margin-top: 14px; padding: 11px 14px; border-radius: 12px; background: #F2EADD; color: #6A554B; font-size: 13px; }
+
+.cd-how { margin-top: 24px; padding: 18px; border-radius: 16px; background: #fff; border: 1px solid #EADFCE; }
+.cd-how h2 { font-family: var(--font-cinzel), serif; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: #8C1C1C; margin: 0 0 10px; }
+.cd-how ol { margin: 0; padding-left: 20px; list-style: decimal; display: flex; flex-direction: column; gap: 8px; }
+.cd-how li { font-size: 14px; line-height: 1.5; color: #4E3B33; }
+.cd-how li::marker { color: #B58A3C; font-weight: 700; }
+.cd-past { margin: 12px 0 0; font-size: 13px; color: #6A554B; }
+.cd-tip { margin: 18px 0 0; font-size: 12px; color: #9C8A7E; text-align: center; }
+.cd-by { margin: 8px 0 0; font-size: 11.5px; color: #B0A092; text-align: center; }
+.cd-by b { color: #6E1618; }
+
+.cd-skel { height: 260px; border-radius: 22px; margin-top: 70px; background: linear-gradient(90deg, #F2EADD, #FBF6EC, #F2EADD); background-size: 200% 100%; animation: cd-shim 1.2s linear infinite; }
+.cd-miss { margin-top: 30vh; text-align: center; display: flex; flex-direction: column; gap: 6px; }
+.cd-miss b { font-family: var(--font-rozha), Georgia, serif; font-weight: 400; font-size: 24px; color: #4A0C0D; }
+.cd-miss span { font-size: 14px; color: #6A554B; }
+
+@keyframes cd-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes cd-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(216,178,94,.5); } 50% { box-shadow: 0 0 0 8px rgba(216,178,94,0); } }
+@keyframes cd-shim { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .cd-claim, .cd-fresh, .cd-skel { animation: none; } }

@@ -460,3 +460,16 @@
 [data-tpl="foodtruck"] .pm-cartbar .go { background: #141414; color: var(--gold-hi); border-radius: 10px; }
 [data-tpl="foodtruck"] .pm-endnote { color: #141414; font-weight: 700; }
 [data-tpl="foodtruck"] .pm-logo > span { box-shadow: 0 0 0 2px var(--m-chrome-ink) !important; }
+
+/* ---------------- digital stamp card ---------------- */
+.pm-stampin { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.pm-stampin span { font-size: 12px; font-weight: 700; color: var(--m-accent); }
+.pm-stampin input { font-family: inherit; font-size: 16px; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--m-line); background: var(--m-bg); color: var(--m-ink); outline: none; }
+.pm-stampin input:focus { border-color: var(--m-accent); }
+.pm-stamplink { display: inline-block; margin-top: 14px; padding: 10px 16px; border-radius: 100px; background: color-mix(in srgb, var(--m-accent) 22%, transparent); color: var(--m-chrome-ink); font-size: 13px; font-weight: 700; text-decoration: none; }
+
+/* Stamp strip — full width (bleeds through the body padding), right under the Food Truck ticker */
+.pm-body > .ms-wrap { margin: -16px -16px 16px; }
+[data-tpl="transparent"] .pm-body > .ms-wrap { margin: -8px -18px 16px; }
+[data-tpl="foodtruck"] .pm-body > .ms-wrap { margin-top: 0; border-bottom: 3px solid #141414; }
+[data-tpl="foodtruck"] .pm-ticker:has(+ .ms-wrap) { margin-bottom: 0; }

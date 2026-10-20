@@ -6,6 +6,8 @@ import { Seal } from "@/components/Logo";
 import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { UpiPay } from "@/components/UpiPay";
 import { createOrder } from "@/lib/db";
+import { cleanPhone, loyaltyOf, rememberCard, rememberedCard, rewardText, tokenForOrder } from "@/lib/loyalty";
+import { MenuStampCard, markStampPending } from "@/components/MenuStamp";
 import { isValidUpi, payNote } from "@/lib/upi";
 import { resolveTemplateId, templateStyle } from "@/lib/templates";
 import type { Category, Dish, Restaurant } from "@/lib/types";
@@ -42,6 +44,12 @@ export function MenuClient({
   const [placed, setPlaced] = useState<{ no: string; total: number } | null>(null);
   const [payOpen, setPayOpen] = useState(false);
   const [err, setErr] = useState("");
+  // digital stamp card: optional phone at checkout → a card link after ordering
+  const loy = loyaltyOf(restaurant);
+  const [guestPhone, setGuestPhone] = useState("");
+  const [cardToken, setCardToken] = useState<string | null>(null);
+  const [myCard, setMyCard] = useState<string | null>(null);
+  useEffect(() => { setMyCard(rememberedCard(restaurant.slug)); }, [restaurant.slug]);
   const [bump, setBump] = useState(0); // cart-bar pop on add
   const [small, setSmall] = useState(false); // header shrinks once you scroll
 
@@ -129,8 +137,13 @@ export function MenuClient({
         table,
         subtotal: sub, gst, total: grand,
         items: cartEntries.map(({ d, q }) => ({ dish_id: d.id, name: d.name, qty: q, price: d.price })),
+        phone: loy.loyalty_enabled && cleanPhone(guestPhone) ? cleanPhone(guestPhone) : undefined,
       });
       setPlaced({ no: order.order_no ?? "", total: order.total });
+      if (loy.loyalty_enabled && cleanPhone(guestPhone)) {
+        markStampPending(restaurant.slug);
+        tokenForOrder(order.id).then((t) => { if (t) { setCardToken(t); setMyCard(t); rememberCard(restaurant.slug, t); } });
+      }
       setCart({}); // the order is in — an empty cart means "add more" starts a fresh order
       setCartOpen(false);
     } catch (e) {
@@ -199,13 +212,7 @@ export function MenuClient({
 
       {/* ---------- body ---------- */}
       <main className="pm-body">
-        {/* Café: a big punchy opener. Food Truck: a scrolling "now serving" ticker. Hidden on other designs. */}
-        {!query && (
-          <div className="pm-cafehead">
-            <span className="k">Fresh today</span>
-            <h2>{restaurant.tagline || <>Pop open<br />the flavour</>}</h2>
-          </div>
-        )}
+        {/* Food Truck: a scrolling "now serving" ticker (hidden on other designs). */}
         <div className="pm-ticker" aria-hidden="true">
           <div className="run">
             {[0, 1].map((i) => (
@@ -213,6 +220,17 @@ export function MenuClient({
             ))}
           </div>
         </div>
+        {/* Stamp strip: edge to edge, right under the ticker — or at the very top where there's no ticker. */}
+        {loy.loyalty_enabled && !query && (
+          <MenuStampCard key={myCard ?? "new"} slug={restaurant.slug} name={restaurant.name} goal={loy.loyalty_goal} reward={loy.loyalty_reward} token={myCard} />
+        )}
+        {/* Café: a big punchy opener. Hidden on other designs. */}
+        {!query && (
+          <div className="pm-cafehead">
+            <span className="k">Fresh today</span>
+            <h2>{restaurant.tagline || <>Pop open<br />the flavour</>}</h2>
+          </div>
+        )}
         {!query && (
           <div className="pm-intro">
             <div className="pm-introtx">
@@ -324,6 +342,12 @@ export function MenuClient({
           )}
         </div>
         <div className="pm-sf">
+          {loy.loyalty_enabled && cartEntries.length > 0 && (
+            <label className="pm-stampin">
+              <span>★ Collect a stamp · {loy.loyalty_goal} visits = {rewardText(loy.loyalty_reward)}</span>
+              <input type="tel" inputMode="numeric" autoComplete="tel" maxLength={14} placeholder="Your phone number (optional)" value={guestPhone} onChange={(e) => setGuestPhone(e.target.value)} />
+            </label>
+          )}
           <button className="pm-place" onClick={placeOrder} disabled={count === 0 || placing}>
             {placing ? "Placing…" : `Place order · ₹${grand}`}
           </button>
@@ -337,6 +361,7 @@ export function MenuClient({
           <h2>Order placed!</h2>
           <div className="oid">#{placed.no} · Table {table} · ₹{placed.total.toLocaleString("en-IN")}</div>
           <p className="msg">{restaurant.name} has your order — the kitchen is on it. Sit back and relax.</p>
+          {cardToken && <a className="pm-stamplink" href={`/${restaurant.slug}/card/${cardToken}`}>★ Your stamp card — the stamp lands when you pay →</a>}
           <div className="acts">
             {canPay && <button className="pm-paynow" onClick={() => setPayOpen(true)}>Pay ₹{placed.total.toLocaleString("en-IN")} now · UPI</button>}
             {billChat && <a className="pm-wa" href={billChat(placed.no, placed.total)} target="_blank" rel="noopener noreferrer">Get the bill on WhatsApp</a>}

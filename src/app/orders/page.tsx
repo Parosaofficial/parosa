@@ -8,6 +8,7 @@ import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { AppLoading } from "@/components/AppLoading";
 import { Dialog } from "@/components/Dialog";
 import { addItemToOrder, getMenu, listOrdersWithItems, markOrderPaid, type OrderWithItems } from "@/lib/db";
+import { cardForPhone, cardUrl, loyaltyOf, setOrderPhone } from "@/lib/loyalty";
 import { useOwner } from "@/lib/useOwner";
 import { buildBillText, billFileName, generateBillPdf } from "@/lib/bill";
 import { cleanUpi, isValidUpi, payNote, reviewLinkOf, upiLink } from "@/lib/upi";
@@ -118,7 +119,21 @@ export default function Orders() {
     try { const doc = await generateBillPdf(restaurant, bill); doc.save(billFileName(restaurant, bill)); } catch { /* still open chat */ }
     // The pay link must be https: WhatsApp never makes a upi:// link tappable.
     const payUrl = `${window.location.origin}/pay/${bill.id}`;
-    window.open(waLink(number, buildBillText(restaurant, bill, { payUrl })), "_blank");
+    let text = buildBillText(restaurant, bill, { payUrl });
+    // stamp card: save the number on the order (the database stamps it once paid) and send the card link
+    const loy = loyaltyOf(restaurant);
+    if (loy.loyalty_enabled) {
+      try {
+        await setOrderPhone(bill.id, number);
+        const card = await cardForPhone(restaurant.id, number);
+        if (card) {
+          const left = Math.max(0, loy.loyalty_goal - card.stamps);
+          text += `\n\n★ Your stamp card: ${card.stamps}/${loy.loyalty_goal}` + (left ? ` — ${left} more visit${left === 1 ? "" : "s"} to ${loy.loyalty_reward || "a free treat"}` : " — reward ready! 🎉") +
+            `\n${cardUrl(window.location.origin, restaurant.slug, card.token)}`;
+        }
+      } catch { /* the bill still goes out without the card */ }
+    }
+    window.open(waLink(number, text), "_blank");
     showToast("WhatsApp opened — attach the downloaded bill PDF, then Send");
   };
 
