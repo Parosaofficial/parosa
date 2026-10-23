@@ -1,5 +1,7 @@
-// Parosa — pricing plans (single source of truth for landing, signup & settings)
+// Parosa — pricing plans (single source of truth for landing, settings & sidebar)
 // Razorpay billing is added later; for now choosing a plan just records it.
+// The ids stay "basic" / "growth" / "business" because they are stored on every
+// restaurant row; only the names, prices and features changed (Oct 2026).
 
 export type Plan = {
   id: "basic" | "growth" | "business";
@@ -9,55 +11,54 @@ export type Plan = {
   blurb: string;
   popular?: boolean;
   featured: string[];  // shown on the plan card
+  coming?: string[];   // promised features not built yet — shown as "coming soon"
 };
 
 export const PLANS: Plan[] = [
   {
     id: "basic",
-    name: "Basic",
-    price: 99,
-    yearly: 990,
-    blurb: "Everything to run one outlet beautifully.",
+    name: "Starter",
+    price: 399,
+    yearly: 3990,
+    blurb: "One outlet, getting started.",
     featured: [
-      "1 restaurant",
-      "Unlimited tables & QR codes",
-      "Bilingual (हिंदी + English) menu",
-      "Live orders with sound alerts",
-      "WhatsApp bills",
-      "UPI & cash tracking",
+      "QR menu in Hindi + English",
+      "QR table ordering & live orders",
+      "WhatsApp bills + UPI pay QR",
+      "Google review ask on every bill",
+      "Unlimited tables",
       "0% commission — always",
     ],
   },
   {
     id: "growth",
     name: "Growth",
-    price: 299,
-    yearly: 2990,
-    blurb: "For busy kitchens that want to grow.",
+    price: 699,
+    yearly: 6990,
+    blurb: "Bring your guests back.",
     popular: true,
     featured: [
-      "Everything in Basic, plus",
-      "All premium menu templates & branding",
-      "Deep analytics & exports",
-      "Review-boost QR + auto-ask",
-      "Up to 3 staff logins",
-      "Priority support",
+      "Everything in Starter, plus",
+      "Loyalty stamp cards",
+      "Customer list & analytics",
+      "All menu designs & branding",
+      "Up to 3 staff logins (POS)",
     ],
+    coming: ["Add-on suggestions on the menu"],
   },
   {
     id: "business",
-    name: "Business",
-    price: 499,
-    yearly: 4990,
-    blurb: "Multiple outlets and the full toolkit.",
+    name: "Pro",
+    price: 999,
+    yearly: 9990,
+    blurb: "For busy and multi-outlet places.",
     featured: [
       "Everything in Growth, plus",
       "Multiple outlets",
       "Unlimited staff logins",
-      "WhatsApp broadcasts & promos",
-      "Custom domain",
-      "Dedicated onboarding & support",
+      "Priority onboarding & support",
     ],
+    coming: ["WhatsApp “we miss you” messages"],
   },
 ];
 
