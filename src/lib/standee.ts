@@ -201,7 +201,7 @@ export type TextSpec = {
   ls?: number; fill: string; anchor?: "middle" | "start"; rotate?: number;
 };
 
-export function texts(table: number): TextSpec[] {
+export function texts(label: string): TextSpec[] {
   return [
     { t: "PAROSA", x: 300, y: 252, size: 62, family: "caps", weight: 700, ls: 12, fill: MAROON, anchor: "middle" },
     { t: "SERVE  ·  SAVOUR", x: 300, y: 282, size: 19, family: "caps", weight: 700, ls: 5, fill: MAROON, anchor: "middle" },
@@ -210,7 +210,7 @@ export function texts(table: number): TextSpec[] {
     { t: "Food", x: 252, y: 814, size: 40, family: "script", weight: 400, fill: MAROON, anchor: "start", rotate: -12 },
     { t: "Brighter", x: 266, y: 852, size: 40, family: "script", weight: 400, fill: MAROON, anchor: "start", rotate: -12 },
     { t: "People", x: 300, y: 890, size: 40, family: "script", weight: 400, fill: MAROON, anchor: "start", rotate: -12 },
-    { t: `TABLE ${table}`, x: 300, y: BAND.y + BAND.h / 2 + 7, size: 19, family: "caps", weight: 700, ls: 3, fill: GOLD_HI, anchor: "middle" },
+    { t: label.toUpperCase(), x: 300, y: BAND.y + BAND.h / 2 + 7, size: 19, family: "caps", weight: 700, ls: 3, fill: GOLD_HI, anchor: "middle" },
   ];
 }
 
@@ -226,14 +226,14 @@ const CSS_FONT: Record<Family, string> = {
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
 /** Full standee as inline SVG markup for the page (uses the page's fonts). */
-export function standeeSvg(url: string, table: number): string {
+export function standeeSvg(url: string, label: string): string {
   const art = artSvg(url).replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
-  const lettering = texts(table).map((s) =>
+  const lettering = texts(label).map((s) =>
     `<text x="${s.x}" y="${s.y}" text-anchor="${s.anchor ?? "middle"}" fill="${s.fill}" font-size="${s.size}"`
     + ` style="font-family:${CSS_FONT[s.family]};font-weight:${s.weight};letter-spacing:${s.ls ?? 0}px"`
     + (s.rotate ? ` transform="rotate(${s.rotate} ${s.x} ${s.y})"` : "")
     + `>${esc(s.t)}</text>`).join("");
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Table ${table} QR standee">${art}`
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)} QR standee">${art}`
     + `<image href="${SEAL.src}" x="${SEAL.x}" y="${SEAL.y}" width="${SEAL.size}" height="${SEAL.size}"/>`
     + lettering
     + `<path d="${SWASH}" fill="none" stroke="${MAROON}" stroke-width="2" stroke-linecap="round"/></svg>`;
@@ -258,8 +258,8 @@ function fontOf(el: Element, family: Family): string {
 }
 
 /** A print-ready PNG (1200 × 2000) of the standee. `fontScope` is any element inside the page. */
-export async function standeePng(url: string, table: number, fontScope: Element, scale = 2): Promise<string> {
-  const specs = texts(table);
+export async function standeePng(url: string, label: string, fontScope: Element, scale = 2): Promise<string> {
+  const specs = texts(label);
   await Promise.all(specs.map((s) => document.fonts.load(`${s.weight} ${s.size}px ${fontOf(fontScope, s.family)}`).catch(() => [])));
 
   const artUrl = URL.createObjectURL(new Blob([artSvg(url)], { type: "image/svg+xml" }));

@@ -168,3 +168,7 @@
   .set-check button,.set-links a{font-size:14.5px}
   .set-links{gap:11px}
 }
+
+/* table-session controls (0015) */
+.set-geo{margin-top:8px;border-top:1px solid var(--line);padding-top:6px}
+.set-range{width:100%;accent-color:var(--oxblood);padding:0!important;border:none!important;background:none!important}

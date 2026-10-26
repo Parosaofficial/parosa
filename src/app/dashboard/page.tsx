@@ -12,6 +12,7 @@ import { supabase } from "@/lib/supabase";
 import { playChime, primeAudio } from "@/lib/chime";
 import type { Order, OrderStatus } from "@/lib/types";
 import "../dash.css";
+import { Floor } from "./Floor";
 import "./dashboard.css";
 
 const NEXT: Record<OrderStatus, OrderStatus | null> = { new: "cooking", cooking: "ready", ready: "served", served: null };
@@ -217,6 +218,8 @@ export default function Dashboard() {
             <div className="ov-kpi"><span>Unpaid bills</span><b>{kpis.unpaid}</b><em className={kpis.unpaid ? "w" : ""}>{kpis.unpaid ? `₹${kpis.unpaidAmt.toLocaleString("en-IN")} to collect` : "all settled"}</em></div>
             <div className="ov-kpi"><span>Average bill</span><b>₹{kpis.aov}</b><em>today</em></div>
           </div>
+
+          <Floor restaurant={restaurant} orders={orders} />
 
           <div className="ov-grid">
             <section className="db-panel ov-live">

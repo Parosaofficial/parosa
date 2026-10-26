@@ -214,6 +214,7 @@ export async function createOrder(input: {
   phone?: string;
   customerName?: string;
   staffName?: string;
+  sessionId?: string | null; // table session (0015) — only sent when the guest has one
 }): Promise<Order> {
   // We generate the id and order number on the client so a customer (anon)
   // only ever needs INSERT permission — never SELECT — under RLS.
@@ -244,6 +245,7 @@ export async function createOrder(input: {
   const { error } = await supabase.from("orders").insert({
     id,
     restaurant_id: input.restaurantId,
+    ...(input.sessionId ? { session_id: input.sessionId } : {}),
     table_number: input.table,
     order_no: orderNo,
     subtotal: input.subtotal,

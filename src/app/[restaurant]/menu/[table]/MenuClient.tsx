@@ -10,6 +10,7 @@ import { cleanPhone, loyaltyOf, rememberCard, rememberedCard, rewardText, tokenF
 import { MenuStampCard, markStampPending } from "@/components/MenuStamp";
 import { isValidUpi, payNote } from "@/lib/upi";
 import { resolveTemplateId, templateStyle } from "@/lib/templates";
+import { SessionGate, useTableSession } from "./SessionGate";
 import type { Category, Dish, Restaurant } from "@/lib/types";
 import "./menu.css";
 
@@ -23,6 +24,7 @@ export function MenuClient({
   table,
   template,
   theme,
+  preview = false,
 }: {
   restaurant: Restaurant;
   categories: Category[];
@@ -30,6 +32,8 @@ export function MenuClient({
   table: string;
   template?: string;
   theme?: string;
+  /** The owner previewing a template — no table session, no location check. */
+  preview?: boolean;
 }) {
   const tpl = resolveTemplateId(template ?? restaurant.template);
 
@@ -50,6 +54,9 @@ export function MenuClient({
   const [cardToken, setCardToken] = useState<string | null>(null);
   const [myCard, setMyCard] = useState<string | null>(null);
   useEffect(() => { setMyCard(rememberedCard(restaurant.slug)); }, [restaurant.slug]);
+  // table session (0015): location check, one shared session per table, closes on payment
+  const { state: ts, ui: tsUi } = useTableSession({ restaurantId: restaurant.id, slug: restaurant.slug, table, enabled: !preview });
+  const tableTitle = ts.tableName ?? `Table ${table}`;
   const [bump, setBump] = useState(0); // cart-bar pop on add
   const [small, setSmall] = useState(false); // header shrinks once you scroll
 
@@ -129,7 +136,7 @@ export function MenuClient({
   const cartEntries = Object.keys(cart).map((id) => ({ d: byId[id], q: cart[id] })).filter((e) => e.d);
 
   const placeOrder = async () => {
-    if (count === 0 || placing) return;
+    if (count === 0 || placing || !ts.canOrder) return;
     setPlacing(true);
     try {
       const order = await createOrder({
@@ -138,6 +145,7 @@ export function MenuClient({
         subtotal: sub, gst, total: grand,
         items: cartEntries.map(({ d, q }) => ({ dish_id: d.id, name: d.name, qty: q, price: d.price })),
         phone: loy.loyalty_enabled && cleanPhone(guestPhone) ? cleanPhone(guestPhone) : undefined,
+        sessionId: ts.sessionId,
       });
       setPlaced({ no: order.order_no ?? "", total: order.total });
       if (loy.loyalty_enabled && cleanPhone(guestPhone)) {
@@ -147,6 +155,13 @@ export function MenuClient({
       setCart({}); // the order is in — an empty cart means "add more" starts a fresh order
       setCartOpen(false);
     } catch (e) {
+      if (String((e as { message?: string })?.message ?? "").includes("session has ended")) {
+        setCartOpen(false);
+        ts.expired(); // the owner closed this table — confirm again, then order
+        setErr("Your table was reset. Please confirm your table again to order.");
+        setTimeout(() => setErr(""), 4500);
+        return;
+      }
       setErr("Sorry, we couldn't place your order. Please try again.");
       setTimeout(() => setErr(""), 3500);
       console.error(e);
@@ -158,6 +173,7 @@ export function MenuClient({
   const Action = ({ d }: { d: Dish }) => {
     const q = cart[d.id] || 0;
     if (!d.available) return <span className="pm-soldout">Sold out</span>;
+    if (!ts.canOrder) return null; // menu-only mode
     if (q > 0)
       return (
         <div className="pm-stepper">
@@ -177,7 +193,7 @@ export function MenuClient({
           <span className="pm-logo"><RestaurantLogo restaurant={restaurant} size={42} /></span>
           <div className="pm-id">
             <div className="rn">{restaurant.name}</div>
-            <div className="tb">Table {table} · Scan &amp; order</div>
+            <div className="tb">{tableTitle} · Scan &amp; order</div>
           </div>
           <button className={`pm-icon${searchOpen ? " on" : ""}`} onClick={() => { setSearchOpen((v) => !v); if (searchOpen) setQuery(""); }} aria-label="Search the menu">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><path d="m20 20-3-3" /></svg>
@@ -216,7 +232,7 @@ export function MenuClient({
         <div className="pm-ticker" aria-hidden="true">
           <div className="run">
             {[0, 1].map((i) => (
-              <span key={i}>NOW SERVING ★ TABLE {table} ★ ORDER RIGHT FROM YOUR PHONE ★ HOT &amp; FRESH ★ {restaurant.name.toUpperCase()} ★&nbsp;</span>
+              <span key={i}>NOW SERVING ★ {tableTitle.toUpperCase()} ★ ORDER RIGHT FROM YOUR PHONE ★ HOT &amp; FRESH ★ {restaurant.name.toUpperCase()} ★&nbsp;</span>
             ))}
           </div>
         </div>
@@ -386,6 +402,10 @@ export function MenuClient({
           </div>
         </>
       )}
+      {ts.phase === "browse" && (
+        <div className="pm-viewonly" role="status">Menu only — not at the restaurant? <button onClick={tsUi.allow}>Order here</button></div>
+      )}
+      <SessionGate ui={tsUi} restaurantName={restaurant.name} reviewUrl={restaurant.google_review_url} />
     </div>
   );
 }

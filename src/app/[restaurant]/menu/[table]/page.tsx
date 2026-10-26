@@ -38,6 +38,7 @@ export default async function Page({
       table={table}
       template={template}
       theme={themeId}
+      preview={!!preview || !!theme}
     />
   );
 }

@@ -27,6 +27,7 @@ type Form = {
   phone: string; whatsapp: string;
   address: string; city: string; district: string; state: string; pincode: string;
   latitude: number | null; longitude: number | null;
+  geofence_on: boolean; geofence_m: number; session_idle_hours: number;
   gstin: string; fssai: string; hours: Hours;
   upi_id: string; review_url: string; review_prompt: boolean;
 };
@@ -105,6 +106,7 @@ export default function Settings() {
       address: restaurant.address ?? "", city: restaurant.city ?? "",
       district: restaurant.district ?? "", state: restaurant.state ?? "", pincode: restaurant.pincode ?? "",
       latitude: restaurant.latitude ?? null, longitude: restaurant.longitude ?? null,
+      geofence_on: restaurant.geofence_on !== false, geofence_m: restaurant.geofence_m ?? 150, session_idle_hours: restaurant.session_idle_hours ?? 3,
       gstin: restaurant.gstin ?? "", fssai: restaurant.fssai ?? "",
       hours: restaurant.hours ?? defaultHours,
       upi_id: restaurant.upi_id ?? "", review_url: restaurant.google_review_url ?? "",
@@ -182,6 +184,9 @@ export default function Settings() {
           district: f.district.trim() || null, state: f.state.trim() || null,
           latitude: f.latitude, longitude: f.longitude,
         });
+      } catch { extrasSaved = false; }
+      try {
+        await updateRestaurant(restaurant.id, { geofence_on: f.geofence_on, geofence_m: f.geofence_m, session_idle_hours: f.session_idle_hours });
       } catch { extrasSaved = false; }
       await reload();
       showToast(extrasSaved ? "Saved ✓" : "Saved — some fields need a database update first");
@@ -356,6 +361,25 @@ export default function Settings() {
               <div className="db-frow two">
                 <div className="db-field"><label>State</label><input type="text" value={f.state} onChange={(e) => set("state", e.target.value)} /></div>
                 <div className={`db-field${pinBad ? " bad" : ""}`}><label>Pincode</label><input type="text" inputMode="numeric" maxLength={6} value={f.pincode} onChange={(e) => set("pincode", e.target.value.replace(/\D/g, ""))} /></div>
+              </div>
+
+              <div className="set-geo">
+                <div className="db-togrow">
+                  <div><div className="tt">Guests must be at the restaurant to order</div><div className="ts">Their phone&apos;s location is checked once when they scan a table QR. Turn off if your GPS pin isn&apos;t accurate.</div></div>
+                  <button className={`db-switch${f.geofence_on ? " on" : ""}`} onClick={() => set("geofence_on", !f.geofence_on)} aria-label="Location check" />
+                </div>
+                {f.geofence_on && (
+                  <div className="db-field" style={{ marginTop: 10 }}>
+                    <label>Allowed distance · {f.geofence_m} m</label>
+                    <input type="range" min={100} max={150} step={10} value={f.geofence_m} onChange={(e) => set("geofence_m", Number(e.target.value))} className="set-range" />
+                    {f.latitude == null && <div className="set-hint">No GPS pin saved yet — tap &ldquo;Use current location&rdquo; above while you&apos;re at the restaurant, or the check is skipped.</div>}
+                  </div>
+                )}
+                <div className="db-field" style={{ marginTop: 6 }}>
+                  <label>Close a quiet table after</label>
+                  <div className="set-days">{[2, 3, 4].map((h) => <button key={h} type="button" className={`set-day${f.session_idle_hours === h ? " on" : ""}`} style={{ width: "auto", padding: "0 14px" }} onClick={() => set("session_idle_hours", h)}>{h} hours</button>)}</div>
+                  <div className="set-hint">A table with no new orders for this long is freed automatically. Unpaid bills stay in Orders.</div>
+                </div>
               </div>
             </div></div>
           )}

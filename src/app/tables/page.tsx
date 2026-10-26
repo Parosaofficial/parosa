@@ -9,6 +9,7 @@ import { Seal } from "@/components/Logo";
 import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { AppLoading } from "@/components/AppLoading";
 import { setTablesCount } from "@/lib/db";
+import { TABLE_KINDS, addTable, deleteTable, listTables, nextCode, shapeFor, tableLabel, updateTable, type RestaurantTable, type TableShape } from "@/lib/tables";
 import { useOwner } from "@/lib/useOwner";
 import { reviewLinkOf } from "@/lib/upi";
 import { standeePng, standeeSvg } from "@/lib/standee";
@@ -67,70 +68,118 @@ function drawLogo(ctx: CanvasRenderingContext2D, cx: number, top: number, size: 
 
 type Design = "heritage" | "classic" | "branded";
 
+function Seats({ n }: { n: number }) {
+  return <span className="tb-seats" aria-label={`${n} seats`}>{Array.from({ length: Math.min(n, 10) }, (_, i) => <i key={i} />)}</span>;
+}
+
+type Draft = { name: string; kind: string; seats: number; shape: TableShape; area: string; custom: boolean };
+
 export default function Tables() {
   const { restaurant, ready } = useOwner();
   const [origin, setOrigin] = useState("https://parosa.app");
   useEffect(() => { setOrigin(window.location.origin); }, []);
 
-  const [count, setCount] = useState(0);
+  const [tables, setTables] = useState<RestaurantTable[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [missing, setMissing] = useState(false); // migration 0015 not applied yet
+  const [kindFilter, setKindFilter] = useState("All");
   const [design, setDesign] = useState<Design>("heritage");
-  const [hidden, setHidden] = useState<number[]>([]); // deleted table numbers (device-local)
-  const [paused, setPaused] = useState<number[]>([]); // turned-off table numbers (device-local)
+  const [draft, setDraft] = useState<Draft | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const reviewBox = useRef<HTMLDivElement>(null);
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2100); };
 
-  useEffect(() => { if (restaurant) setCount(restaurant.tables_count ?? 0); }, [restaurant]);
   useEffect(() => { try { const d = localStorage.getItem("parosa-standee"); if (d === "branded" || d === "classic" || d === "heritage") setDesign(d); } catch { /* ignore */ } }, []);
   useEffect(() => {
     if (!restaurant) return;
-    try {
-      const raw = localStorage.getItem(`parosa-tables-${restaurant.id}`);
-      if (raw) { const o = JSON.parse(raw); setHidden(Array.isArray(o.hidden) ? o.hidden : []); setPaused(Array.isArray(o.paused) ? o.paused : []); }
-    } catch { /* ignore */ }
+    listTables(restaurant.id)
+      .then((t) => { setTables(t); setLoaded(true); })
+      .catch(() => {
+        // migration 0015 not run yet: show the old numbered tables so QRs stay downloadable
+        const n = restaurant.tables_count ?? 0;
+        setTables(Array.from({ length: n }, (_, i) => ({
+          id: `legacy-${i + 1}`, restaurant_id: restaurant.id, code: String(i + 1), name: String(i + 1),
+          kind: "4-seater", seats: 4, shape: "four" as const, area: null, active: true, sort: i + 1,
+        })));
+        setMissing(true); setLoaded(true);
+      });
   }, [restaurant]);
 
   const pickDesign = (d: Design) => { setDesign(d); try { localStorage.setItem("parosa-standee", d); } catch { /* ignore */ } };
 
-  if (!ready || !restaurant) return <AppLoading label="Loading tables…" />;
+  if (!ready || !restaurant || !loaded) return <AppLoading label="Loading tables…" />;
 
   const BASE = `${origin}/${restaurant.slug}/menu`;
   const review = reviewLinkOf(restaurant);
-  const tkey = `parosa-tables-${restaurant.id}`;
-  const persist = (h: number[], p: number[]) => { try { localStorage.setItem(tkey, JSON.stringify({ hidden: h, paused: p })); } catch { /* ignore */ } };
+  const kinds = Array.from(new Set([...TABLE_KINDS.map((k) => k.kind), ...tables.map((t) => t.kind)]));
+  const areas = Array.from(new Set(tables.map((t) => t.area).filter(Boolean) as string[]));
+  const shown = kindFilter === "All" ? tables : tables.filter((t) => t.kind === kindFilter);
+  const active = tables.filter((t) => t.active);
 
-  const visible = Array.from({ length: count }, (_, i) => i + 1).filter((n) => !hidden.includes(n));
+  // keep the old count in step (sidebar, analytics) with the real list
+  const syncCount = (list: RestaurantTable[]) => setTablesCount(restaurant.id, list.length).catch(() => {});
 
-  const changeCount = async (n: number) => {
-    const c = Math.max(0, Math.min(99, n));
-    setCount(c);
-    await setTablesCount(restaurant.id, c);
+  const openNew = () => {
+    const last = tables[tables.length - 1];
+    const base = last ? TABLE_KINDS.find((k) => k.kind === last.kind) ?? TABLE_KINDS[1] : TABLE_KINDS[1];
+    const prefix = base.shape === "sofa" ? "F" : "T";
+    const n = tables.filter((t) => t.name.startsWith(prefix)).length + 1;
+    setEditId(null);
+    setDraft({ name: `${prefix}${n}`, kind: base.kind, seats: base.seats, shape: base.shape, area: last?.area ?? "", custom: false });
   };
-  const addTable = async () => { await changeCount(count + 1); showToast(`Table ${count + 1} added`); };
-
-  const deleteTable = async (n: number) => {
-    const nh = Array.from(new Set([...hidden, n])).sort((a, b) => a - b);
-    const np = paused.filter((x) => x !== n);
-    // keep tables_count equal to the highest still-active table; interior gaps live in `hidden`
-    let c = count;
-    while (c > 0 && nh.includes(c)) c--;
-    const trimmed = nh.filter((x) => x <= c);
-    setHidden(trimmed); setPaused(np); persist(trimmed, np);
-    if (c !== count) await changeCount(c);
-    showToast(`Table ${n} removed`);
+  const openEdit = (t: RestaurantTable) => {
+    setEditId(t.id);
+    setDraft({ name: t.name, kind: t.kind, seats: t.seats, shape: t.shape, area: t.area ?? "", custom: !TABLE_KINDS.some((k) => k.kind === t.kind) });
   };
-  const removeLast = async () => { if (visible.length) await deleteTable(visible[visible.length - 1]); };
+  const pickKind = (k: (typeof TABLE_KINDS)[number]) => setDraft((d) => d && { ...d, kind: k.kind, seats: k.seats, shape: k.shape, custom: false });
 
-  const togglePause = (n: number) => {
-    const np = paused.includes(n) ? paused.filter((x) => x !== n) : [...paused, n];
-    setPaused(np); persist(hidden, np);
-    showToast(paused.includes(n) ? `Table ${n} turned on` : `Table ${n} turned off`);
+  const saveDraft = async () => {
+    if (!draft) return;
+    const name = draft.name.trim();
+    const kind = draft.kind.trim();
+    if (!name) { showToast("Give the table a name, like T1"); return; }
+    if (!kind) { showToast("Choose or type a table type"); return; }
+    if (tables.some((t) => t.name.trim().toLowerCase() === name.toLowerCase() && t.id !== editId)) { showToast(`There's already a table called ${name}`); return; }
+    const seats = Math.max(1, Math.min(30, Math.round(draft.seats) || 1));
+    const shape = draft.custom ? shapeFor(seats) : draft.shape;
+    setBusy(true);
+    try {
+      if (editId) {
+        await updateTable(editId, { name, kind, seats, shape, area: draft.area.trim() || null });
+        setTables((ts) => ts.map((t) => (t.id === editId ? { ...t, name, kind, seats, shape, area: draft.area.trim() || null } : t)));
+        showToast(`${name} saved`);
+      } else {
+        const row = await addTable(restaurant.id, { code: nextCode(tables), name, kind, seats, shape, area: draft.area.trim() || null, sort: tables.length + 1 });
+        const next = [...tables, row];
+        setTables(next); syncCount(next);
+        showToast(`${name} added`);
+      }
+      setDraft(null); setEditId(null);
+    } catch { showToast("Couldn't save — try again"); }
+    finally { setBusy(false); }
+  };
+
+  const toggleActive = async (t: RestaurantTable) => {
+    setTables((ts) => ts.map((x) => (x.id === t.id ? { ...x, active: !t.active } : x)));
+    try { await updateTable(t.id, { active: !t.active }); showToast(t.active ? `${t.name} turned off` : `${t.name} turned on`); }
+    catch { setTables((ts) => ts.map((x) => (x.id === t.id ? { ...x, active: t.active } : x))); showToast("Couldn't update — try again"); }
+  };
+  const removeTable = async (t: RestaurantTable) => {
+    if (!window.confirm(`Delete ${t.name}? Its printed QR will stop working.`)) return;
+    try {
+      await deleteTable(t.id);
+      const next = tables.filter((x) => x.id !== t.id);
+      setTables(next); syncCount(next);
+      showToast(`${t.name} deleted`);
+    } catch { showToast("Couldn't delete — try again"); }
   };
 
   /* ---------- build a printable standee PNG for one table ---------- */
-  const buildPng = async (n: number): Promise<string> => {
-    if (design === "heritage") return standeePng(`${BASE}/${n}`, n, document.querySelector(".db-app") ?? document.body);
-    const qrDataUrl = await QRCode.toDataURL(`${BASE}/${n}`, { margin: 1, width: 520, color: { dark: "#4A0C0D", light: "#FBF4E2" } });
+  const buildPng = async (t: RestaurantTable): Promise<string> => {
+    if (design === "heritage") return standeePng(`${BASE}/${t.code}`, tableLabel(t), document.querySelector(".db-app") ?? document.body);
+    const qrDataUrl = await QRCode.toDataURL(`${BASE}/${t.code}`, { margin: 1, width: 520, color: { dark: "#4A0C0D", light: "#FBF4E2" } });
     const qrImg = await loadImage(qrDataUrl);
     let logoImg: HTMLImageElement | null = null;
     if (restaurant.logo_url) { try { logoImg = await loadImage(restaurant.logo_url, true); } catch { logoImg = null; } }
@@ -159,7 +208,7 @@ export default function Tables() {
     ctx.fillText(nm, cx, y); y += (branded ? 44 : 40) + 14;
 
     ctx.fillStyle = "#9C8A7E"; ctx.font = "600 18px Arial, sans-serif"; setLS("3px");
-    ctx.fillText(branded ? `SCAN TO ORDER · TABLE ${n}` : "SCAN TO ORDER", cx, y);
+    ctx.fillText(branded ? `SCAN TO ORDER · ${tableLabel(t).toUpperCase()}` : "SCAN TO ORDER", cx, y);
     setLS("normal"); y += 18 + (branded ? 24 : 22);
 
     const qs = 430;
@@ -167,7 +216,7 @@ export default function Tables() {
 
     if (!branded) {
       ctx.fillStyle = "#4A0C0D"; ctx.font = "60px Georgia, serif";
-      ctx.fillText(`Table ${n}`, cx, y); y += 60 + 22;
+      ctx.fillText(tableLabel(t), cx, y); y += 60 + 22;
       ctx.strokeStyle = "#EADFCE"; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(120, y); ctx.lineTo(W - 120, y); ctx.stroke(); y += 16;
       drawSeal(ctx, cx - 78, y, 26);
@@ -190,19 +239,19 @@ export default function Tables() {
     return cv.toDataURL("image/png");
   };
 
-  const downloadTable = async (n: number) => {
+  const downloadTable = async (t: RestaurantTable) => {
     try {
-      const dataUrl = await buildPng(n);
+      const dataUrl = await buildPng(t);
       const a = document.createElement("a");
-      a.href = dataUrl; a.download = `${restaurant.slug}-table-${n}-qr.png`;
+      a.href = dataUrl; a.download = `${restaurant.slug}-${t.name.replace(/\s+/g, "-").toLowerCase()}-qr.png`;
       document.body.appendChild(a); a.click(); a.remove();
-      showToast(`Table ${n} QR downloaded`);
+      showToast(`${tableLabel(t)} QR downloaded`);
     } catch (e) { console.error(e); showToast("Couldn't build the PNG — try again"); }
   };
   const downloadAll = async () => {
-    if (!visible.length) return;
-    showToast(`Downloading ${visible.length} QR codes…`);
-    for (const n of visible) { await downloadTable(n); await new Promise((r) => setTimeout(r, 350)); }
+    if (!active.length) return;
+    showToast(`Downloading ${active.length} QR codes…`);
+    for (const t of active) { await downloadTable(t); await new Promise((r) => setTimeout(r, 350)); }
   };
 
   const downloadReviewQr = () => {
@@ -220,23 +269,81 @@ export default function Tables() {
       <Sidebar restaurant={restaurant} />
       <main className="db-main">
         <div className="db-topbar">
-          <div><h1>Tables &amp; QR</h1><p>Add a table to generate its QR — same menu, table number baked in. Download the PNG and print it for every table.</p></div>
+          <div><h1>Tables &amp; QR</h1><p>Set up your tables by type, then print a QR for each one.</p></div>
           <div className="db-acts">
-            <button className="db-btn prime" disabled={visible.length === 0} onClick={downloadAll}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" /></svg> Download all</button>
+            <button className="db-btn" onClick={openNew} disabled={missing}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add table</button>
+            <button className="db-btn prime" disabled={active.length === 0} onClick={downloadAll}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" /></svg> Download all</button>
           </div>
         </div>
         <div className="db-content">
-          <div className="db-note">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
-            <span>Each QR is <b>real — scan it with your phone</b> to open that table&apos;s live menu. Turn a table off to hide it while it&apos;s not in use, or delete it entirely.</span>
-          </div>
+          {missing && (
+            <div className="tb-missing"><b>One-time database update needed</b><span>Table types, areas and live sessions need migration 0015. Your {tables.length} tables and their QR codes below keep working meanwhile.</span></div>
+          )}
 
-          <div className="tb-urlbar">
-            <div className="tb-u"><div className="l">Your menu link</div><div className="v">{origin.replace(/^https?:\/\//, "")}/{restaurant.slug}/menu<span className="t">/7</span> &nbsp;<span style={{ color: "var(--muted)", fontWeight: 500, fontSize: 12.5 }}>← only the table number changes</span></div></div>
-            <div className="tb-stepper"><span className="lbl">Tables</span><button onClick={removeLast}>−</button><span className="n">{visible.length}</span><button onClick={addTable}>+</button></div>
-          </div>
+          {/* ---- your tables ---- */}
+          {!missing && (
+            <div className="db-panel">
+              <div className="db-ph">
+                <h3>Your tables · {tables.length}</h3>
+                <div className="tb-kinds">
+                  {["All", ...kinds].map((k) => {
+                    const n = k === "All" ? tables.length : tables.filter((t) => t.kind === k).length;
+                    if (k !== "All" && n === 0) return null;
+                    return <button key={k} className={kindFilter === k ? "on" : ""} onClick={() => setKindFilter(k)}>{k} · {n}</button>;
+                  })}
+                </div>
+              </div>
 
-          {visible.length > 0 && (
+              {draft && (
+                <div className="tb-form">
+                  <div className="db-field"><label>Table name</label><input value={draft.name} maxLength={20} placeholder="T1" onChange={(e) => setDraft({ ...draft, name: e.target.value })} /></div>
+                  <div className="db-field"><label>Type</label>
+                    <div className="tb-kpick">
+                      {TABLE_KINDS.map((k) => <button key={k.kind} type="button" className={!draft.custom && draft.kind === k.kind ? "on" : ""} onClick={() => pickKind(k)}>{k.kind}</button>)}
+                      <button type="button" className={draft.custom ? "on" : ""} onClick={() => setDraft({ ...draft, custom: true, kind: draft.custom ? draft.kind : "" })}>+ Custom</button>
+                    </div>
+                  </div>
+                  {draft.custom && (
+                    <div className="db-frow two">
+                      <div className="db-field"><label>Custom type</label><input value={draft.kind} maxLength={24} placeholder="6-seater, Rooftop…" onChange={(e) => setDraft({ ...draft, kind: e.target.value })} /></div>
+                      <div className="db-field"><label>Seats</label><input inputMode="numeric" value={draft.seats || ""} onChange={(e) => setDraft({ ...draft, seats: Number(e.target.value.replace(/\D/g, "")) || 0 })} /></div>
+                    </div>
+                  )}
+                  <div className="db-field"><label>Area <span className="tb-opt">· optional</span></label>
+                    <input value={draft.area} maxLength={24} placeholder="Inside, Outside, Family hall…" list="tb-areas" onChange={(e) => setDraft({ ...draft, area: e.target.value })} />
+                    <datalist id="tb-areas">{areas.map((a) => <option key={a} value={a} />)}</datalist>
+                  </div>
+                  <div className="tb-formacts">
+                    <button className="db-btn" onClick={() => { setDraft(null); setEditId(null); }} disabled={busy}>Cancel</button>
+                    <button className="db-btn prime" onClick={saveDraft} disabled={busy}>{busy ? "Saving…" : editId ? "Save table" : "Add table"}</button>
+                  </div>
+                </div>
+              )}
+
+              {tables.length === 0 ? (
+                <div className="tb-none">No tables yet. <button className="db-see" onClick={openNew}>Add your first table →</button></div>
+              ) : (
+                <div className="tb-list">
+                  <div className="tb-lh"><span>Table</span><span>Type</span><span>Seats</span><span>Area</span><span>On</span><span /></div>
+                  {shown.map((t) => (
+                    <div key={t.id} className={`tb-li${t.active ? "" : " off"}`}>
+                      <b>{t.name}</b>
+                      <span>{t.kind}</span>
+                      <span><Seats n={t.seats} /></span>
+                      <span className="ar">{t.area || "—"}</span>
+                      <button className={`tb-switch${t.active ? " on" : ""}`} onClick={() => toggleActive(t)} aria-label={t.active ? `Turn ${t.name} off` : `Turn ${t.name} on`}><span className="k" /></button>
+                      <span className="acts">
+                        <button className="db-btn" onClick={() => openEdit(t)}>Edit</button>
+                        <button className="tb-x" onClick={() => removeTable(t)} aria-label={`Delete ${t.name}`} title={`Delete ${t.name}`}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /></svg></button>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {active.length > 0 && (
             <div className="tb-designbar">
               <span className="l">QR standee design</span>
               <div className="tb-seg">
@@ -247,8 +354,48 @@ export default function Tables() {
             </div>
           )}
 
+          {/* ---- one printable QR per active table ---- */}
+          {active.length > 0 && (
+            <div className={`tb-grid tb-${design}`}>
+              {active.map((t) => {
+                const url = `${BASE}/${t.code}`;
+                const lbl = tableLabel(t);
+                return (
+                  <div key={t.id} className="tb-standee">
+                    {design === "heritage" ? (
+                      <div className="tb-hcard" dangerouslySetInnerHTML={{ __html: standeeSvg(url, lbl) }} />
+                    ) : design === "classic" ? (
+                      <>
+                        <div className="tb-top"><RestaurantLogo restaurant={restaurant} size={30} /><span className="tb-bn">{restaurant.name}</span></div>
+                        <div className="tb-scan">Scan to order</div>
+                        <div className="tb-qbox"><QRCodeCanvas value={url} size={130} fgColor="#4A0C0D" bgColor="#FBF4E2" level="M" /></div>
+                        <div className="tb-tno">{lbl}</div>
+                        <div className="tb-brandfoot"><Seal size={15} /><span>Powered by <b>Parosa</b></span></div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="tb-hero">
+                          <RestaurantLogo restaurant={restaurant} size={54} />
+                          <span className="tb-bn">{restaurant.name}</span>
+                          <span className="tb-scan">Scan to order · {lbl}</span>
+                        </div>
+                        <div className="tb-qbox"><QRCodeCanvas value={url} size={130} fgColor="#4A0C0D" bgColor="#FBF4E2" level="M" /></div>
+                        <div className="tb-noapp">No app needed — opens in the browser</div>
+                        <div className="tb-brandband"><Seal size={22} /><div><b>परोसा · PAROSA</b><i>Scan · Serve · Savour</i></div></div>
+                      </>
+                    )}
+                    <div className="tb-row">
+                      <span className="tb-cap">{t.kind}{t.area ? ` · ${t.area}` : ""}</span>
+                      <button className="tb-dl" onClick={() => downloadTable(t)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3v11M8 10l4 4 4-4M5 20h14" /></svg>PNG</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {/* Review QR — the link itself lives in Settings */}
-          <div className="db-panel">
+          <div className="db-panel" style={{ marginTop: 18 }}>
             <div className="db-ph"><h3>Reviews · Rate us QR</h3><span className="tag">★ Get 5-star reviews</span></div>
             {review ? (
               <div className="db-pb" style={{ display: "flex", gap: 18, alignItems: "center", flexWrap: "wrap" }}>
@@ -258,7 +405,7 @@ export default function Tables() {
                   <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
                     <button className="db-btn prime" onClick={downloadReviewQr}>Download PNG</button>
                     <a className="db-btn" href={review} target="_blank" rel="noopener noreferrer">Test link ↗</a>
-                    <Link className="db-btn" href="/settings#collect">Change link</Link>
+                    <Link className="db-btn" href="/settings/payments">Change link</Link>
                   </div>
                 </div>
               </div>
@@ -268,63 +415,10 @@ export default function Tables() {
                   {restaurant.google_review_url ? <>Asking for reviews is <b>turned off</b>. Turn it on in Settings to put a &ldquo;Rate us on Google&rdquo; QR on every bill.</>
                     : <>Add your <b>Google review link</b> once — Parosa puts a &ldquo;Rate us on Google&rdquo; QR on every bill and the link in every WhatsApp bill.</>}
                 </div>
-                <Link className="db-btn prime" href="/settings#collect">{restaurant.google_review_url ? "Open Settings" : "Add review link"}</Link>
+                <Link className="db-btn prime" href="/settings/payments">{restaurant.google_review_url ? "Open Settings" : "Add review link"}</Link>
               </div>
             )}
           </div>
-
-          {/* Table QRs */}
-          {visible.length === 0 ? (
-            <div className="tb-empty">
-              <div className="tb-emptyicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="4" y="4" width="7" height="7" rx="1" /><rect x="13" y="4" width="7" height="7" rx="1" /><rect x="4" y="13" width="7" height="7" rx="1" /><path d="M14 14h6v6h-6z" /></svg></div>
-              <h3>No tables yet</h3>
-              <p>Add your tables and Parosa generates a unique QR for each one. Download &amp; print them and place one on every table.</p>
-              <button className="db-btn prime" onClick={addTable}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add your first table</button>
-            </div>
-          ) : (
-            <div className={`tb-grid tb-${design}`}>
-              {visible.map((n) => {
-                const off = paused.includes(n);
-                return (
-                <div key={n} className={`tb-standee${off ? " paused" : ""}`}>
-                  <button className="tb-del" onClick={() => deleteTable(n)} title={`Delete Table ${n}`} aria-label={`Delete Table ${n}`}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /></svg>
-                  </button>
-                  {off && <span className="tb-offtag">Off</span>}
-                  {design === "heritage" ? (
-                    <div className="tb-hcard" dangerouslySetInnerHTML={{ __html: standeeSvg(`${BASE}/${n}`, n) }} />
-                  ) : design === "classic" ? (
-                    <>
-                      <div className="tb-top"><RestaurantLogo restaurant={restaurant} size={30} /><span className="tb-bn">{restaurant.name}</span></div>
-                      <div className="tb-scan">Scan to order</div>
-                      <div className="tb-qbox"><QRCodeCanvas value={`${BASE}/${n}`} size={130} fgColor="#4A0C0D" bgColor="#FBF4E2" level="M" /></div>
-                      <div className="tb-tno">Table {n}</div>
-                      <div className="tb-brandfoot"><Seal size={15} /><span>Powered by <b>Parosa</b></span></div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="tb-hero">
-                        <RestaurantLogo restaurant={restaurant} size={54} />
-                        <span className="tb-bn">{restaurant.name}</span>
-                        <span className="tb-scan">Scan to order · Table {n}</span>
-                      </div>
-                      <div className="tb-qbox"><QRCodeCanvas value={`${BASE}/${n}`} size={130} fgColor="#4A0C0D" bgColor="#FBF4E2" level="M" /></div>
-                      <div className="tb-noapp">No app needed — opens in the browser</div>
-                      <div className="tb-brandband"><Seal size={22} /><div><b>परोसा · PAROSA</b><i>Scan · Serve · Savour</i></div></div>
-                    </>
-                  )}
-                  <div className="tb-row">
-                    <button className={`tb-switch${off ? "" : " on"}`} onClick={() => togglePause(n)} title={off ? "Turn table on" : "Turn table off"}>
-                      <span className="k" /><b>{off ? "Off" : "On"}</b>
-                    </button>
-                    <button className="tb-dl" onClick={() => downloadTable(n)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3v11M8 10l4 4 4-4M5 20h14" /></svg>PNG</button>
-                  </div>
-                </div>
-                );
-              })}
-              <button className="tb-add" onClick={addTable}><div className="in"><span className="tb-plus">+</span>Add table</div></button>
-            </div>
-          )}
           <div style={{ height: 30 }} />
         </div>
       </main>

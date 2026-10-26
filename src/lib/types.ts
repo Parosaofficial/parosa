@@ -46,6 +46,9 @@ export type Restaurant = {
   tables_count: number;
   staff_code: string | null;
   staff_code_date: string | null;
+  geofence_on?: boolean;         // table sessions (0015): guests must be near the restaurant
+  geofence_m?: number;
+  session_idle_hours?: number;
 };
 
 export type Staff = {
@@ -107,6 +110,7 @@ export type Order = {
   customer_name: string | null;
   staff_name: string | null;
   created_at: string;
+  session_id?: string | null;    // table session (0015)
 };
 
 export type OrderItem = {
