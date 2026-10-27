@@ -215,6 +215,7 @@ export async function createOrder(input: {
   customerName?: string;
   staffName?: string;
   sessionId?: string | null; // table session (0015) — only sent when the guest has one
+  note?: string | null;       // for the kitchen (0016)
 }): Promise<Order> {
   // We generate the id and order number on the client so a customer (anon)
   // only ever needs INSERT permission — never SELECT — under RLS.
@@ -240,12 +241,14 @@ export async function createOrder(input: {
     customer_name: input.customerName ?? null,
     staff_name: input.staffName ?? null,
     created_at,
+    note: input.note?.trim() || null,
   };
 
   const { error } = await supabase.from("orders").insert({
     id,
     restaurant_id: input.restaurantId,
     ...(input.sessionId ? { session_id: input.sessionId } : {}),
+    ...(input.note?.trim() ? { note: input.note.trim().slice(0, 200) } : {}),
     table_number: input.table,
     order_no: orderNo,
     subtotal: input.subtotal,

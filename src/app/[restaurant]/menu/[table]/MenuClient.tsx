@@ -2,15 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Mr_Dafoe } from "next/font/google";
-import { Seal } from "@/components/Logo";
 import { RestaurantLogo } from "@/components/RestaurantLogo";
-import { UpiPay } from "@/components/UpiPay";
 import { createOrder } from "@/lib/db";
 import { cleanPhone, loyaltyOf, rememberCard, rememberedCard, rewardText, tokenForOrder } from "@/lib/loyalty";
 import { MenuStampCard, markStampPending } from "@/components/MenuStamp";
-import { isValidUpi, payNote } from "@/lib/upi";
 import { resolveTemplateId, templateStyle } from "@/lib/templates";
 import { SessionGate, useTableSession } from "./SessionGate";
+import { PaidStamp, ThankYou } from "./ThankYou";
 import type { Category, Dish, Restaurant } from "@/lib/types";
 import "./menu.css";
 
@@ -44,14 +42,13 @@ export function MenuClient({
   const [cart, setCart] = useState<Record<string, number>>({});
   const [cartOpen, setCartOpen] = useState(false);
   const [placing, setPlacing] = useState(false);
-  // the order just placed — drives the success screen and the optional "pay now"
-  const [placed, setPlaced] = useState<{ no: string; total: number } | null>(null);
-  const [payOpen, setPayOpen] = useState(false);
+  // the order just placed — drives the thank-you screen
+  const [placed, setPlaced] = useState<{ no: string; total: number; session: string | null } | null>(null);
+  const [note, setNote] = useState(""); // for the kitchen
   const [err, setErr] = useState("");
   // digital stamp card: optional phone at checkout → a card link after ordering
   const loy = loyaltyOf(restaurant);
   const [guestPhone, setGuestPhone] = useState("");
-  const [cardToken, setCardToken] = useState<string | null>(null);
   const [myCard, setMyCard] = useState<string | null>(null);
   useEffect(() => { setMyCard(rememberedCard(restaurant.slug)); }, [restaurant.slug]);
   // table session (0015): location check, one shared session per table, closes on payment
@@ -123,16 +120,6 @@ export function MenuClient({
   const add = (id: string) => { setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 })); setBump((b) => b + 1); };
   const dec = (id: string) => setCart((c) => { const q = (c[id] || 0) - 1; const n = { ...c }; if (q <= 0) delete n[id]; else n[id] = q; return n; });
 
-  const canPay = !!restaurant.upi_id && isValidUpi(restaurant.upi_id);
-  // "Get the bill on WhatsApp" opens a chat WITH the restaurant, so the owner gets the guest's number to send the bill to.
-  const waNum = (restaurant.whatsapp || restaurant.phone || "").replace(/\D/g, "");
-  const billChat = waNum.length >= 10
-    ? (no: string, total: number) => {
-        const text = `Hi ${restaurant.name}! Please send my bill 🙏\nOrder #${no} · Table ${table} · ₹${total}`;
-        return `https://wa.me/${waNum.length === 10 ? "91" + waNum : waNum}?text=${encodeURIComponent(text)}`;
-      }
-    : null;
-
   const cartEntries = Object.keys(cart).map((id) => ({ d: byId[id], q: cart[id] })).filter((e) => e.d);
 
   const placeOrder = async () => {
@@ -146,12 +133,14 @@ export function MenuClient({
         items: cartEntries.map(({ d, q }) => ({ dish_id: d.id, name: d.name, qty: q, price: d.price })),
         phone: loy.loyalty_enabled && cleanPhone(guestPhone) ? cleanPhone(guestPhone) : undefined,
         sessionId: ts.sessionId,
+        note,
       });
-      setPlaced({ no: order.order_no ?? "", total: order.total });
+      setPlaced({ no: order.order_no ?? "", total: order.total, session: ts.sessionId });
       if (loy.loyalty_enabled && cleanPhone(guestPhone)) {
         markStampPending(restaurant.slug);
-        tokenForOrder(order.id).then((t) => { if (t) { setCardToken(t); setMyCard(t); rememberCard(restaurant.slug, t); } });
+        tokenForOrder(order.id).then((t) => { if (t) { setMyCard(t); rememberCard(restaurant.slug, t); } });
       }
+      setNote("");
       setCart({}); // the order is in — an empty cart means "add more" starts a fresh order
       setCartOpen(false);
     } catch (e) {
@@ -337,7 +326,7 @@ export function MenuClient({
       {/* ---------- cart sheet ---------- */}
       <div className={`pm-sheet${cartOpen ? " show" : ""}`} role="dialog" aria-label="Your order">
         <div className="pm-grab" />
-        <div className="pm-sh"><h3>Your order</h3><button className="x" onClick={() => setCartOpen(false)} aria-label="Close">×</button></div>
+        <div className="pm-sh"><h3>Your order<small className="pm-sess">{tableTitle}{ts.sessionCode ? ` · #${ts.sessionCode}` : ""}</small></h3><button className="x" onClick={() => setCartOpen(false)} aria-label="Close">×</button></div>
         <div className="pm-sb">
           {cartEntries.length === 0 ? (
             <p className="pm-empty2">Your order is empty.</p>
@@ -358,6 +347,12 @@ export function MenuClient({
           )}
         </div>
         <div className="pm-sf">
+          {cartEntries.length > 0 && (
+            <label className="pm-note">
+              <span>✎ Note for the kitchen</span>
+              <textarea rows={2} maxLength={200} placeholder="e.g. less spicy, no onion" value={note} onChange={(e) => setNote(e.target.value)} />
+            </label>
+          )}
           {loy.loyalty_enabled && cartEntries.length > 0 && (
             <label className="pm-stampin">
               <span>★ Collect a stamp · {loy.loyalty_goal} visits = {rewardText(loy.loyalty_reward)}</span>
@@ -370,42 +365,29 @@ export function MenuClient({
         </div>
       </div>
 
-      {/* ---------- success ---------- */}
-      {placed && (
-        <div className="pm-success">
-          <div className="tick">✓</div>
-          <h2>Order placed!</h2>
-          <div className="oid">#{placed.no} · Table {table} · ₹{placed.total.toLocaleString("en-IN")}</div>
-          <p className="msg">{restaurant.name} has your order — the kitchen is on it. Sit back and relax.</p>
-          {cardToken && <a className="pm-stamplink" href={`/${restaurant.slug}/card/${cardToken}`}>★ Your stamp card — the stamp lands when you pay →</a>}
-          <div className="acts">
-            {canPay && <button className="pm-paynow" onClick={() => setPayOpen(true)}>Pay ₹{placed.total.toLocaleString("en-IN")} now · UPI</button>}
-            {billChat && <a className="pm-wa" href={billChat(placed.no, placed.total)} target="_blank" rel="noopener noreferrer">Get the bill on WhatsApp</a>}
-            <button className="pm-more" onClick={() => { setPlaced(null); setPayOpen(false); }}>+ Add more items</button>
-          </div>
-          {canPay && <p className="pm-later">Rather pay at the end? That&apos;s fine — pay at the counter.</p>}
-          <Seal size={54} className="ds" />
-        </div>
-      )}
-
-      {/* ---------- pay now (over the success screen) ---------- */}
-      {placed && canPay && (
-        <>
-          <div className={`pm-scrim pm-payscrim${payOpen ? " show" : ""}`} onClick={() => setPayOpen(false)} />
-          <div className={`pm-sheet pm-paysheet${payOpen ? " show" : ""}`} role="dialog" aria-label="Pay by UPI">
-            <div className="pm-grab" />
-            <div className="pm-sh"><h3>Pay ₹{placed.total.toLocaleString("en-IN")}</h3><button className="x" onClick={() => setPayOpen(false)} aria-label="Close">×</button></div>
-            <div className="pm-sb">
-              <UpiPay upi={restaurant.upi_id!} name={restaurant.name} amount={placed.total} note={payNote(restaurant.name, placed.no, table)} />
-              <p className="pm-payafter">After paying, show the payment screen to the staff.</p>
-            </div>
-          </div>
-        </>
+      {/* ---------- thank you: add more · call waiter · bill my amount ---------- */}
+      {/* hidden once the bill is closed — the table session it belonged to has ended */}
+      {placed && placed.session === ts.sessionId && (
+        <ThankYou
+          restaurantName={restaurant.name}
+          tableTitle={tableTitle}
+          sessionId={ts.sessionId}
+          sessionCode={ts.sessionCode}
+          order={placed}
+          billAsked={ts.billAsked}
+          onRequest={ts.sessionId ? ts.request : null}
+          onAddMore={() => setPlaced(null)}
+        />
       )}
       {ts.phase === "browse" && (
         <div className="pm-viewonly" role="status">Menu only — not at the restaurant? <button onClick={tsUi.allow}>Order here</button></div>
       )}
-      <SessionGate ui={tsUi} restaurantName={restaurant.name} reviewUrl={restaurant.google_review_url} />
+      <SessionGate
+        ui={tsUi}
+        restaurantName={restaurant.name}
+        reviewUrl={restaurant.google_review_url}
+        stamp={loy.loyalty_enabled ? <PaidStamp name={restaurant.name} goal={loy.loyalty_goal} reward={loy.loyalty_reward} token={myCard} /> : null}
+      />
     </div>
   );
 }

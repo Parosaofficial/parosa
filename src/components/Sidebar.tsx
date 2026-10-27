@@ -18,6 +18,7 @@ const I = {
   tables: <><rect x="4" y="4" width="7" height="7" rx="1" /><rect x="13" y="4" width="7" height="7" rx="1" /><rect x="4" y="13" width="7" height="7" rx="1" /></>,
   templates: <path d="M12 3l2.3 4.7 5.2.8-3.8 3.6.9 5.1L12 15.9 7.4 17.2l.9-5.1L4.5 8.5l5.2-.8Z" />,
   customers: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.9" /></>,
+  reserve: <><path d="M4 21V10M20 21V10M2 10h20" /><path d="M7 10V6a5 5 0 0 1 10 0v4" /><path d="M8 15h8" /></>,
   loyalty: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m7 12 2 2 3-4M15 12h2" /></>,
   analytics: <><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="7" /><rect x="12" y="7" width="3" height="11" /><rect x="17" y="4" width="3" height="14" /></>,
   payments: <><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M3 10h18" /></>,
@@ -40,6 +41,7 @@ const GROUPS: { name: string; items: Item[] }[] = [
   ] },
   { name: "Guests", items: [
     { label: "Customers", href: "/customers", icon: I.customers },
+    { label: "Seat Reserve", href: "/seat-reserve", icon: I.reserve },
     { label: "Loyalty", href: "/loyalty", icon: I.loyalty },
   ] },
   { name: "Business", items: [

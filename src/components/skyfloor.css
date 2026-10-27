@@ -1,0 +1,38 @@
+/* Sky-grid floor: halls as soft blue grid blocks, an Entry marker on one side, tables in equal slots */
+.sky-hall{
+  --sky:#EEF6FC;--sky-l:#D8E9F6;--sky-m:#BAD6EE;--sky-ink:#2F5E86;--door:#5C0F14;
+  position:relative;border-radius:16px;border:1.5px solid var(--sky-m);
+  background-color:var(--sky);
+  background-image:linear-gradient(var(--sky-l) 1px,transparent 1px),linear-gradient(90deg,var(--sky-l) 1px,transparent 1px),linear-gradient(var(--sky-m) 1px,transparent 1px),linear-gradient(90deg,var(--sky-m) 1px,transparent 1px);
+  background-size:24px 24px,24px 24px,96px 96px,96px 96px;
+  padding:12px 14px 16px;
+}
+.sky-hall.entry-bottom{padding-bottom:34px}
+.sky-hall.entry-top{padding-top:34px}
+.sky-hall.entry-left{padding-left:40px}
+.sky-hall.entry-right{padding-right:40px}
+.sky-hh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;min-height:28px}
+.sky-hh>b{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--sky-ink);background:#fff;border:1px solid var(--sky-m);border-radius:8px;padding:2px 10px}
+.sky-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:18px;align-items:center}
+.sky-hall.compact .sky-slots{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.sky-slot{position:relative;display:grid;justify-items:center;align-content:center;gap:3px;padding:6px 4px;border-radius:12px;border:1.5px solid transparent;background:transparent;font-family:var(--font-body),system-ui,sans-serif;cursor:pointer;min-width:0;color:inherit}
+.sky-slot.wide{grid-column:span 2}
+.sky-slot svg{width:100%;max-width:120px;height:auto;overflow:visible}
+.sky-slot.wide svg{max-width:230px}
+.sky-slot text{font-family:var(--font-body),system-ui,sans-serif;font-weight:800;font-size:17px;text-anchor:middle;fill:#24090B}
+.sky-slot:focus-visible{outline:2px solid #5C0F14;outline-offset:2px}
+.sky-slot:disabled{cursor:default}
+.sky-hall .fl-top{fill:#fff;stroke:#9FBCD6}
+.sky-hall .fl-ch{fill:#DCEAF6;stroke:#9FBCD6}
+.sky-hall .fl-sofa{fill:#E4EFF8;stroke:#9FBCD6}
+.sky-pr{font-size:12px;font-weight:800;color:#5C0F14;background:#fff;border:1px solid #E6CBCD;border-radius:99px;padding:0 9px;white-space:nowrap}
+
+/* the door: a maroon gap in the hall's wall with "Entry" */
+.sky-door{position:absolute;display:flex;align-items:center;gap:5px;background:var(--door);color:#fff;font-family:var(--font-body),system-ui,sans-serif;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:2px 12px 2px 8px;box-shadow:0 6px 14px -8px #000;white-space:nowrap}
+.sky-door i{font-style:normal;font-size:13px}
+.entry-bottom>.sky-door{left:50%;bottom:-11px;transform:translateX(-50%)}
+.entry-top>.sky-door{left:50%;top:-11px;transform:translateX(-50%)}
+.entry-left>.sky-door{left:-12px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:center}
+.entry-right>.sky-door{right:-12px;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:center}
+.entry-left>.sky-door{left:-26px}
+.entry-right>.sky-door{right:-26px}

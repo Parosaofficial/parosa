@@ -151,7 +151,7 @@ export default function Tables() {
         setTables((ts) => ts.map((t) => (t.id === editId ? { ...t, name, kind, seats, shape, area: draft.area.trim() || null } : t)));
         showToast(`${name} saved`);
       } else {
-        const row = await addTable(restaurant.id, { code: nextCode(tables), name, kind, seats, shape, area: draft.area.trim() || null, sort: tables.length + 1 });
+        const row = await addTable(restaurant.id, { code: nextCode(tables, restaurant.table_code_hi ?? 0), name, kind, seats, shape, area: draft.area.trim() || null, sort: tables.length + 1 });
         const next = [...tables, row];
         setTables(next); syncCount(next);
         showToast(`${name} added`);
@@ -163,11 +163,11 @@ export default function Tables() {
 
   const toggleActive = async (t: RestaurantTable) => {
     setTables((ts) => ts.map((x) => (x.id === t.id ? { ...x, active: !t.active } : x)));
-    try { await updateTable(t.id, { active: !t.active }); showToast(t.active ? `${t.name} turned off` : `${t.name} turned on`); }
+    try { await updateTable(t.id, { active: !t.active }); showToast(t.active ? `${t.name} off — its QR says "not taking orders"` : `${t.name} on — same QR, taking orders`); }
     catch { setTables((ts) => ts.map((x) => (x.id === t.id ? { ...x, active: t.active } : x))); showToast("Couldn't update — try again"); }
   };
   const removeTable = async (t: RestaurantTable) => {
-    if (!window.confirm(`Delete ${t.name}? Its printed QR will stop working.`)) return;
+    if (!window.confirm(`Delete ${t.name}? Its printed QR will say "table not found", and its number is never reused. To pause a table, turn it off instead — the same QR works again when you turn it on.`)) return;
     try {
       await deleteTable(t.id);
       const next = tables.filter((x) => x.id !== t.id);
@@ -324,6 +324,7 @@ export default function Tables() {
                 <div className="tb-none">No tables yet. <button className="db-see" onClick={openNew}>Add your first table →</button></div>
               ) : (
                 <div className="tb-list">
+                  <p className="tb-perm"><b>🔒 Every table&apos;s QR link is permanent.</b> Renaming, changing the type or turning a table off never changes it — an Off table&apos;s QR just says &ldquo;not taking orders&rdquo;.</p>
                   <div className="tb-lh"><span>Table</span><span>Type</span><span>Seats</span><span>Area</span><span>On</span><span /></div>
                   {shown.map((t) => (
                     <div key={t.id} className={`tb-li${t.active ? "" : " off"}`}>

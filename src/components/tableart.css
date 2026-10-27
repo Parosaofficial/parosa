@@ -1,0 +1,4 @@
+/* TableArt base colours — parents restyle by state (seated, booked, picked…) */
+.fl-top{fill:#fff;stroke:#CFC6C6;stroke-width:2}
+.fl-ch{fill:#E7E2E2;stroke:#CFC6C6;stroke-width:1.5}
+.fl-sofa{fill:#EFEAEA;stroke:#CFC6C6;stroke-width:1.5}

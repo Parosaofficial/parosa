@@ -49,6 +49,13 @@ export type Restaurant = {
   geofence_on?: boolean;         // table sessions (0015): guests must be near the restaurant
   geofence_m?: number;
   session_idle_hours?: number;
+  table_code_hi?: number;        // 0016: highest table number ever used (never reused)
+  reserve_on?: boolean;          // Seat Reserve (0016)
+  floor_halls?: { name: string; entry: "top" | "bottom" | "left" | "right" }[];
+  reserve_hold_min?: number;
+  reserve_days?: number;
+  reserve_from?: string;
+  reserve_to?: string;
 };
 
 export type Staff = {
@@ -111,6 +118,7 @@ export type Order = {
   staff_name: string | null;
   created_at: string;
   session_id?: string | null;    // table session (0015)
+  note?: string | null;          // for the kitchen (0016)
 };
 
 export type OrderItem = {

@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { currentLocation, joinSession, rememberSession, rememberedSession, sessionStatus, tableLabel, type JoinResult } from "@/lib/tables";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { currentLocation, joinSession, rememberSession, rememberedSession, requestHelp, sessionStatus, tableLabel, type JoinResult } from "@/lib/tables";
 import "./sessiongate.css";
 
 /*
@@ -23,36 +23,50 @@ type Phase =
   | "joined"     // other phones already at this table → confirm joining
   | "ok"
   | "browse"     // menu only, no ordering
+  | "closed"     // the owner turned this table off (same link — it works again when turned on)
+  | "unknown"    // a QR for a table that no longer exists
   | "paid";      // the owner closed the session after payment
 
 export type TableSessionState = {
   phase: Phase;
   sessionId: string | null;
+  sessionCode: string | null;
   tableName: string | null;
   canOrder: boolean;
+  /** The guest asked for the bill (from this phone or another at the table). */
+  billAsked: boolean;
+  /** Ring the staff: a waiter, or the bill. */
+  request: (kind: "waiter" | "bill") => Promise<void>;
   /** Call when an order is refused because the session ended. */
   expired: () => void;
 };
 
 const POLL_MS = 30000;
+const POLL_BILL_MS = 8000; // waiting for the owner to close the bill
 
 export function useTableSession({ restaurantId, slug, table, enabled }: { restaurantId: string; slug: string; table: string; enabled: boolean }) {
   const [phase, setPhase] = useState<Phase>(enabled ? "checking" : "off");
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionCode, setSessionCode] = useState<string | null>(null);
+  const [billAsked, setBillAsked] = useState(false);
   const [tableName, setTableName] = useState<string | null>(null);
   const [others, setOthers] = useState(0);
   const [distance, setDistance] = useState(0);
   const [denied, setDenied] = useState("");
   const alive = useRef(true);
-  useEffect(() => () => { alive.current = false; }, []);
+  // set back to true on (re)mount — React's dev double-mount runs the cleanup once first
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
 
   const apply = useCallback((r: JoinResult | null) => {
     if (!alive.current) return;
     if (!r || r.status === "no_table") { setPhase("off"); return; }
+    if (r.status === "unknown") { setPhase("unknown"); return; }
     if ("table_name" in r && r.table_name) setTableName(tableLabel({ name: r.table_name }));
+    if (r.status === "off") { setPhase("closed"); return; }
     if (r.status === "need_location") { setPhase("ask"); return; }
     if (r.status === "far") { setDistance(r.distance_m); setPhase("far"); return; }
     setSessionId(r.session_id);
+    setSessionCode(r.code);
     rememberSession(slug, table, r.session_id);
     if (r.status === "joined" && r.phones > 1) { setOthers(r.phones - 1); setPhase("joined"); }
     else setPhase("ok");
@@ -87,6 +101,8 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
   const reset = useCallback(() => {
     rememberSession(slug, table, null);
     setSessionId(null);
+    setSessionCode(null);
+    setBillAsked(false);
     setPhase("checking");
     start(true);
   }, [slug, table, start]);
@@ -96,20 +112,31 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
     if (!sessionId || (phase !== "ok" && phase !== "joined")) return;
     const t = setInterval(async () => {
       const s = await sessionStatus(sessionId);
-      if (!alive.current || !s || s.status !== "closed") return;
+      if (!alive.current || !s) return;
+      if (s.status !== "closed") { if (s.bill_asked) setBillAsked(true); return; }
       rememberSession(slug, table, null);
       setSessionId(null);
+      setBillAsked(false);
       if (s.close_reason === "paid") setPhase("paid");
       else { setPhase("checking"); start(true); }
-    }, POLL_MS);
+    }, billAsked ? POLL_BILL_MS : POLL_MS);
     return () => clearInterval(t);
-  }, [sessionId, phase, slug, table, start]);
+  }, [sessionId, phase, slug, table, start, billAsked]);
+
+  const request = useCallback(async (kind: "waiter" | "bill") => {
+    if (!sessionId) throw new Error("no session");
+    await requestHelp(sessionId, kind);
+    if (kind === "bill") setBillAsked(true);
+  }, [sessionId]);
 
   const state: TableSessionState = {
     phase,
     sessionId,
+    sessionCode,
     tableName,
     canOrder: phase === "off" || phase === "ok",
+    billAsked,
+    request,
     expired: reset,
   };
   const ui = { phase, others, distance, denied, tableName, allow, browse: () => setPhase("browse"), join: () => setPhase("ok"), retry: () => { setPhase("checking"); start(); }, reset };
@@ -118,8 +145,8 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
 
 type Ui = ReturnType<typeof useTableSession>["ui"];
 
-/** Full-screen steps shown over the menu: location, too far, join the table, bill paid. */
-export function SessionGate({ ui, restaurantName, reviewUrl }: { ui: Ui; restaurantName: string; reviewUrl?: string | null }) {
+/** Full-screen steps shown over the menu: location, too far, join the table, table off, bill paid. */
+export function SessionGate({ ui, restaurantName, reviewUrl, stamp }: { ui: Ui; restaurantName: string; reviewUrl?: string | null; stamp?: ReactNode }) {
   const { phase } = ui;
   if (phase === "off" || phase === "ok" || phase === "browse") return null;
   const where = ui.tableName ?? "your table";
@@ -170,12 +197,37 @@ export function SessionGate({ ui, restaurantName, reviewUrl }: { ui: Ui; restaur
           </>
         )}
 
+        {phase === "closed" && (
+          <>
+            <span className="sg-ic" aria-hidden="true">🍽</span>
+            <h2>{where} isn&apos;t taking orders right now</h2>
+            <p className="sg-sub">Please ask the staff — they&apos;ll seat you or take your order.</p>
+            <button className="sg-btn" onClick={ui.browse}>See the menu</button>
+          </>
+        )}
+
+        {phase === "unknown" && (
+          <>
+            <span className="sg-ic" aria-hidden="true">🔎</span>
+            <h2>This table wasn&apos;t found</h2>
+            <p className="sg-sub">This QR isn&apos;t linked to a table any more. Please ask the staff for help.</p>
+            <button className="sg-btn" onClick={ui.browse}>See the menu</button>
+          </>
+        )}
+
         {phase === "paid" && (
           <>
             <span className="sg-ic ok" aria-hidden="true">✓</span>
             <h2>Bill paid — thank you!</h2>
             <p className="sg-sub">We hope to see you again soon.</p>
-            {reviewUrl && <a className="sg-btn" href={reviewUrl} target="_blank" rel="noopener noreferrer">Rate us on Google</a>}
+            {stamp}
+            {reviewUrl && (
+              <div className="sg-rate">
+                <b>How was your meal?</b>
+                <span className="sg-stars" aria-hidden="true">★★★★★</span>
+                <a className="sg-btn" href={reviewUrl} target="_blank" rel="noopener noreferrer">Rate us on Google</a>
+              </div>
+            )}
             <button className="sg-link" onClick={ui.reset}>Start a new order</button>
           </>
         )}

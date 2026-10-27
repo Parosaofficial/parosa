@@ -1,12 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { TableArt } from "@/components/TableArt";
+import { playChime, primeAudio } from "@/lib/chime";
 import { listStaff, type OrderWithItems } from "@/lib/db";
+import { listReservations, timeLabel, type Reservation } from "@/lib/reserve";
 import { supabase } from "@/lib/supabase";
 import {
-  assignWaiter, closeSession, freeSession, listOpenSessions, listTables, tableLabel,
-  type RestaurantTable, type TableSession, type TableShape,
+  assignWaiter, clearWaiterCall, closeSession, freeSession, listOpenSessions, listTables, tableLabel,
+  type RestaurantTable, type TableSession,
 } from "@/lib/tables";
 import type { Restaurant, Staff } from "@/lib/types";
 import "./floor.css";
@@ -32,38 +35,6 @@ function stageOf(session: TableSession | undefined, orders: OrderWithItems[]): S
 const mins = (iso: string, now: number) => Math.max(0, Math.round((now - new Date(iso).getTime()) / 60000));
 const rupees = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
-/** A table seen from above: chairs (or sofa) around a tabletop with its name. */
-function TableArt({ shape, name, seated }: { shape: TableShape; name: string; seated: boolean }) {
-  const ch = `fl-ch${seated ? " on" : ""}`;
-  if (shape === "sofa") {
-    return (
-      <svg viewBox="0 0 220 120" aria-hidden="true">
-        <path className={`fl-sofa${seated ? " on" : ""}`} d="M14 14h192a8 8 0 0 1 8 8v12h-178v64h-14a8 8 0 0 1-8-8V22a8 8 0 0 1 8-8z" />
-        <rect className={ch} x="78" y="98" width="24" height="14" rx="5" /><rect className={ch} x="118" y="98" width="24" height="14" rx="5" /><rect className={ch} x="158" y="98" width="24" height="14" rx="5" />
-        <rect className="fl-top" x="44" y="40" width="160" height="52" rx="10" />
-        <text x="124" y="71">{name}</text>
-      </svg>
-    );
-  }
-  if (shape === "two") {
-    return (
-      <svg viewBox="0 0 140 100" aria-hidden="true">
-        <rect className={ch} x="22" y="38" width="16" height="24" rx="5" /><rect className={ch} x="102" y="38" width="16" height="24" rx="5" />
-        <rect className="fl-top" x="44" y="28" width="52" height="44" rx="8" />
-        <text x="70" y="55">{name}</text>
-      </svg>
-    );
-  }
-  return (
-    <svg viewBox="0 0 140 100" aria-hidden="true">
-      <rect className={ch} x="46" y="6" width="20" height="14" rx="5" /><rect className={ch} x="74" y="6" width="20" height="14" rx="5" />
-      <rect className={ch} x="46" y="80" width="20" height="14" rx="5" /><rect className={ch} x="74" y="80" width="20" height="14" rx="5" />
-      <rect className="fl-top" x="38" y="24" width="64" height="52" rx="8" />
-      <text x="70" y="55">{name}</text>
-    </svg>
-  );
-}
-
 export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: OrderWithItems[] }) {
   const [tables, setTables] = useState<RestaurantTable[] | null>(null); // null = migration 0015 not applied
   const [sessions, setSessions] = useState<TableSession[]>([]);
@@ -73,9 +44,15 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
   const [openId, setOpenId] = useState<string | null>(null);
   const [busy, setBusy] = useState("");
   const [now, setNow] = useState(() => Date.now());
+  const [bookings, setBookings] = useState<Reservation[]>([]);
 
   const loadSessions = useCallback(() => {
     listOpenSessions(restaurant.id).then(setSessions).catch(() => {});
+  }, [restaurant.id]);
+  // today's upcoming bookings (Seat Reserve) — a table turns purple 30 minutes before
+  const loadBookings = useCallback(() => {
+    const from = new Date(Date.now() - 30 * 60000), to = new Date(Date.now() + 12 * 3600000);
+    listReservations(restaurant.id, from, to).then((b) => setBookings(b.filter((x) => x.status === "booked"))).catch(() => {});
   }, [restaurant.id]);
 
   useEffect(() => {
@@ -85,10 +62,12 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
     const ch = supabase
       .channel(`tsess-${restaurant.id}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "table_sessions", filter: `restaurant_id=eq.${restaurant.id}` }, loadSessions)
+      .on("postgres_changes", { event: "*", schema: "public", table: "reservations", filter: `restaurant_id=eq.${restaurant.id}` }, loadBookings)
       .subscribe();
+    loadBookings();
     const tick = setInterval(() => setNow(Date.now()), 30000);
     return () => { supabase.removeChannel(ch); clearInterval(tick); };
-  }, [restaurant.id, loadSessions]);
+  }, [restaurant.id, loadSessions, loadBookings]);
 
   // an order arriving for a table we don't have an open session for yet → refresh sessions
   useEffect(() => { loadSessions(); }, [orders.length, loadSessions]);
@@ -96,8 +75,24 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
   const rows = useMemo(() => (tables ?? []).map((t) => {
     const session = sessions.find((s) => s.table_code === t.code);
     const sOrders = session ? orders.filter((o) => o.session_id === session.id) : [];
-    return { t, session, orders: sOrders, stage: stageOf(session, sOrders), bill: sOrders.reduce((a, o) => a + o.total, 0) };
-  }), [tables, sessions, orders]);
+    const booking = session ? undefined : bookings.find((b) => b.table_id === t.id && new Date(b.starts_at).getTime() - now < 30 * 60000);
+    return {
+      t, session, orders: sOrders, stage: stageOf(session, sOrders), booking,
+      bill: sOrders.reduce((a, o) => a + o.total, 0) + (session?.booking_charge ?? 0),
+      waiter: !!session?.waiter_call_at, billAsked: !!session?.bill_asked_at,
+    };
+  }), [tables, sessions, orders, bookings, now]);
+
+  // ring when a guest calls a waiter or asks for the bill
+  const calls = rows.filter((r) => r.waiter).map((r) => `w${r.session!.id}${r.session!.waiter_call_at}`)
+    .concat(rows.filter((r) => r.billAsked).map((r) => `b${r.session!.id}`)).join("|");
+  const seen = useRef<string | null>(null);
+  useEffect(() => {
+    const prev = seen.current;
+    seen.current = calls;
+    if (prev === null || !calls) return;
+    if (calls.split("|").some((c) => !prev.split("|").includes(c))) { primeAudio(); playChime(); }
+  }, [calls]);
 
   if (!tables || tables.length === 0) {
     if (tables && tables.length === 0) {
@@ -128,6 +123,9 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
   const info = (r: (typeof rows)[number]) => (
     <div className="fl-inf">
       <span className="st">{STAGE_LABEL[r.stage]}{r.session ? ` · ${mins(r.session.opened_at, now)} min` : ""}</span>
+      {r.waiter && <span className="fl-call w">🛎 Waiter called · {mins(r.session!.waiter_call_at!, now)} min</span>}
+      {r.billAsked && <span className="fl-call b">₹ Bill asked · {mins(r.session!.bill_asked_at!, now)} min</span>}
+      {r.booking && <span className="fl-call r">Booked {timeLabel(r.booking.starts_at)} · {r.booking.guest_name}</span>}
       {r.session ? (
         <>
           <span className="sid">#{r.session.code} · {r.session.phones} {r.session.phones === 1 ? "phone" : "phones"}</span>
@@ -159,6 +157,7 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
         <span className="c cooking">Cooking {count("cooking")}</span>
         <span className="c ready">Food ready {count("ready")}</span>
         <span className="c bill">Waiting to pay {count("bill")}</span>
+        {rows.some((r) => r.waiter || r.billAsked) && <span className="c call">🛎 Calls {rows.filter((r) => r.waiter || r.billAsked).length}</span>}
       </div>
 
       {view === "floor" ? (
@@ -173,7 +172,7 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
                 {small.length > 0 && (
                   <div className="fl-floor">
                     {small.map((r) => (
-                      <button key={r.t.id} className={`fl-t ${r.stage}`} onClick={() => setOpenId(r.t.id)} aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}>
+                      <button key={r.t.id} className={`fl-t ${r.stage}${r.waiter || r.billAsked ? " alert" : ""}${r.booking ? " booked" : ""}`} onClick={() => setOpenId(r.t.id)} aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}>
                         <TableArt shape={r.t.shape} name={r.t.name} seated={!!r.session} />
                         {info(r)}
                       </button>
@@ -183,7 +182,7 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
                 {sofas.length > 0 && (
                   <div className="fl-floor wide">
                     {sofas.map((r) => (
-                      <button key={r.t.id} className={`fl-t ${r.stage}`} onClick={() => setOpenId(r.t.id)} aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}>
+                      <button key={r.t.id} className={`fl-t ${r.stage}${r.waiter || r.billAsked ? " alert" : ""}${r.booking ? " booked" : ""}`} onClick={() => setOpenId(r.t.id)} aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}>
                         <TableArt shape="sofa" name={r.t.name} seated={!!r.session} />
                         {info(r)}
                       </button>
@@ -229,14 +228,25 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
                   {open.orders.length === 0 && <p className="fl-muted">No orders yet.</p>}
                   {open.orders.map((o) => (
                     <div key={o.id} className="fl-item">
-                      <span>#{o.order_no} · {o.items.map((i) => `${i.qty} × ${i.name}`).join(", ")}</span>
+                      <span>#{o.order_no} · {o.items.map((i) => `${i.qty} × ${i.name}`).join(", ")}{o.note && <em className="fl-note">✎ {o.note}</em>}</span>
                       <span className={`fl-os ${o.status}`}>{STATUS_LABEL[o.status] ?? o.status}</span>
                     </div>
                   ))}
+                  {!!open.session.booking_charge && <div className="fl-item"><span>Table booking</span><span>{rupees(open.session.booking_charge)}</span></div>}
                   <div className="fl-item tot"><b>Table bill</b><b>{rupees(open.bill)}</b></div>
                 </div>
 
                 <div className="fl-side">
+                  {(open.waiter || open.billAsked) && (
+                    <div className="fl-box fl-req">
+                      <b className="fl-bt">Guest asked</b>
+                      {open.waiter && (
+                        <div className="fl-reqrow"><span>🛎 Call waiter · {mins(open.session.waiter_call_at!, now)} min ago</span>
+                          <button disabled={!!busy} onClick={() => act("seen", () => clearWaiterCall(open.session!.id))}>{busy === "seen" ? "…" : "Mark attended"}</button></div>
+                      )}
+                      {open.billAsked && <div className="fl-reqrow"><span>₹ Bill my amount · {mins(open.session.bill_asked_at!, now)} min ago</span></div>}
+                    </div>
+                  )}
                   <div className="fl-box">
                     <b className="fl-bt">Waiter</b>
                     {staff.length === 0 ? <p className="fl-muted">Add staff in <Link href="/staff">Staff &amp; Admin</Link> to assign them.</p> : (

@@ -20,6 +20,11 @@ export type RestaurantTable = {
   area: string | null;
   active: boolean;
   sort: number;
+  // Seat Reserve floor plan (0016)
+  on_floor?: boolean;
+  floor_slot?: number;   // order inside its hall (area)
+  bookable?: boolean;
+  book_price?: number;
 };
 
 export type TableSession = {
@@ -36,6 +41,11 @@ export type TableSession = {
   closed_at: string | null;
   close_reason: "paid" | "freed" | "timeout" | null;
   payment_method: string | null;
+  // 0016: the guest's requests + a booking charge when the table was reserved
+  waiter_call_at?: string | null;
+  bill_asked_at?: string | null;
+  booking_charge?: number;
+  reservation_id?: string | null;
 };
 
 /** The built-in table types; owners can also type their own label. */
@@ -60,14 +70,14 @@ export async function listTables(restaurantId: string): Promise<RestaurantTable[
   return (data ?? []) as RestaurantTable[];
 }
 
-export async function addTable(restaurantId: string, t: { code: string; name: string; kind: string; seats: number; shape: TableShape; area: string | null; sort: number }) {
+export async function addTable(restaurantId: string, t: { code: string; name: string; kind: string; seats: number; shape: TableShape; area: string | null; sort: number; on_floor?: boolean; floor_slot?: number }) {
   const { data, error } = await supabase.from("restaurant_tables")
     .insert({ restaurant_id: restaurantId, ...t }).select().single();
   if (error) throw error;
   return data as RestaurantTable;
 }
 
-export async function updateTable(id: string, patch: Partial<Pick<RestaurantTable, "name" | "kind" | "seats" | "shape" | "area" | "active" | "sort">>) {
+export async function updateTable(id: string, patch: Partial<Pick<RestaurantTable, "name" | "kind" | "seats" | "shape" | "area" | "active" | "sort" | "on_floor" | "floor_slot" | "bookable" | "book_price">>) {
   const { error } = await supabase.from("restaurant_tables").update(patch).eq("id", id);
   if (error) throw error;
 }
@@ -77,9 +87,13 @@ export async function deleteTable(id: string) {
   if (error) throw error;
 }
 
-/** Next free QR code: one more than the highest numeric code (printed QRs never change). */
-export function nextCode(tables: RestaurantTable[]): string {
-  const max = tables.reduce((m, t) => Math.max(m, Number.parseInt(t.code, 10) || 0), 0);
+/**
+ * Next QR code: one more than the highest number this restaurant ever used.
+ * `hi` (restaurants.table_code_hi, 0016) remembers deleted tables, so an old
+ * printed QR never ends up pointing at a different table.
+ */
+export function nextCode(tables: RestaurantTable[], hi = 0): string {
+  const max = tables.reduce((m, t) => Math.max(m, Number.parseInt(t.code, 10) || 0), hi);
   return String(max + 1);
 }
 
@@ -111,12 +125,20 @@ export async function freeSession(sessionId: string) {
   if (error) throw error;
 }
 
+/** A waiter went to the table that called. */
+export async function clearWaiterCall(sessionId: string) {
+  const { error } = await supabase.from("table_sessions").update({ waiter_call_at: null }).eq("id", sessionId);
+  if (error) throw error;
+}
+
 /* ---------------- guest ---------------- */
 
 export type JoinResult =
   | { status: "ok" | "joined" | "new"; session_id: string; code: string; table_name: string; kind: string; phones: number }
   | { status: "far"; distance_m: number; table_name: string }
   | { status: "need_location"; table_name: string }
+  | { status: "off"; table_name: string }   // the owner turned this table off — same link, no orders for now
+  | { status: "unknown" }                   // a QR for a table that was deleted
   | { status: "no_table" };
 
 /** Open or join the table's session. Pass the phone's location when the restaurant asks for it. */
@@ -128,10 +150,31 @@ export async function joinSession(restaurantId: string, table: string, at: { lat
   return data as JoinResult;
 }
 
-export async function sessionStatus(sessionId: string): Promise<{ status: "open" | "closed"; close_reason: string | null } | null> {
+export type SessionStatus = { status: "open" | "closed"; close_reason: string | null; bill_asked?: boolean };
+export async function sessionStatus(sessionId: string): Promise<SessionStatus | null> {
   const { data, error } = await supabase.rpc("table_session_status", { p_session: sessionId });
   if (error || !data) return null;
-  return data as { status: "open" | "closed"; close_reason: string | null };
+  return data as SessionStatus;
+}
+
+/** Ring the staff from the guest's phone: a waiter, or the bill. */
+export async function requestHelp(sessionId: string, kind: "waiter" | "bill") {
+  const { error } = await supabase.rpc("table_session_request", { p_session: sessionId, p_kind: kind });
+  if (error) throw error;
+}
+
+export type SessionBill = {
+  code: string;
+  status: "open" | "closed";
+  booking_charge: number;
+  bill_asked: boolean;
+  orders: { order_no: string | null; total: number; status: string; items: { name: string; qty: number; price: number }[] }[];
+};
+/** The whole table's bill so far — the same on every phone at the table. */
+export async function sessionBill(sessionId: string): Promise<SessionBill | null> {
+  const { data, error } = await supabase.rpc("table_session_bill", { p_session: sessionId });
+  if (error || !data) return null;
+  return data as SessionBill;
 }
 
 /** The phone's own session per restaurant + table, so reopening the menu doesn't re-check location. */

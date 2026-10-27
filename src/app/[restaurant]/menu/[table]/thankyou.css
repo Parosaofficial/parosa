@@ -1,0 +1,38 @@
+/* After ordering: thank-you screen + table bill. Always maroon and white, whatever the menu template. */
+.ty{position:fixed;inset:0;z-index:70;background:#fff;color:#24090B;font-family:var(--font-body),system-ui,sans-serif;display:flex;flex-direction:column;overflow:auto;animation:ty-in .25s ease-out}
+@keyframes ty-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.ty-top{background:#5C0F14;color:#fff;display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:calc(14px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) 14px max(18px,env(safe-area-inset-left,0px))}
+.ty-top b{font-size:16px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ty-top span{flex:none;font-size:13.5px;font-weight:600;color:#E9CFD0}
+.ty-body{width:100%;max-width:440px;margin:0 auto;padding:28px 18px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+.ty-tick{width:76px;height:76px;border-radius:50%;background:#E6F4EC;color:#1F7A45;display:grid;place-items:center;font-size:38px;font-weight:800;animation:ty-pop .45s cubic-bezier(.2,.8,.25,1.5)}
+@keyframes ty-pop{from{transform:scale(.4)}to{transform:none}}
+.ty h2{margin:6px 0 0;font-size:24px;font-weight:800;line-height:1.2}
+.ty-sub{margin:0;font-size:15px;color:#6E5557}
+.ty-acts{width:100%;display:grid;gap:10px;margin-top:14px}
+.ty-act{width:100%;display:flex;align-items:center;gap:12px;text-align:left;border:1.5px solid #E6D6D7;background:#fff;color:#24090B;border-radius:16px;padding:12px 14px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;min-height:64px}
+.ty-act i{font-style:normal;width:40px;height:40px;border-radius:12px;background:#F7ECEC;color:#5C0F14;display:grid;place-items:center;font-size:19px;flex:none}
+.ty-act small{display:block;font-size:13px;font-weight:500;color:#6E5557;margin-top:1px}
+.ty-act.main{background:#5C0F14;border-color:#5C0F14;color:#fff}
+.ty-act.main i{background:#ffffff24;color:#fff}
+.ty-act.main small{color:#E9CFD0}
+.ty-act.done{border-color:#B7DEC5;background:#F3FAF6}
+.ty-act.done i{background:#E6F4EC;color:#1F7A45}
+.ty-act:disabled{cursor:default}
+.ty-act:not(:disabled):active{transform:scale(.98)}
+.ty-act:focus-visible{outline:2px solid #5C0F14;outline-offset:2px}
+.ty-err{margin:0;font-size:14px;color:#B4231C}
+.ty-sid{text-align:center;margin:10px 0 0;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:#8B7476}
+
+.ty-body.bill{align-items:stretch;text-align:left}
+.ty-body.bill h2{text-align:center;margin-bottom:4px}
+.ty-bill{border:1.5px solid #EEE2E3;border-radius:16px;padding:6px 14px 10px}
+.ty-ord{padding:8px 0;border-bottom:1px solid #F3EAEA}
+.ty-oh{display:flex;justify-content:space-between;font-size:14px;color:#6E5557}
+.ty-it{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:3px 0}
+.ty-total{display:flex;justify-content:space-between;font-size:19px;padding-top:10px}
+.ty-gst{margin:2px 0 0;font-size:12.5px;color:#8B7476}
+.ty-asked{display:grid;gap:2px;text-align:center;background:#F7ECEC;border-radius:14px;padding:12px 14px;margin:4px 0}
+.ty-asked b{color:#5C0F14;font-size:16px}
+.ty-asked span{font-size:14px;color:#6E5557}
+@media(prefers-reduced-motion:reduce){.ty,.ty-tick{animation:none}}

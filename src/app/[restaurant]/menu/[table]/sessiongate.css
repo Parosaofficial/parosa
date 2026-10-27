@@ -17,3 +17,15 @@
 /* menu-only mode: a slim note instead of the order buttons */
 .pm-viewonly{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;background:#24090B;color:#fff;font-family:var(--font-body),system-ui,sans-serif;font-size:14px;font-weight:600;border-radius:99px;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 14px 30px -12px #000;max-width:calc(100vw - 32px)}
 .pm-viewonly button{border:none;background:#fff;color:#5C0F14;font:inherit;font-weight:800;font-size:13px;border-radius:99px;padding:5px 12px;cursor:pointer;white-space:nowrap}
+
+/* bill paid: stamp card, then "rate us" */
+.sg-card .ms-card{width:100%;text-align:left;margin-top:4px;border-radius:14px;padding:14px}
+.sg-rate{width:100%;display:grid;justify-items:center;gap:2px;margin-top:8px;padding-top:12px;border-top:1px solid #F1E4E5}
+.sg-rate b{font-size:16px}
+.sg-stars{color:#D9A21B;font-size:24px;letter-spacing:4px}
+
+/* cart: kitchen note + the table's session id */
+.pm-note{display:grid;gap:5px;margin-bottom:10px;font-size:13.5px;font-weight:700}
+.pm-note textarea{width:100%;resize:none;font:inherit;font-size:15px;font-weight:400;border:1.5px solid color-mix(in srgb,currentColor 22%,transparent);border-radius:12px;padding:9px 11px;background:transparent;color:inherit}
+.pm-note textarea:focus{outline:2px solid #5C0F14;outline-offset:1px}
+.pm-sess{display:block;font-family:ui-monospace,Consolas,monospace;font-size:12px;font-weight:600;opacity:.7;letter-spacing:0;text-transform:none;margin-top:2px}

@@ -180,7 +180,7 @@ export default function Orders() {
             ) : shown.map((o) => (
               <div className="or-row" key={o.id}>
                 <div className="or-id"><b>#{o.order_no}</b><span>Table {o.table_number} · {time(o.created_at)}</span><span className={`or-src ${o.staff_name ? "staff" : "qr"}`}>{o.staff_name ? `👤 ${o.staff_name}` : "📱 QR self-order"}</span></div>
-                <div className="or-c-items">{aggregate(o.items).map((i) => `${i.qty}× ${i.name}`).join(" · ") || "—"}</div>
+                <div className="or-c-items">{aggregate(o.items).map((i) => `${i.qty}× ${i.name}`).join(" · ") || "—"}{o.note && <span className="or-note">✎ {o.note}</span>}</div>
                 <div className="or-c-amt">₹{o.total}</div>
                 <div className="or-pills">
                   <span className={`or-pill ${o.status}`}>{o.status[0].toUpperCase() + o.status.slice(1)}</span>
