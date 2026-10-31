@@ -1,3 +1,4 @@
+import { cdnImage } from "@/lib/cdn";
 import type { Restaurant } from "@/lib/types";
 
 function initials(name?: string | null) {
@@ -14,7 +15,7 @@ export function RestaurantLogo({ restaurant, size = 44 }: { restaurant: Pick<Res
   if (restaurant.logo_url) {
     return (
       <span
-        style={{ width: size, height: size, borderRadius: size * 0.24, backgroundImage: `url(${restaurant.logo_url})`, backgroundSize: "cover", backgroundPosition: "center", display: "inline-block", flex: "none", boxShadow: "inset 0 0 0 1px #0000001a" }}
+        style={{ width: size, height: size, borderRadius: size * 0.24, backgroundImage: `url(${cdnImage(restaurant.logo_url)})`, backgroundSize: "cover", backgroundPosition: "center", display: "inline-block", flex: "none", boxShadow: "inset 0 0 0 1px #0000001a" }}
         aria-label={restaurant.name}
       />
     );

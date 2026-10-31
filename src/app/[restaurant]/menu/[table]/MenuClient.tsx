@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Mr_Dafoe } from "next/font/google";
 import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { createOrder } from "@/lib/db";
+import { cdnImage } from "@/lib/cdn";
+import { isLibraryPhoto } from "@/lib/dishLibrary";
 import { cleanPhone, loyaltyOf, rememberCard, rememberedCard, rewardText, tokenForOrder } from "@/lib/loyalty";
 import { MenuStampCard, markStampPending } from "@/components/MenuStamp";
 import { resolveTemplateId, templateStyle } from "@/lib/templates";
@@ -248,7 +250,7 @@ export function MenuClient({
 
         {hero && !query && (
           <section className={`pm-hero${hero.photo_url ? "" : " noimg"}`}>
-            {hero.photo_url && <div className="pm-hero-img" style={{ backgroundImage: `url(${hero.photo_url})` }} />}
+            {hero.photo_url && <div className="pm-hero-img" style={{ backgroundImage: `url(${cdnImage(hero.photo_url)})` }} />}
             <div className="pm-hero-in">
               <span className="flag">★ Chef&apos;s special</span>
               <h2>{hero.name}</h2>
@@ -277,7 +279,7 @@ export function MenuClient({
                 {g.items.map((d) => (
                   <article key={d.id} className={`pm-dish${d.photo_url ? "" : " noimg"}${d.available ? "" : " out"}${cart[d.id] ? " in" : ""}`}>
                     {d.photo_url && (
-                      <div className="pm-thumb" style={{ backgroundImage: `url(${d.photo_url})` }}>
+                      <div className="pm-thumb" style={{ backgroundImage: `url(${cdnImage(d.photo_url)})` }}>
                         {d.tag === "best" && <span className="badge best">Bestseller</span>}
                         {d.tag === "new" && <span className="badge new">New</span>}
                       </div>
@@ -308,6 +310,7 @@ export function MenuClient({
         </div>
 
         <p className="pm-endnote">❖ End of menu ❖<br />Tap <b>Add</b> on a dish — it goes straight to your order.</p>
+        {dishes.some((d) => isLibraryPhoto(d.photo_url)) && <a className="pm-credits" href="/photo-credits">Dish photo credits</a>}
       </main>
 
       {/* ---------- cart bar ---------- */}
@@ -332,7 +335,7 @@ export function MenuClient({
             <p className="pm-empty2">Your order is empty.</p>
           ) : cartEntries.map(({ d, q }) => (
             <div key={d.id} className="pm-cline">
-              {d.photo_url && <span className="ce" style={{ backgroundImage: `url(${d.photo_url})` }} />}
+              {d.photo_url && <span className="ce" style={{ backgroundImage: `url(${cdnImage(d.photo_url)})` }} />}
               <div className="ci"><div className="cn">{d.name}</div><div className="cp">₹{d.price} each</div></div>
               <div className="pm-stepper sm"><button onClick={() => dec(d.id)}>−</button><span className="q">{q}</span><button onClick={() => add(d.id)}>+</button></div>
               <div className="pm-clt">₹{q * d.price}</div>

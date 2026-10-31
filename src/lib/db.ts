@@ -362,10 +362,41 @@ export async function setTablesCount(restaurantId: string, count: number) {
 
 /* ---------------- Photo storage ---------------- */
 
+/**
+ * Resize a photo in the browser before it's uploaded: a phone camera picture
+ * (3–5 MB) becomes a ~100–200 KB WebP, which is what every guest downloads.
+ * Logos are kept smaller. GIF/SVG and anything that can't be decoded upload as is.
+ */
+async function shrinkPhoto(file: File, maxSide: number): Promise<{ blob: Blob; ext: string }> {
+  const keep = { blob: file as Blob, ext: (file.name.split(".").pop() || "jpg").toLowerCase() };
+  if (!/^image\/(jpeg|png|webp|heic|heif|avif)$/.test(file.type) || typeof document === "undefined") return keep;
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, maxSide / Math.max(bmp.width, bmp.height));
+    const w = Math.max(1, Math.round(bmp.width * scale)), h = Math.max(1, Math.round(bmp.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    canvas.getContext("2d")!.drawImage(bmp, 0, 0, w, h);
+    bmp.close();
+    const encode = (type: string, q: number) => new Promise<Blob | null>((res) => canvas.toBlob(res, type, q));
+    let blob = await encode("image/webp", 0.82);
+    let ext = "webp";
+    if (!blob || blob.type !== "image/webp") {
+      if (file.type === "image/png") return keep;                                   // JPEG would lose a logo's transparency
+      blob = await encode("image/jpeg", 0.84); ext = "jpg";                          // older Safari can't make WebP
+    }
+    if (!blob || (scale === 1 && blob.size >= file.size)) return keep;              // already small — leave it
+    return { blob, ext };
+  } catch {
+    return keep;
+  }
+}
+
 export async function uploadPhoto(folder: string, file: File): Promise<string> {
-  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+  const { blob, ext } = await shrinkPhoto(file, folder === "logos" ? 512 : 1200);
   const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
-  const { error } = await supabase.storage.from("photos").upload(path, file, { upsert: true, cacheControl: "3600" });
+  // every upload gets a new name, so browsers and the CDN may keep it for a year
+  const { error } = await supabase.storage.from("photos").upload(path, blob, { upsert: true, cacheControl: "31536000", contentType: blob.type || file.type });
   if (error) throw error;
   return supabase.storage.from("photos").getPublicUrl(path).data.publicUrl;
 }

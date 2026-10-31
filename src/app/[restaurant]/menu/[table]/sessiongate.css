@@ -29,3 +29,4 @@
 .pm-note textarea{width:100%;resize:none;font:inherit;font-size:15px;font-weight:400;border:1.5px solid color-mix(in srgb,currentColor 22%,transparent);border-radius:12px;padding:9px 11px;background:transparent;color:inherit}
 .pm-note textarea:focus{outline:2px solid #5C0F14;outline-offset:1px}
 .pm-sess{display:block;font-family:ui-monospace,Consolas,monospace;font-size:12px;font-weight:600;opacity:.7;letter-spacing:0;text-transform:none;margin-top:2px}
+.pm-credits{display:block;text-align:center;font-size:12px;opacity:.6;color:inherit;margin:-6px 0 24px;text-decoration:underline;text-underline-offset:2px}

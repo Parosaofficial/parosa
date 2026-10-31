@@ -5,13 +5,22 @@ import { Sidebar } from "@/components/Sidebar";
 import { AppLoading } from "@/components/AppLoading";
 import { addCategory, deleteDish, getMenu, setDishAvailable, upsertDish, uploadPhoto } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
+import { isLibraryPhoto, libraryPhotoUrl, matchDish } from "@/lib/dishLibrary";
 import { Dialog } from "@/components/Dialog";
 import type { Category, Dish } from "@/lib/types";
 import "../dash.css";
 import "./editor.css";
 
-type Form = { id: string | null; category_id: string; name: string; description: string; price: string; is_veg: boolean; tag: string; available: boolean; photo_url: string };
+// noLib: the owner removed the library photo, so don't attach one again
+type Form = { id: string | null; category_id: string; name: string; description: string; price: string; is_veg: boolean; tag: string; available: boolean; photo_url: string; noLib?: boolean };
 const blank = (cat: string): Form => ({ id: null, category_id: cat, name: "", description: "", price: "", is_veg: true, tag: "", available: true, photo_url: "" });
+
+/** Typing a dish name attaches the matching library photo — unless the owner uploaded their own or said no. */
+function withName(f: Form, name: string): Form {
+  if (f.noLib || (f.photo_url && !isLibraryPhoto(f.photo_url))) return { ...f, name };
+  const m = matchDish(name);
+  return { ...f, name, photo_url: m ? libraryPhotoUrl(m.slug) : "" };
+}
 
 function PhIcon() {
   return <svg className="ph" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M7 4h2l1-2h4l1 2h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z" /><circle cx="12" cy="12" r="3.5" /></svg>;
@@ -45,6 +54,9 @@ export default function MenuEditor() {
   const catName = cats.find((c) => c.id === active);
   const items = useMemo(() => dishes.filter((d) => d.category_id === active), [dishes, active]);
   const shown = items.filter((d) => !search || d.name.toLowerCase().includes(search.toLowerCase()));
+  // dishes without a photo that the library has one for
+  const fillable = useMemo(() => dishes.filter((d) => !d.photo_url && matchDish(d.name)), [dishes]);
+  const [filling, setFilling] = useState(false);
 
   const onPhoto = async (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -87,6 +99,21 @@ export default function MenuEditor() {
     finally { setBusy(false); }
   };
 
+  const fillPhotos = async () => {
+    if (!restaurant || !fillable.length) return;
+    setFilling(true);
+    let n = 0;
+    for (const d of fillable) {
+      const m = matchDish(d.name);
+      if (!m) continue;
+      try { await upsertDish({ id: d.id, restaurant_id: restaurant.id, category_id: d.category_id, name: d.name, description: d.description ?? "", price: d.price, is_veg: d.is_veg, tag: d.tag ?? "", available: d.available, photo_url: libraryPhotoUrl(m.slug) }); n++; }
+      catch { /* keep going — the rest still get photos */ }
+    }
+    await load();
+    setFilling(false);
+    showToast(n ? `Photos added to ${n} ${n === 1 ? "dish" : "dishes"}` : "Couldn't add photos — try again");
+  };
+
   const saveCat = async (name: string) => {
     if (!name || !restaurant) return;
     setCatBusy(true);
@@ -110,6 +137,12 @@ export default function MenuEditor() {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
             <span><b>Live</b> — every change saves to your database and appears on the scanned menu instantly. Dish photos are optional.</span>
           </div>
+          {fillable.length > 0 && (
+            <div className="ed-fill">
+              <span>📷 <b>{fillable.length} {fillable.length === 1 ? "dish has" : "dishes have"} no photo</b> — Parosa has ready photos for {fillable.length === 1 ? "it" : "them"}.</span>
+              <button className="db-btn prime" onClick={fillPhotos} disabled={filling}>{filling ? "Adding…" : "Add photos"}</button>
+            </div>
+          )}
 
           {loading ? (
             <div style={{ padding: 60, textAlign: "center", color: "var(--muted)" }}>Loading your menu…</div>
@@ -176,7 +209,7 @@ export default function MenuEditor() {
           <div className="ed-modal">
             <div className="ed-mh"><h3>{form.id ? "Edit dish" : "Add dish"}</h3><button className="ed-x" onClick={() => setForm(null)}>×</button></div>
             <div className="ed-mbody">
-              <div className="db-field"><label>Dish name</label><input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Tandoori Chicken" /></div>
+              <div className="db-field"><label>Dish name</label><input value={form.name} onChange={(e) => setForm(withName(form, e.target.value))} placeholder="Tandoori Chicken" /></div>
               <div className="db-frow two">
                 <div className="db-field"><label>Category</label><select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}>{cats.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
                 <div className="db-field"><label>Price (₹)</label><input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="320" /></div>
@@ -193,8 +226,17 @@ export default function MenuEditor() {
               </div>
               <div className="db-field">
                 <label>Dish photo <span style={{ color: "var(--muted)", fontWeight: 400, letterSpacing: 0, textTransform: "none" }}>· optional</span></label>
-                {form.photo_url ? (
-                  <div><div className="ed-prev" style={{ backgroundImage: `url(${form.photo_url})` }} /><button className="ed-remove" onClick={() => setForm({ ...form, photo_url: "" })}>Remove photo</button></div>
+                {form.photo_url && isLibraryPhoto(form.photo_url) ? (
+                  <div className="ed-lib">
+                    <div className="ed-prev" style={{ backgroundImage: `url(${form.photo_url})` }} />
+                    <p>✓ <b>Parosa photo added automatically</b> — or use your own.</p>
+                    <div className="ed-libacts">
+                      <label className="ed-own"><input type="file" accept="image/*" hidden onChange={onPhoto} />{uploading ? "Uploading…" : "Upload my own photo"}</label>
+                      <button className="ed-remove" onClick={() => setForm({ ...form, photo_url: "", noLib: true })}>No photo</button>
+                    </div>
+                  </div>
+                ) : form.photo_url ? (
+                  <div><div className="ed-prev" style={{ backgroundImage: `url(${form.photo_url})` }} /><button className="ed-remove" onClick={() => setForm({ ...form, photo_url: "", noLib: true })}>Remove photo</button></div>
                 ) : (
                   <label className="ed-drop"><input type="file" accept="image/*" hidden onChange={onPhoto} /><b>{uploading ? "Uploading…" : "Click to upload a photo"}</b><span>JPG/PNG · saved to your restaurant</span></label>
                 )}

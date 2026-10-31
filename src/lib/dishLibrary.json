@@ -1,0 +1,2254 @@
+[
+ {
+  "slug": "afghani-chicken",
+  "name": "Afghani Chicken",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/12737659/"
+  }
+ },
+ {
+  "slug": "aloo-gobi",
+  "name": "Aloo Gobi",
+  "aliases": [
+   "Aloo Gobhi"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/2116093/"
+  }
+ },
+ {
+  "slug": "aloo-matar",
+  "name": "Aloo Matar",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/36343375/"
+  }
+ },
+ {
+  "slug": "aloo-paratha",
+  "name": "Aloo Paratha",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/33428723/"
+  }
+ },
+ {
+  "slug": "aloo-tikki",
+  "name": "Aloo Tikki",
+  "aliases": [
+   "Tikki Chaat",
+   "Aloo Tikki Chaat"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/7353381/"
+  }
+ },
+ {
+  "slug": "appam",
+  "name": "Appam",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/39851682/"
+  }
+ },
+ {
+  "slug": "badam-milk",
+  "name": "Badam Milk",
+  "aliases": [
+   "Kesar Badam Milk",
+   "Haldi Doodh"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/4475024/"
+  }
+ },
+ {
+  "slug": "baingan-bharta",
+  "name": "Baingan Bharta",
+  "aliases": [
+   "Bharta",
+   "Begun Bharta"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/15108368/"
+  }
+ },
+ {
+  "slug": "bhatura",
+  "name": "Bhatura",
+  "aliases": [
+   "Chole Bhature",
+   "Chhole Bhature"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/20422122/"
+  }
+ },
+ {
+  "slug": "bhel-puri",
+  "name": "Bhel Puri",
+  "aliases": [
+   "Bhel"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35213277/"
+  }
+ },
+ {
+  "slug": "bhindi-masala",
+  "name": "Bhindi Masala",
+  "aliases": [
+   "Bhindi Fry",
+   "Okra Masala"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/20422192/"
+  }
+ },
+ {
+  "slug": "boiled-eggs",
+  "name": "Boiled Eggs",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/39831726/"
+  }
+ },
+ {
+  "slug": "bread-omelette",
+  "name": "Bread Omelette",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/27706324/"
+  }
+ },
+ {
+  "slug": "brownie",
+  "name": "Brownie",
+  "aliases": [
+   "Chocolate Brownie",
+   "Brownie with Ice Cream"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/11867534/"
+  }
+ },
+ {
+  "slug": "butter-chicken",
+  "name": "Butter Chicken",
+  "aliases": [
+   "Murgh Makhani",
+   "Chicken Makhani"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35158690/"
+  }
+ },
+ {
+  "slug": "butter-naan",
+  "name": "Butter Naan",
+  "aliases": [
+   "Naan",
+   "Plain Naan"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/40262818/"
+  }
+ },
+ {
+  "slug": "cappuccino",
+  "name": "Cappuccino",
+  "aliases": [
+   "Coffee"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/19252265/"
+  }
+ },
+ {
+  "slug": "chana-masala",
+  "name": "Chana Masala",
+  "aliases": [
+   "Chole",
+   "Chhole",
+   "Chole Masala"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/9287035/"
+  }
+ },
+ {
+  "slug": "chapati",
+  "name": "Chapati",
+  "aliases": [
+   "Phulka",
+   "Roti",
+   "Fulka"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/9797029/"
+  }
+ },
+ {
+  "slug": "cheesecake",
+  "name": "Cheesecake",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/37678304/"
+  }
+ },
+ {
+  "slug": "chicken-65",
+  "name": "Chicken 65",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/7353388/"
+  }
+ },
+ {
+  "slug": "chicken-biryani",
+  "name": "Chicken Biryani",
+  "aliases": [
+   "Hyderabadi Chicken Biryani",
+   "Dum Biryani"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/39536492/"
+  }
+ },
+ {
+  "slug": "chicken-burger",
+  "name": "Chicken Burger",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/11354487/"
+  }
+ },
+ {
+  "slug": "chicken-changezi",
+  "name": "Chicken Changezi",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/39378356/"
+  }
+ },
+ {
+  "slug": "chicken-curry",
+  "name": "Chicken Curry",
+  "aliases": [
+   "Home Style Chicken",
+   "Desi Chicken"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35629938/"
+  }
+ },
+ {
+  "slug": "chicken-do-pyaza",
+  "name": "Chicken Do Pyaza",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/6113813/"
+  }
+ },
+ {
+  "slug": "chicken-fried-rice",
+  "name": "Chicken Fried Rice",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/12052350/"
+  }
+ },
+ {
+  "slug": "chicken-korma",
+  "name": "Chicken Korma",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/8992836/"
+  }
+ },
+ {
+  "slug": "chicken-lollipop",
+  "name": "Chicken Lollipop",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29631422/"
+  }
+ },
+ {
+  "slug": "chicken-noodles",
+  "name": "Chicken Noodles",
+  "aliases": [
+   "Chicken Chowmein"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/40263070/"
+  }
+ },
+ {
+  "slug": "chicken-pizza",
+  "name": "Chicken Pizza",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/31587565/"
+  }
+ },
+ {
+  "slug": "chicken-sandwich",
+  "name": "Chicken Sandwich",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/30350298/"
+  }
+ },
+ {
+  "slug": "chicken-seekh-kebab",
+  "name": "Chicken Seekh Kebab",
+  "aliases": [
+   "Seekh Kebab",
+   "Mutton Seekh Kebab"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/37080242/"
+  }
+ },
+ {
+  "slug": "chicken-tikka",
+  "name": "Chicken Tikka",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29173114/"
+  }
+ },
+ {
+  "slug": "chicken-tikka-masala",
+  "name": "Chicken Tikka Masala",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/37295815/"
+  }
+ },
+ {
+  "slug": "chilli-chicken",
+  "name": "Chilli Chicken",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/28674534/"
+  }
+ },
+ {
+  "slug": "chilli-paneer",
+  "name": "Chilli Paneer",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29631468/"
+  }
+ },
+ {
+  "slug": "chocolate-cake",
+  "name": "Chocolate Cake",
+  "aliases": [
+   "Cake",
+   "Pastry"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/10249461/"
+  }
+ },
+ {
+  "slug": "chocolate-shake",
+  "name": "Chocolate Shake",
+  "aliases": [
+   "Oreo Shake"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/28525200/"
+  }
+ },
+ {
+  "slug": "chole-chawal",
+  "name": "Chole Chawal",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/36673618/"
+  }
+ },
+ {
+  "slug": "coconut-water",
+  "name": "Coconut Water",
+  "aliases": [
+   "Nariyal Pani"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/20720084/"
+  }
+ },
+ {
+  "slug": "cold-coffee",
+  "name": "Cold Coffee",
+  "aliases": [
+   "Iced Coffee"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/37604037/"
+  }
+ },
+ {
+  "slug": "croissant",
+  "name": "Croissant",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/17581159/"
+  }
+ },
+ {
+  "slug": "curd-rice",
+  "name": "Curd Rice",
+  "aliases": [
+   "Dahi Chawal",
+   "Thayir Sadam"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29684991/"
+  }
+ },
+ {
+  "slug": "dahi-bhalla",
+  "name": "Dahi Bhalla",
+  "aliases": [
+   "Dahi Vada",
+   "Dahi Bhalle"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/9213253/"
+  }
+ },
+ {
+  "slug": "dahi-puri",
+  "name": "Dahi Puri",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/40000375/"
+  }
+ },
+ {
+  "slug": "dal-makhani",
+  "name": "Dal Makhani",
+  "aliases": [
+   "Dal Makhni",
+   "Maa ki Dal"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/37182514/"
+  }
+ },
+ {
+  "slug": "dal-tadka",
+  "name": "Dal Tadka",
+  "aliases": [
+   "Dal Fry",
+   "Yellow Dal",
+   "Tadka Dal"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/30203314/"
+  }
+ },
+ {
+  "slug": "dhokla",
+  "name": "Dhokla",
+  "aliases": [
+   "Khaman Dhokla"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35041878/"
+  }
+ },
+ {
+  "slug": "dum-aloo",
+  "name": "Dum Aloo",
+  "aliases": [
+   "Kashmiri Dum Aloo"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/33643298/"
+  }
+ },
+ {
+  "slug": "egg-biryani",
+  "name": "Egg Biryani",
+  "aliases": [
+   "Anda Biryani"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/31537385/"
+  }
+ },
+ {
+  "slug": "egg-curry",
+  "name": "Egg Curry",
+  "aliases": [
+   "Anda Curry"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/40247278/"
+  }
+ },
+ {
+  "slug": "fish-curry",
+  "name": "Fish Curry",
+  "aliases": [
+   "Machher Jhol",
+   "Fish Masala"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35532828/"
+  }
+ },
+ {
+  "slug": "fish-fry",
+  "name": "Fish Fry",
+  "aliases": [
+   "Fried Fish",
+   "Amritsari Fish"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35267272/"
+  }
+ },
+ {
+  "slug": "french-fries",
+  "name": "French Fries",
+  "aliases": [
+   "Fries",
+   "Peri Peri Fries"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35017890/"
+  }
+ },
+ {
+  "slug": "fresh-juice",
+  "name": "Fresh Juice",
+  "aliases": [
+   "Orange Juice",
+   "Mosambi Juice",
+   "Watermelon Juice"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/30900665/"
+  }
+ },
+ {
+  "slug": "fresh-lime-soda",
+  "name": "Fresh Lime Soda",
+  "aliases": [
+   "Nimbu Soda",
+   "Lime Soda",
+   "Nimbu Pani",
+   "Lemonade"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/31975410/"
+  }
+ },
+ {
+  "slug": "fried-rice",
+  "name": "Fried Rice",
+  "aliases": [
+   "Veg Fried Rice",
+   "Egg Fried Rice"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/34683317/"
+  }
+ },
+ {
+  "slug": "gajar-halwa",
+  "name": "Gajar Halwa",
+  "aliases": [
+   "Gajar ka Halwa",
+   "Carrot Halwa"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35532835/"
+  }
+ },
+ {
+  "slug": "garlic-bread",
+  "name": "Garlic Bread",
+  "aliases": [
+   "Cheese Garlic Bread"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/7159284/"
+  }
+ },
+ {
+  "slug": "garlic-naan",
+  "name": "Garlic Naan",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/10337726/"
+  }
+ },
+ {
+  "slug": "gobi-paratha",
+  "name": "Gobi Paratha",
+  "aliases": [
+   "Gobhi Paratha"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/40262786/"
+  }
+ },
+ {
+  "slug": "green-salad",
+  "name": "Green Salad",
+  "aliases": [
+   "Salad",
+   "Kachumber Salad"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/28467237/"
+  }
+ },
+ {
+  "slug": "grilled-sandwich",
+  "name": "Grilled Sandwich",
+  "aliases": [
+   "Cheese Sandwich",
+   "Club Sandwich"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29747752/"
+  }
+ },
+ {
+  "slug": "gulab-jamun",
+  "name": "Gulab Jamun",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/37294501/"
+  }
+ },
+ {
+  "slug": "hakka-noodles",
+  "name": "Hakka Noodles",
+  "aliases": [
+   "Chow Mein",
+   "Veg Noodles",
+   "Chowmein"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/36771456/"
+  }
+ },
+ {
+  "slug": "honey-chilli-potato",
+  "name": "Honey Chilli Potato",
+  "aliases": [
+   "Chilli Potato"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/8601177/"
+  }
+ },
+ {
+  "slug": "hot-chocolate",
+  "name": "Hot Chocolate",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35210027/"
+  }
+ },
+ {
+  "slug": "hot-and-sour-soup",
+  "name": "Hot and Sour Soup",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/16845652/"
+  }
+ },
+ {
+  "slug": "ice-cream",
+  "name": "Ice Cream",
+  "aliases": [
+   "Vanilla Ice Cream",
+   "Sundae"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/13133432/"
+  }
+ },
+ {
+  "slug": "idli",
+  "name": "Idli",
+  "aliases": [
+   "Idli Sambar",
+   "Idly"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/31199041/"
+  }
+ },
+ {
+  "slug": "jalebi",
+  "name": "Jalebi",
+  "aliases": [
+   "Imarti"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/39852220/"
+  }
+ },
+ {
+  "slug": "jaljeera",
+  "name": "Jaljeera",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/8430446/"
+  }
+ },
+ {
+  "slug": "jeera-rice",
+  "name": "Jeera Rice",
+  "aliases": [
+   "Cumin Rice"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/28674713/"
+  }
+ },
+ {
+  "slug": "kadai-chicken",
+  "name": "Kadai Chicken",
+  "aliases": [
+   "Chicken Kadai",
+   "Karahi Chicken"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29684985/"
+  }
+ },
+ {
+  "slug": "kadai-paneer",
+  "name": "Kadai Paneer",
+  "aliases": [
+   "Kadhai Paneer",
+   "Karahi Paneer"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/30858402/"
+  }
+ },
+ {
+  "slug": "kaju-katli",
+  "name": "Kaju Katli",
+  "aliases": [
+   "Kaju Barfi",
+   "Barfi"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/18488310/"
+  }
+ },
+ {
+  "slug": "kathi-roll",
+  "name": "Kathi Roll",
+  "aliases": [
+   "Chicken Roll",
+   "Egg Roll",
+   "Paneer Roll",
+   "Frankie"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/11136408/"
+  }
+ },
+ {
+  "slug": "keema",
+  "name": "Keema",
+  "aliases": [
+   "Mutton Keema",
+   "Keema Matar",
+   "Kheema"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/32825911/"
+  }
+ },
+ {
+  "slug": "kheer",
+  "name": "Kheer",
+  "aliases": [
+   "Rice Kheer",
+   "Payasam",
+   "Payesh"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/31109623/"
+  }
+ },
+ {
+  "slug": "khichdi",
+  "name": "Khichdi",
+  "aliases": [
+   "Khichuri",
+   "Dal Khichdi"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/6363499/"
+  }
+ },
+ {
+  "slug": "kolkata-biryani",
+  "name": "Kolkata Biryani",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/28674660/"
+  }
+ },
+ {
+  "slug": "kulcha",
+  "name": "Kulcha",
+  "aliases": [
+   "Amritsari Kulcha",
+   "Aloo Kulcha"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/38163958/"
+  }
+ },
+ {
+  "slug": "kulfi",
+  "name": "Kulfi",
+  "aliases": [
+   "Malai Kulfi",
+   "Matka Kulfi"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/39831472/"
+  }
+ },
+ {
+  "slug": "lachha-paratha",
+  "name": "Lachha Paratha",
+  "aliases": [
+   "Laccha Paratha"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/39833406/"
+  }
+ },
+ {
+  "slug": "ladoo",
+  "name": "Ladoo",
+  "aliases": [
+   "Laddu",
+   "Besan Ladoo",
+   "Motichoor Ladoo"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/19151506/"
+  }
+ },
+ {
+  "slug": "lemon-rice",
+  "name": "Lemon Rice",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/20408460/"
+  }
+ },
+ {
+  "slug": "maggi",
+  "name": "Maggi",
+  "aliases": [
+   "Masala Maggi",
+   "Instant Noodles"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/8108045/"
+  }
+ },
+ {
+  "slug": "malai-kofta",
+  "name": "Malai Kofta",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/37206690/"
+  }
+ },
+ {
+  "slug": "malai-tikka",
+  "name": "Malai Tikka",
+  "aliases": [
+   "Chicken Malai Tikka",
+   "Reshmi Tikka"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/12312104/"
+  }
+ },
+ {
+  "slug": "malpua",
+  "name": "Malpua",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/18488303/"
+  }
+ },
+ {
+  "slug": "manchow-soup",
+  "name": "Manchow Soup",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/25325508/"
+  }
+ },
+ {
+  "slug": "mango-shake",
+  "name": "Mango Shake",
+  "aliases": [
+   "Milkshake",
+   "Banana Shake"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/8813997/"
+  }
+ },
+ {
+  "slug": "margherita-pizza",
+  "name": "Margherita Pizza",
+  "aliases": [
+   "Cheese Pizza",
+   "Pizza"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/31708263/"
+  }
+ },
+ {
+  "slug": "masala-chai",
+  "name": "Masala Chai",
+  "aliases": [
+   "Chai",
+   "Tea",
+   "Cutting Chai",
+   "Adrak Chai"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/37186989/"
+  }
+ },
+ {
+  "slug": "masala-dosa",
+  "name": "Masala Dosa",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/12392915/"
+  }
+ },
+ {
+  "slug": "matar-paneer",
+  "name": "Matar Paneer",
+  "aliases": [
+   "Mutter Paneer"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/9609842/"
+  }
+ },
+ {
+  "slug": "medu-vada",
+  "name": "Medu Vada",
+  "aliases": [
+   "Vada",
+   "Vada Sambar",
+   "Uddina Vada"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/37421009/"
+  }
+ },
+ {
+  "slug": "methi-malai-matar",
+  "name": "Methi Malai Matar",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/11325184/"
+  }
+ },
+ {
+  "slug": "mineral-water",
+  "name": "Mineral Water",
+  "aliases": [
+   "Water Bottle",
+   "Packaged Water"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/31699476/"
+  }
+ },
+ {
+  "slug": "misal-pav",
+  "name": "Misal Pav",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/30769679/"
+  }
+ },
+ {
+  "slug": "mix-veg",
+  "name": "Mix Veg",
+  "aliases": [
+   "Mixed Vegetable Curry",
+   "Veg Kolhapuri"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/33430561/"
+  }
+ },
+ {
+  "slug": "mojito",
+  "name": "Mojito",
+  "aliases": [
+   "Virgin Mojito",
+   "Mint Mojito"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/37662775/"
+  }
+ },
+ {
+  "slug": "momos",
+  "name": "Momos",
+  "aliases": [
+   "Veg Momos",
+   "Chicken Momos",
+   "Dumplings"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/33670191/"
+  }
+ },
+ {
+  "slug": "muffin",
+  "name": "Muffin",
+  "aliases": [
+   "Chocolate Muffin"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/10225264/"
+  }
+ },
+ {
+  "slug": "mushroom-masala",
+  "name": "Mushroom Masala",
+  "aliases": [
+   "Kadai Mushroom",
+   "Mushroom Curry"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35041660/"
+  }
+ },
+ {
+  "slug": "mutton-biryani",
+  "name": "Mutton Biryani",
+  "aliases": [
+   "Hyderabadi Mutton Biryani",
+   "Gosht Biryani"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/9609856/"
+  }
+ },
+ {
+  "slug": "mutton-curry",
+  "name": "Mutton Curry",
+  "aliases": [
+   "Mutton Masala",
+   "Kosha Mangsho",
+   "Goat Curry"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29684989/"
+  }
+ },
+ {
+  "slug": "mutton-rogan-josh",
+  "name": "Mutton Rogan Josh",
+  "aliases": [
+   "Rogan Josh",
+   "Lamb Rogan Josh"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/10445627/"
+  }
+ },
+ {
+  "slug": "mysore-masala-dosa",
+  "name": "Mysore Masala Dosa",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/28107046/"
+  }
+ },
+ {
+  "slug": "mysore-pak",
+  "name": "Mysore Pak",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/40262790/"
+  }
+ },
+ {
+  "slug": "nachos",
+  "name": "Nachos",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/15801068/"
+  }
+ },
+ {
+  "slug": "navratan-korma",
+  "name": "Navratan Korma",
+  "aliases": [
+   "Veg Korma",
+   "Vegetable Korma"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/20408445/"
+  }
+ },
+ {
+  "slug": "non-veg-thali",
+  "name": "Non Veg Thali",
+  "aliases": [
+   "Chicken Thali",
+   "Fish Thali"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/39977161/"
+  }
+ },
+ {
+  "slug": "omelette",
+  "name": "Omelette",
+  "aliases": [
+   "Masala Omelette",
+   "Plain Omelette"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/25402351/"
+  }
+ },
+ {
+  "slug": "onion-uttapam",
+  "name": "Onion Uttapam",
+  "aliases": [
+   "Uttapam",
+   "Uthappam"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/17869140/"
+  }
+ },
+ {
+  "slug": "pakora",
+  "name": "Pakora",
+  "aliases": [
+   "Pakoda",
+   "Onion Pakora",
+   "Bhajiya",
+   "Onion Bhaji"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29547418/"
+  }
+ },
+ {
+  "slug": "palak-paneer",
+  "name": "Palak Paneer",
+  "aliases": [
+   "Saag Paneer"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/31249589/"
+  }
+ },
+ {
+  "slug": "pancakes",
+  "name": "Pancakes",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/6758386/"
+  }
+ },
+ {
+  "slug": "paneer-butter-masala",
+  "name": "Paneer Butter Masala",
+  "aliases": [
+   "Paneer Makhani",
+   "Butter Paneer"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/11188417/"
+  }
+ },
+ {
+  "slug": "paneer-pakora",
+  "name": "Paneer Pakora",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/8585763/"
+  }
+ },
+ {
+  "slug": "paneer-paratha",
+  "name": "Paneer Paratha",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35066810/"
+  }
+ },
+ {
+  "slug": "paneer-pizza",
+  "name": "Paneer Pizza",
+  "aliases": [
+   "Paneer Tikka Pizza"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/33384416/"
+  }
+ },
+ {
+  "slug": "paneer-tikka-masala",
+  "name": "Paneer Tikka Masala",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/30858420/"
+  }
+ },
+ {
+  "slug": "pani-puri",
+  "name": "Pani Puri",
+  "aliases": [
+   "Golgappa",
+   "Puchka",
+   "Gol Gappe"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/13063312/"
+  }
+ },
+ {
+  "slug": "papad",
+  "name": "Papad",
+  "aliases": [
+   "Masala Papad",
+   "Papadum"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/34347890/"
+  }
+ },
+ {
+  "slug": "papdi-chaat",
+  "name": "Papdi Chaat",
+  "aliases": [
+   "Chaat"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/32894826/"
+  }
+ },
+ {
+  "slug": "pav-bhaji",
+  "name": "Pav Bhaji",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/5410400/"
+  }
+ },
+ {
+  "slug": "pesarattu",
+  "name": "Pesarattu",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/9975612/"
+  }
+ },
+ {
+  "slug": "phirni",
+  "name": "Phirni",
+  "aliases": [
+   "Firni"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/20692141/"
+  }
+ },
+ {
+  "slug": "pickle",
+  "name": "Pickle",
+  "aliases": [
+   "Achar"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/13724203/"
+  }
+ },
+ {
+  "slug": "plain-dosa",
+  "name": "Plain Dosa",
+  "aliases": [
+   "Sada Dosa",
+   "Dosa"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35351659/"
+  }
+ },
+ {
+  "slug": "poha",
+  "name": "Poha",
+  "aliases": [
+   "Kanda Poha"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/36715858/"
+  }
+ },
+ {
+  "slug": "prawn-curry",
+  "name": "Prawn Curry",
+  "aliases": [
+   "Prawn Masala",
+   "Chingri Malai Curry"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/15059057/"
+  }
+ },
+ {
+  "slug": "pulao",
+  "name": "Pulao",
+  "aliases": [
+   "Veg Pulao",
+   "Matar Pulao"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/40262800/"
+  }
+ },
+ {
+  "slug": "puri",
+  "name": "Puri",
+  "aliases": [
+   "Poori"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/1080314/"
+  }
+ },
+ {
+  "slug": "rabri",
+  "name": "Rabri",
+  "aliases": [
+   "Rabdi"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/39851983/"
+  }
+ },
+ {
+  "slug": "raita",
+  "name": "Raita",
+  "aliases": [
+   "Boondi Raita",
+   "Cucumber Raita"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29699511/"
+  }
+ },
+ {
+  "slug": "rajma",
+  "name": "Rajma",
+  "aliases": [
+   "Rajma Masala",
+   "Rajma Chawal"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/13758305/"
+  }
+ },
+ {
+  "slug": "rajma-chawal",
+  "name": "Rajma Chawal",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/12737913/"
+  }
+ },
+ {
+  "slug": "rasgulla",
+  "name": "Rasgulla",
+  "aliases": [
+   "Rosogolla",
+   "Rasagola"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35921862/"
+  }
+ },
+ {
+  "slug": "rasmalai",
+  "name": "Rasmalai",
+  "aliases": [
+   "Ras Malai"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/9617396/"
+  }
+ },
+ {
+  "slug": "rava-dosa",
+  "name": "Rava Dosa",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/20422138/"
+  }
+ },
+ {
+  "slug": "red-sauce-pasta",
+  "name": "Red Sauce Pasta",
+  "aliases": [
+   "Arrabbiata Pasta",
+   "Penne Pasta"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/5419339/"
+  }
+ },
+ {
+  "slug": "rumali-roti",
+  "name": "Rumali Roti",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/13084520/"
+  }
+ },
+ {
+  "slug": "sambar",
+  "name": "Sambar",
+  "aliases": [
+   "Sambhar"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35041658/"
+  }
+ },
+ {
+  "slug": "samosa",
+  "name": "Samosa",
+  "aliases": [
+   "Aloo Samosa"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/36170557/"
+  }
+ },
+ {
+  "slug": "sandesh",
+  "name": "Sandesh",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/39959149/"
+  }
+ },
+ {
+  "slug": "sarson-ka-saag",
+  "name": "Sarson ka Saag",
+  "aliases": [
+   "Sarson Da Saag"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/5031947/"
+  }
+ },
+ {
+  "slug": "schezwan-fried-rice",
+  "name": "Schezwan Fried Rice",
+  "aliases": [
+   "Szechuan Fried Rice"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/34668494/"
+  }
+ },
+ {
+  "slug": "sev-puri",
+  "name": "Sev Puri",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/17184404/"
+  }
+ },
+ {
+  "slug": "shahi-paneer",
+  "name": "Shahi Paneer",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/10345736/"
+  }
+ },
+ {
+  "slug": "shrikhand",
+  "name": "Shrikhand",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/34131068/"
+  }
+ },
+ {
+  "slug": "sooji-halwa",
+  "name": "Sooji Halwa",
+  "aliases": [
+   "Suji Halwa",
+   "Sheera",
+   "Kesari"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/20689161/"
+  }
+ },
+ {
+  "slug": "soya-chaap",
+  "name": "Soya Chaap",
+  "aliases": [
+   "Malai Chaap",
+   "Chaap"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/30749026/"
+  }
+ },
+ {
+  "slug": "spring-roll",
+  "name": "Spring Roll",
+  "aliases": [
+   "Veg Spring Roll"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35407775/"
+  }
+ },
+ {
+  "slug": "steamed-rice",
+  "name": "Steamed Rice",
+  "aliases": [
+   "Plain Rice",
+   "Basmati Rice"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/14518996/"
+  }
+ },
+ {
+  "slug": "sweet-corn-soup",
+  "name": "Sweet Corn Soup",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29631481/"
+  }
+ },
+ {
+  "slug": "sweet-lassi",
+  "name": "Sweet Lassi",
+  "aliases": [
+   "Lassi",
+   "Mango Lassi",
+   "Salted Lassi"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/18142603/"
+  }
+ },
+ {
+  "slug": "tandoori-chicken",
+  "name": "Tandoori Chicken",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29173124/"
+  }
+ },
+ {
+  "slug": "tandoori-roti",
+  "name": "Tandoori Roti",
+  "aliases": [
+   "Roti",
+   "Butter Roti"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/12737800/"
+  }
+ },
+ {
+  "slug": "thepla",
+  "name": "Thepla",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/28885201/"
+  }
+ },
+ {
+  "slug": "tomato-soup",
+  "name": "Tomato Soup",
+  "aliases": [],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/12338625/"
+  }
+ },
+ {
+  "slug": "upma",
+  "name": "Upma",
+  "aliases": [
+   "Rava Upma"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/20408455/"
+  }
+ },
+ {
+  "slug": "vada-pav",
+  "name": "Vada Pav",
+  "aliases": [
+   "Wada Pav"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/17433353/"
+  }
+ },
+ {
+  "slug": "veg-biryani",
+  "name": "Veg Biryani",
+  "aliases": [
+   "Vegetable Biryani"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/9738983/"
+  }
+ },
+ {
+  "slug": "veg-burger",
+  "name": "Veg Burger",
+  "aliases": [
+   "Aloo Tikki Burger",
+   "Burger"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/28636771/"
+  }
+ },
+ {
+  "slug": "veg-cutlet",
+  "name": "Veg Cutlet",
+  "aliases": [
+   "Cutlet"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/5486690/"
+  }
+ },
+ {
+  "slug": "veg-manchurian",
+  "name": "Veg Manchurian",
+  "aliases": [
+   "Gobi Manchurian",
+   "Manchurian"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/29631489/"
+  }
+ },
+ {
+  "slug": "veg-pizza",
+  "name": "Veg Pizza",
+  "aliases": [
+   "Farmhouse Pizza"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/33592996/"
+  }
+ },
+ {
+  "slug": "veg-sandwich",
+  "name": "Veg Sandwich",
+  "aliases": [
+   "Sandwich",
+   "Bombay Sandwich"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/37853683/"
+  }
+ },
+ {
+  "slug": "veg-thali",
+  "name": "Veg Thali",
+  "aliases": [
+   "Thali",
+   "Special Thali",
+   "Mini Thali"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/35539324/"
+  }
+ },
+ {
+  "slug": "waffle",
+  "name": "Waffle",
+  "aliases": [
+   "Waffles"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/31377698/"
+  }
+ },
+ {
+  "slug": "white-sauce-pasta",
+  "name": "White Sauce Pasta",
+  "aliases": [
+   "Alfredo Pasta",
+   "Pasta"
+  ],
+  "credit": {
+   "by": "Pexels",
+   "license": "Pexels License",
+   "license_url": "https://www.pexels.com/license/",
+   "source": "https://www.pexels.com/photo/11220208/"
+  }
+ }
+]

@@ -1,0 +1,7 @@
+/* Dish photo credits — plain maroon and white */
+.pc{max-width:760px;margin:0 auto;padding:40px 18px 64px;font-family:var(--font-body),system-ui,sans-serif;color:#24090B;background:#fff;min-height:100dvh}
+.pc h1{margin:0 0 10px;font-size:30px;font-weight:800;color:#5C0F14}
+.pc p{margin:0 0 22px;font-size:15.5px;line-height:1.6;color:#4A3335}
+.pc ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.pc li{font-size:14.5px;line-height:1.5;padding:8px 0;border-bottom:1px solid #F1E6E7}
+.pc a{color:#5C0F14;font-weight:700}
