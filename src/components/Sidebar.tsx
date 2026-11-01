@@ -16,7 +16,6 @@ const I = {
   orders: <><path d="M6 2h12v20l-3-2-3 2-3-2-3 2Z" /><path d="M9 7h6M9 11h6M9 15h4" /></>,
   menu: <path d="M4 5h16M4 12h16M4 19h10" />,
   tables: <><rect x="4" y="4" width="7" height="7" rx="1" /><rect x="13" y="4" width="7" height="7" rx="1" /><rect x="4" y="13" width="7" height="7" rx="1" /></>,
-  templates: <path d="M12 3l2.3 4.7 5.2.8-3.8 3.6.9 5.1L12 15.9 7.4 17.2l.9-5.1L4.5 8.5l5.2-.8Z" />,
   customers: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.9" /></>,
   reserve: <><path d="M4 21V10M20 21V10M2 10h20" /><path d="M7 10V6a5 5 0 0 1 10 0v4" /><path d="M8 15h8" /></>,
   loyalty: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m7 12 2 2 3-4M15 12h2" /></>,
@@ -37,7 +36,6 @@ const GROUPS: { name: string; items: Item[] }[] = [
   { name: "Menu", items: [
     { label: "Menu & Dishes", href: "/menu-editor", icon: I.menu },
     { label: "Tables & QR", href: "/tables", icon: I.tables },
-    { label: "Templates", href: "/templates", icon: I.templates },
   ] },
   { name: "Guests", items: [
     { label: "Customers", href: "/customers", icon: I.customers },

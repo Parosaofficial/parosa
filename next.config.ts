@@ -8,7 +8,9 @@ const nextConfig: NextConfig = {
   // Friendly aliases → the real page.
   async redirects() {
     return [
-      { source: "/template", destination: "/templates", permanent: false },
+      // one menu design for everyone — the old Templates page now lives in Settings
+      { source: "/template", destination: "/settings", permanent: false },
+      { source: "/templates", destination: "/settings", permanent: false },
       { source: "/register", destination: "/signup", permanent: false },
       { source: "/staff-login", destination: "/login/staff", permanent: false },
     ];

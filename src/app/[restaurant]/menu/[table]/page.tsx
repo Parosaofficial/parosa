@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMenu } from "@/lib/db";
 import { MenuClient } from "./MenuClient";
+import "./parosa-look.css";
 
 // always fetch the latest menu (so edits show up immediately)
 export const dynamic = "force-dynamic";
@@ -25,10 +26,8 @@ export default async function Page({
   const data = await getMenu(restaurant);
   if (!data) notFound();
 
-  // preview lets the owner see a template from the Templates page before applying;
-  // otherwise the customer sees the restaurant's saved template.
-  const template = preview || data.restaurant.template || "virasat";
-  const themeId = theme || data.restaurant.theme || "default";
+  // every restaurant uses the one Parosa design (Settings → Menu design shows it);
+  // ?preview just lets the owner look at their menu without a table session
 
   return (
     <MenuClient
@@ -36,8 +35,8 @@ export default async function Page({
       categories={data.categories}
       dishes={data.dishes}
       table={table}
-      template={template}
-      theme={themeId}
+      template="parosa"
+      theme="default"
       preview={!!preview || !!theme}
     />
   );

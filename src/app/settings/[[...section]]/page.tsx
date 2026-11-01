@@ -13,6 +13,7 @@ import { missingProfile, setupChecklist } from "@/lib/profile";
 import { geoMessage, pinCurrentAddress } from "@/lib/geo";
 import { cleanUpi, isValidReviewUrl, isValidUpi, upiLink } from "@/lib/upi";
 import { Dialog } from "@/components/Dialog";
+import { MenuDesignCard } from "@/components/MenuDesignCard";
 import Link from "next/link";
 import { SUPPORT_EMAIL } from "@/components/LegalShell";
 import type { Hours, Restaurant } from "@/lib/types";
@@ -298,6 +299,9 @@ export default function Settings() {
                 ))}
               </div>
 
+              {/* one Parosa design for every menu — shown here as the default */}
+              <MenuDesignCard slug={restaurant.slug} />
+
               <div className="set-bottom">
                 <section className="set-card set-check">
                   <h3>{doneCount === checklist.length ? "You're all set up ✓" : "Finish setting up"}</h3>
@@ -315,7 +319,7 @@ export default function Settings() {
                   <h3>Quick links</h3>
                   <Link href="/tables">Download table QRs</Link>
                   <Link href="/menu-editor">Edit menu &amp; dishes</Link>
-                  <Link href="/templates">Change menu design</Link>
+                  <a href={`/${restaurant.slug}/menu/1?preview=1`} target="_blank" rel="noopener noreferrer">Preview your menu</a>
                 </section>
                 <section className="set-card set-links">
                   <h3>Need help?</h3>
