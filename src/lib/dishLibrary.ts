@@ -21,6 +21,9 @@ const SITE = "https://www.parosa.food";
 export const libraryPhotoUrl = (slug: string) => `${SITE}/dishes/${slug}.webp`;
 export const isLibraryPhoto = (url: string | null | undefined) => !!url && /\/dishes\/[a-z0-9-]+\.webp$/.test(url);
 
+/** Stored in photo_url when the owner chose "No photo", so no library photo is shown either. */
+export const NO_PHOTO = "none";
+
 // words that don't change which dish it is
 const NOISE = new Set(["special", "spl", "full", "half", "plate", "portion", "regular", "large", "small", "medium", "pc", "pcs", "piece", "pieces", "with", "and", "the", "of", "a", "style", "house", "chef", "s", "fresh", "hot"]);
 const SPELL: Record<string, string> = {
@@ -30,11 +33,11 @@ const SPELL: Record<string, string> = {
   tikki: "tikki", golgappe: "golgappa", pakoda: "pakora", pakodas: "pakora", pakoras: "pakora",
   momo: "momos", noodle: "noodles", fries: "fries", dosai: "dosa", idly: "idli", vadai: "vada",
   roti: "roti", rotis: "roti", naans: "naan", parantha: "paratha", parotta: "paratha", prantha: "paratha",
-  laddoo: "ladoo", laddu: "ladoo", lassi: "lassi", chai: "chai", tea: "chai", shake: "shake", milkshake: "shake",
+  laddoo: "ladoo", laddu: "ladoo", chilly: "chilli", chili: "chilli", chillie: "chilli", hydrabadi: "hyderabadi", lassi: "lassi", chai: "chai", tea: "chai", shake: "shake", milkshake: "shake",
 };
 
 function tokens(s: string): string[] {
-  return s.toLowerCase().normalize("NFKD").replace(/[^a-z\s]/g, " ").split(/\s+/)
+  return s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9\s]/g, " ").split(/\s+/)
     .filter((w) => w && !NOISE.has(w)).map((w) => SPELL[w] ?? w);
 }
 
@@ -54,4 +57,15 @@ export function matchDish(name: string): LibraryDish | null {
   // every word of the library name appears in the owner's name (in any order)
   const contained = KEYS.find((k) => k.t.every((w) => set.has(w)) && (k.t.length >= 2 || have.length <= 2));
   return contained?.d ?? null;
+}
+
+/**
+ * The photo to show for a dish: the owner's own photo, else the library photo
+ * for its name (no click needed, old dishes included), else none.
+ */
+export function dishPhoto(d: { name: string; photo_url: string | null }): string | null {
+  if (d.photo_url === NO_PHOTO) return null;
+  if (d.photo_url) return d.photo_url;
+  const m = matchDish(d.name);
+  return m ? libraryPhotoUrl(m.slug) : null;
 }

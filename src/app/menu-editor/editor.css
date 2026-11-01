@@ -65,7 +65,6 @@
 .ed-save{background:var(--oxblood);color:var(--gold-hi);border:none;border-radius:7px;padding:10px 22px;font-weight:700;font-size:13px;cursor:pointer}
 
 /* shared dish photo library */
-.ed-fill{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#F7ECEC;border:1px solid #E6CBCD;border-radius:14px;padding:10px 14px;margin-bottom:16px;font-size:14px;color:var(--ink)}
 .ed-lib p{margin:8px 0 6px;font-size:13.5px;color:var(--ink-2)}
 .ed-lib p b{color:#1F7A45}
 .ed-libacts{display:flex;align-items:center;gap:12px;flex-wrap:wrap}

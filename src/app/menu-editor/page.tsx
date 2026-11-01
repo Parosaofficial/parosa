@@ -5,7 +5,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { AppLoading } from "@/components/AppLoading";
 import { addCategory, deleteDish, getMenu, setDishAvailable, upsertDish, uploadPhoto } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
-import { isLibraryPhoto, libraryPhotoUrl, matchDish } from "@/lib/dishLibrary";
+import { NO_PHOTO, dishPhoto, isLibraryPhoto, libraryPhotoUrl, matchDish } from "@/lib/dishLibrary";
 import { Dialog } from "@/components/Dialog";
 import type { Category, Dish } from "@/lib/types";
 import "../dash.css";
@@ -54,9 +54,6 @@ export default function MenuEditor() {
   const catName = cats.find((c) => c.id === active);
   const items = useMemo(() => dishes.filter((d) => d.category_id === active), [dishes, active]);
   const shown = items.filter((d) => !search || d.name.toLowerCase().includes(search.toLowerCase()));
-  // dishes without a photo that the library has one for
-  const fillable = useMemo(() => dishes.filter((d) => !d.photo_url && matchDish(d.name)), [dishes]);
-  const [filling, setFilling] = useState(false);
 
   const onPhoto = async (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -89,7 +86,8 @@ export default function MenuEditor() {
         restaurant_id: restaurant.id, category_id: form.category_id,
         name: form.name.trim(), description: form.description.trim(),
         price: parseInt(form.price) || 0, is_veg: form.is_veg, tag: form.tag,
-        available: form.available, photo_url: form.photo_url || null,
+        // "No photo" is remembered; otherwise an empty photo shows the library photo for the name
+        available: form.available, photo_url: form.photo_url || (form.noLib ? NO_PHOTO : null),
       });
       await load();
       setActive(form.category_id);
@@ -97,21 +95,6 @@ export default function MenuEditor() {
       showToast(form.id ? "Dish updated" : "Dish added");
     } catch { showToast("Could not save — try again"); }
     finally { setBusy(false); }
-  };
-
-  const fillPhotos = async () => {
-    if (!restaurant || !fillable.length) return;
-    setFilling(true);
-    let n = 0;
-    for (const d of fillable) {
-      const m = matchDish(d.name);
-      if (!m) continue;
-      try { await upsertDish({ id: d.id, restaurant_id: restaurant.id, category_id: d.category_id, name: d.name, description: d.description ?? "", price: d.price, is_veg: d.is_veg, tag: d.tag ?? "", available: d.available, photo_url: libraryPhotoUrl(m.slug) }); n++; }
-      catch { /* keep going — the rest still get photos */ }
-    }
-    await load();
-    setFilling(false);
-    showToast(n ? `Photos added to ${n} ${n === 1 ? "dish" : "dishes"}` : "Couldn't add photos — try again");
   };
 
   const saveCat = async (name: string) => {
@@ -137,12 +120,6 @@ export default function MenuEditor() {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
             <span><b>Live</b> — every change saves to your database and appears on the scanned menu instantly. Dish photos are optional.</span>
           </div>
-          {fillable.length > 0 && (
-            <div className="ed-fill">
-              <span>📷 <b>{fillable.length} {fillable.length === 1 ? "dish has" : "dishes have"} no photo</b> — Parosa has ready photos for {fillable.length === 1 ? "it" : "them"}.</span>
-              <button className="db-btn prime" onClick={fillPhotos} disabled={filling}>{filling ? "Adding…" : "Add photos"}</button>
-            </div>
-          )}
 
           {loading ? (
             <div style={{ padding: 60, textAlign: "center", color: "var(--muted)" }}>Loading your menu…</div>
@@ -176,7 +153,7 @@ export default function MenuEditor() {
                   <div className="ed-empty"><div className="es">No dishes yet</div><div>Add your first dish to &ldquo;{catName?.name}&rdquo;.</div></div>
                 ) : shown.map((d) => (
                   <div key={d.id} className={`ed-dish${d.available ? "" : " out"}`}>
-                    <div className="ed-thumb" style={d.photo_url ? { backgroundImage: `url(${d.photo_url})` } : undefined}>{!d.photo_url && <PhIcon />}</div>
+                    <div className="ed-thumb" style={dishPhoto(d) ? { backgroundImage: `url(${dishPhoto(d)})` } : undefined}>{!dishPhoto(d) && <PhIcon />}</div>
                     <div className="ed-main">
                       <div className="ed-top">
                         <span className={`ed-vd${d.is_veg ? "" : " nv"}`} />
@@ -190,7 +167,7 @@ export default function MenuEditor() {
                     <div className="ed-actions">
                       <div className="ed-switchrow"><span className="ed-sl">{d.available ? "" : "Sold out"}</span><button className={`db-switch${d.available ? " on" : ""}`} onClick={() => toggleAv(d)} /></div>
                       <div className="ed-ibs">
-                        <button className="ed-ib" onClick={() => setForm({ id: d.id, category_id: d.category_id, name: d.name, description: d.description ?? "", price: String(d.price), is_veg: d.is_veg, tag: d.tag ?? "", available: d.available, photo_url: d.photo_url ?? "" })}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg></button>
+                        <button className="ed-ib" onClick={() => setForm({ id: d.id, category_id: d.category_id, name: d.name, description: d.description ?? "", price: String(d.price), is_veg: d.is_veg, tag: d.tag ?? "", available: d.available, photo_url: dishPhoto(d) ?? "", noLib: d.photo_url === NO_PHOTO })}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg></button>
                         <button className="ed-ib del" onClick={() => setDelDish(d)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /></svg></button>
                       </div>
                     </div>

@@ -5,7 +5,7 @@ import { Mr_Dafoe } from "next/font/google";
 import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { createOrder } from "@/lib/db";
 import { cdnImage } from "@/lib/cdn";
-import { isLibraryPhoto } from "@/lib/dishLibrary";
+import { dishPhoto, isLibraryPhoto } from "@/lib/dishLibrary";
 import { cleanPhone, loyaltyOf, rememberCard, rememberedCard, rewardText, tokenForOrder } from "@/lib/loyalty";
 import { MenuStampCard, markStampPending } from "@/components/MenuStamp";
 import { resolveTemplateId, templateStyle } from "@/lib/templates";
@@ -20,7 +20,7 @@ const script = Mr_Dafoe({ subsets: ["latin"], weight: "400", variable: "--font-p
 export function MenuClient({
   restaurant,
   categories,
-  dishes,
+  dishes: rawDishes,
   table,
   template,
   theme,
@@ -36,6 +36,8 @@ export function MenuClient({
   preview?: boolean;
 }) {
   const tpl = resolveTemplateId(template ?? restaurant.template);
+  // dishes without the owner's own photo show the library photo for their name
+  const dishes = useMemo(() => rawDishes.map((d) => ({ ...d, photo_url: dishPhoto(d) })), [rawDishes]);
 
   const [active, setActive] = useState(categories[0]?.id ?? "");
   const [vegOnly, setVegOnly] = useState(false);
