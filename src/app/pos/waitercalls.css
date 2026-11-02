@@ -1,0 +1,12 @@
+/* Waiter's phone: tables calling (maroon, impossible to miss) */
+.wc-wrap{position:sticky;top:0;z-index:50;display:grid;gap:8px;padding:10px 12px;background:#24090B}
+.wc-call{display:flex;align-items:center;gap:12px;background:#5C0F14;color:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 10px 24px -14px #000;animation:wc-ring 1.2s ease-in-out infinite}
+@keyframes wc-ring{50%{box-shadow:0 0 0 4px #E9C46A88}}
+.wc-bell{font-size:26px;flex:none;animation:wc-shake 1.2s ease-in-out infinite}
+@keyframes wc-shake{0%,100%{transform:rotate(0)}10%,30%{transform:rotate(-14deg)}20%,40%{transform:rotate(14deg)}50%{transform:rotate(0)}}
+.wc-tx{flex:1;min-width:0;display:grid;gap:1px}
+.wc-tx b{font-size:17px;font-weight:800}
+.wc-tx span{font-size:13px;color:#E9CFD0}
+.wc-call button{flex:none;border:none;border-radius:99px;background:#fff;color:#5C0F14;font:inherit;font-size:14px;font-weight:800;padding:10px 16px;cursor:pointer;min-height:42px}
+.wc-call button:focus-visible{outline:2px solid #E9C46A;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.wc-call,.wc-bell{animation:none}}

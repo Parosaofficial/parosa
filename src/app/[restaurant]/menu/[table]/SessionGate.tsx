@@ -35,6 +35,8 @@ export type TableSessionState = {
   canOrder: boolean;
   /** The guest asked for the bill (from this phone or another at the table). */
   billAsked: boolean;
+  /** First name of the waiter looking after this table, once assigned. */
+  waiterName: string | null;
   /** Ring the staff: a waiter, or the bill. */
   request: (kind: "waiter" | "bill") => Promise<void>;
   /** Call when an order is refused because the session ended. */
@@ -49,6 +51,7 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [sessionCode, setSessionCode] = useState<string | null>(null);
   const [billAsked, setBillAsked] = useState(false);
+  const [waiterName, setWaiterName] = useState<string | null>(null);
   const [tableName, setTableName] = useState<string | null>(null);
   const [others, setOthers] = useState(0);
   const [distance, setDistance] = useState(0);
@@ -113,7 +116,7 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
     const t = setInterval(async () => {
       const s = await sessionStatus(sessionId);
       if (!alive.current || !s) return;
-      if (s.status !== "closed") { if (s.bill_asked) setBillAsked(true); return; }
+      if (s.status !== "closed") { if (s.bill_asked) setBillAsked(true); setWaiterName(s.waiter_name ?? null); return; }
       rememberSession(slug, table, null);
       setSessionId(null);
       setBillAsked(false);
@@ -122,6 +125,14 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
     }, billAsked ? POLL_BILL_MS : POLL_MS);
     return () => clearInterval(t);
   }, [sessionId, phase, slug, table, start, billAsked]);
+
+  // the waiter's name as soon as the table is confirmed (the poll above keeps it fresh)
+  useEffect(() => {
+    if (!sessionId) return;
+    let live = true;
+    sessionStatus(sessionId).then((s) => { if (live && s) setWaiterName(s.waiter_name ?? null); });
+    return () => { live = false; };
+  }, [sessionId]);
 
   const request = useCallback(async (kind: "waiter" | "bill") => {
     if (!sessionId) throw new Error("no session");
@@ -136,6 +147,7 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
     tableName,
     canOrder: phase === "off" || phase === "ok",
     billAsked,
+    waiterName,
     request,
     expired: reset,
   };

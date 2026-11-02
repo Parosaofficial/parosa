@@ -11,6 +11,7 @@ import { MenuStampCard, markStampPending } from "@/components/MenuStamp";
 import { resolveTemplateId, templateStyle } from "@/lib/templates";
 import { SessionGate, useTableSession } from "./SessionGate";
 import { PaidStamp, ThankYou } from "./ThankYou";
+import { CustomPanel, GuestNav, LoyaltyPanel, WaiterPanel, type GuestTab } from "./GuestTabs";
 import type { Category, Dish, Restaurant } from "@/lib/types";
 import "./menu.css";
 
@@ -49,6 +50,9 @@ export function MenuClient({
   // the order just placed — drives the thank-you screen
   const [placed, setPlaced] = useState<{ no: string; total: number; session: string | null } | null>(null);
   const [note, setNote] = useState(""); // for the kitchen
+  // the guest's bottom bar: Menu · Custom · Loyalty · Waiter
+  const [tab, setTab] = useState<GuestTab>("menu");
+  const showNav = true;
   const [err, setErr] = useState("");
   // digital stamp card: optional phone at checkout → a card link after ordering
   const loy = loyaltyOf(restaurant);
@@ -163,10 +167,19 @@ export function MenuClient({
     }
   };
 
+  // + tapped before the table is confirmed → run the location check (or explain why not)
+  const askToOrder = () => {
+    if (ts.phase === "browse" || ts.phase === "far" || ts.phase === "denied" || ts.phase === "ask") { tsUi.allow(); return; }
+    if (ts.phase === "checking" || ts.phase === "locating") return;
+    setErr("Please ask the staff to take your order.");
+    setTimeout(() => setErr(""), 3500);
+  };
+
   const Action = ({ d }: { d: Dish }) => {
     const q = cart[d.id] || 0;
     if (!d.available) return <span className="pm-soldout">Sold out</span>;
-    if (!ts.canOrder) return null; // menu-only mode
+    // not confirmed at the table yet: the + still shows, and asks for the table check
+    if (!ts.canOrder) return <button className="pm-add" onClick={askToOrder} aria-label={`Add ${d.name}`}>Add <span aria-hidden="true">+</span></button>;
     if (q > 0)
       return (
         <div className="pm-stepper">
@@ -179,7 +192,7 @@ export function MenuClient({
   };
 
   return (
-    <div className={`pm-app ${script.variable}`} data-tpl={tpl} style={templateStyle(template ?? restaurant.template, theme ?? restaurant.theme)}>
+    <div className={`pm-app ${script.variable}${showNav ? " has-nav" : ""}`} data-tpl={tpl} style={templateStyle(template ?? restaurant.template, theme ?? restaurant.theme)}>
       {/* ---------- sticky chrome ---------- */}
       <header className={`pm-top${small ? " small" : ""}`}>
         <div className="pm-head">
@@ -220,7 +233,7 @@ export function MenuClient({
       </header>
 
       {/* ---------- body ---------- */}
-      <main className="pm-body">
+      <main className="pm-body" hidden={tab !== "menu"}>
         {/* Food Truck: a scrolling "now serving" ticker (hidden on other designs). */}
         <div className="pm-ticker" aria-hidden="true">
           <div className="run">
@@ -314,6 +327,17 @@ export function MenuClient({
         <p className="pm-endnote">❖ End of menu ❖<br />Tap <b>Add</b> on a dish — it goes straight to your order.</p>
         {dishes.some((d) => isLibraryPhoto(d.photo_url)) && <a className="pm-credits" href="/photo-credits">Dish photo credits</a>}
       </main>
+
+      {/* ---------- Custom · Loyalty · Waiter ---------- */}
+      {showNav && tab === "custom" && (
+        <CustomPanel restaurant={restaurant} table={table} ts={ts} onAsk={tsUi.allow}
+          onSent={(o) => { setPlaced({ no: o.order_no ?? "", total: o.total, session: ts.sessionId }); setTab("menu"); }} />
+      )}
+      {showNav && tab === "loyalty" && (
+        <LoyaltyPanel restaurant={restaurant} enabled={loy.loyalty_enabled} goal={loy.loyalty_goal} reward={loy.loyalty_reward} token={myCard} />
+      )}
+      {showNav && tab === "waiter" && <WaiterPanel ts={ts} tableTitle={tableTitle} onAsk={tsUi.allow} />}
+      {showNav && <GuestNav tab={tab} onTab={(t) => { setTab(t); window.scrollTo({ top: 0 }); }} />}
 
       {/* ---------- cart bar ---------- */}
       <div className={`pm-cartbar${count > 0 ? " show" : ""}`} key={`bar-${bump > 0}`}>

@@ -8,6 +8,7 @@ import { createOrder, getMenu, staffCustomerLookup } from "@/lib/db";
 import { clearStaffSession, useStaff } from "@/lib/useStaff";
 import { rewardText, staffLoyalty, staffRedeem, type StaffLoyalty } from "@/lib/loyalty";
 import type { Category, Dish, Restaurant } from "@/lib/types";
+import { WaiterCalls } from "./WaiterCalls";
 import "./pos.css";
 
 export default function POS() {
@@ -123,6 +124,9 @@ export default function POS() {
           </button>
         </div>
       </header>
+
+      {/* tables calling this waiter: banner + vibration */}
+      <WaiterCalls staff={staff} />
 
       {loading ? (
         <div style={{ padding: 50, textAlign: "center", color: "var(--muted)" }}>Loading menu…</div>

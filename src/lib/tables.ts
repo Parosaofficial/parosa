@@ -125,6 +125,23 @@ export async function freeSession(sessionId: string) {
   if (error) throw error;
 }
 
+/* ---------------- staff phone: calls from tables (0017) ---------------- */
+
+export type StaffCall = { session_id: string; code: string; table_code: string; table_name: string; called_at: string; mine: boolean };
+
+/** Tables calling this waiter — or calling with nobody assigned. Empty if the database isn't updated yet. */
+export async function staffCalls(restaurantId: string, code: string, staffId: string): Promise<StaffCall[]> {
+  const { data, error } = await supabase.rpc("staff_calls", { p_restaurant: restaurantId, p_code: code, p_staff: staffId });
+  if (error || !Array.isArray(data)) return [];
+  return data as StaffCall[];
+}
+
+/** "On my way": clears the call; an unassigned table becomes this waiter's. */
+export async function staffCallSeen(restaurantId: string, code: string, staffId: string, sessionId: string) {
+  const { error } = await supabase.rpc("staff_call_seen", { p_restaurant: restaurantId, p_code: code, p_staff: staffId, p_session: sessionId });
+  if (error) throw error;
+}
+
 /** A waiter went to the table that called. */
 export async function clearWaiterCall(sessionId: string) {
   const { error } = await supabase.from("table_sessions").update({ waiter_call_at: null }).eq("id", sessionId);
@@ -150,7 +167,11 @@ export async function joinSession(restaurantId: string, table: string, at: { lat
   return data as JoinResult;
 }
 
-export type SessionStatus = { status: "open" | "closed"; close_reason: string | null; bill_asked?: boolean };
+export type SessionStatus = {
+  status: "open" | "closed"; close_reason: string | null; bill_asked?: boolean;
+  waiter_name?: string | null;   // 0017: the assigned waiter's first name
+  waiter_called?: boolean;       // 0017: a call is waiting for a waiter
+};
 export async function sessionStatus(sessionId: string): Promise<SessionStatus | null> {
   const { data, error } = await supabase.rpc("table_session_status", { p_session: sessionId });
   if (error || !data) return null;

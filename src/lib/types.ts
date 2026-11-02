@@ -131,4 +131,4 @@ export type OrderItem = {
 };
 
 // input when a customer places an order
-export type NewOrderItem = { dish_id: string; name: string; qty: number; price: number };
+export type NewOrderItem = { dish_id: string | null; name: string; qty: number; price: number }; // null = a custom dish
