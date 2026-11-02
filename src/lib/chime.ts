@@ -1,11 +1,20 @@
-// Parosa — order "ka-ching" (cash-register / Shopify-style sale sound).
-// Web Audio, no asset file. Browsers block audio until a user gesture,
-// so call primeAudio() from a click first.
+// Parosa — order "ka-ching": the Cha-Ching sound in public/sounds/cha-ching.mp3,
+// with a small Web Audio chime as the backup if the file can't play.
+// Browsers block audio until a user gesture, so call primeAudio() from a click first.
 
 let ctx: AudioContext | null = null;
+let kaching: HTMLAudioElement | null = null;
+const KACHING_SRC = "/sounds/cha-ching.mp3";
 
 export function primeAudio(): AudioContext | null {
   try {
+    // unlock the sound file too (a silent play during the click)
+    if (!kaching && typeof Audio !== "undefined") {
+      kaching = new Audio(KACHING_SRC);
+      kaching.preload = "auto";
+      kaching.volume = 0;
+      kaching.play().then(() => { kaching!.pause(); kaching!.currentTime = 0; kaching!.volume = 1; }).catch(() => { if (kaching) kaching.volume = 1; });
+    }
     if (!ctx) {
       const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       ctx = new AC();
@@ -34,8 +43,21 @@ function ding(c: AudioContext, freq: number, t: number, gain = 0.5, dur = 0.42) 
   });
 }
 
-/** The "ka-ching" — two quick bright notes rising, like a cash register ringing up a sale. */
+/** New order / guest call: the Cha-Ching sound; the synthesized chime if the file can't play. */
 export function playChime() {
+  try {
+    const a = kaching ?? new Audio(KACHING_SRC);
+    kaching = a;
+    a.volume = 1;
+    a.currentTime = 0;
+    a.play().catch(() => synthChime());
+  } catch {
+    synthChime();
+  }
+}
+
+/** The backup "ka-ching" — two quick bright notes rising, like a cash register ringing up a sale. */
+function synthChime() {
   const c = primeAudio();
   if (!c) return;
   const t = c.currentTime;

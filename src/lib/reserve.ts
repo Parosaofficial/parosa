@@ -26,7 +26,10 @@ export type Reservation = {
 };
 
 export type Entry = "top" | "bottom" | "left" | "right";
-export type Hall = { name: string; entry: Entry };
+/** cols: grid columns in the hall (a family sofa takes two); default HALL_COLS */
+export type Hall = { name: string; entry: Entry; cols?: number };
+export const HALL_COLS = 6;          // 3 family sofas, or 6 small tables, per row
+export const hallCols = (h: Hall) => Math.min(12, Math.max(2, Math.round(h.cols ?? HALL_COLS)));
 
 export type FloorTable = {
   id: string; name: string; kind: string; seats: number; shape: TableShape; area: string | null;

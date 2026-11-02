@@ -21,7 +21,7 @@
 
 .sr-editor{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
 .sr-floorp{margin-bottom:0;overflow:visible}
-.sr-halls{display:grid;gap:30px;padding:18px 30px 30px}
+.sr-halls{display:grid;grid-template-columns:minmax(0,1fr);gap:30px;padding:18px 30px 30px}
 
 /* hall header controls */
 .sr-hctl{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1}
@@ -111,3 +111,8 @@
   .sr-row .sr-st{grid-column:3;grid-row:1}
   .sr-row .sr-ra{grid-column:1/-1;justify-content:flex-start}
 }
+
+/* columns per hall */
+.sr-cols{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:800;color:#2F5E86;background:#fff;border:1px solid #BAD6EE;border-radius:9px;padding:2px 4px 2px 9px}
+.sr-cols b{min-width:18px;text-align:center;color:#24090B}
+.sr-hctl .sr-cols button{width:24px;height:24px;border-radius:6px;font-size:15px}

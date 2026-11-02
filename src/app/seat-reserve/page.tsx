@@ -9,7 +9,7 @@ import { setTablesCount } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { TABLE_KINDS, addTable, listTables, nextCode, tableLabel, updateTable, type RestaurantTable } from "@/lib/tables";
 import {
-  DEFAULT_HALL, bookUrl, dayLabel, groupHalls, listReservations, saveReserveSettings, seatReservation, setReservationStatus, timeLabel,
+  DEFAULT_HALL, bookUrl, dayLabel, groupHalls, hallCols, listReservations, saveReserveSettings, seatReservation, setReservationStatus, timeLabel,
   type Entry, type Hall, type Reservation,
 } from "@/lib/reserve";
 import { useOwner } from "@/lib/useOwner";
@@ -193,6 +193,10 @@ export default function SeatReservePage() {
     }
     setHallForm(null);
   };
+  const setCols = (name: string, cols: number) => {
+    const n = Math.min(12, Math.max(2, cols));
+    saveHalls(hallList().map((h) => (h.name === name ? { ...h, cols: n } : h)), `${name}: ${n} columns · ${Math.floor(n / 2)} family sofas per row`);
+  };
   const setEntry = (name: string, entry: Entry) => saveHalls(hallList().map((h) => (h.name === name ? { ...h, entry } : h)), `${name}: entry on the ${entry}`);
   const moveHall = (i: number, dir: -1 | 1) => {
     const list = hallList();
@@ -283,9 +287,16 @@ export default function SeatReservePage() {
                       key={g.hall.name}
                       name={g.hall.name}
                       entry={g.hall.entry}
+                      cols={hallCols(g.hall)}
                       head={
                         <span className="sr-hctl">
                           <span className="sr-hn">{g.tables.length} {g.tables.length === 1 ? "table" : "tables"}</span>
+                          <span className="sr-cols" aria-label={`${g.hall.name} columns`}>
+                            Columns
+                            <button onClick={() => setCols(g.hall.name, hallCols(g.hall) - 1)} disabled={hallCols(g.hall) <= 2} aria-label="Fewer columns">−</button>
+                            <b>{hallCols(g.hall)}</b>
+                            <button onClick={() => setCols(g.hall.name, hallCols(g.hall) + 1)} disabled={hallCols(g.hall) >= 12} aria-label="More columns">+</button>
+                          </span>
                           <label className="sr-entry">🚪 Entry
                             <select value={g.hall.entry} onChange={(e) => setEntry(g.hall.name, e.target.value as Entry)} aria-label={`${g.hall.name} entry side`}>
                               {ENTRIES.map((x) => <option key={x} value={x}>{ENTRY_LABEL[x]}</option>)}

@@ -109,7 +109,10 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
   const kinds = Array.from(new Set(tables.map((t) => t.kind)));
   const shown = kind === "All" ? rows : rows.filter((r) => r.t.kind === kind);
   const count = (s: Stage) => rows.filter((r) => r.stage === s).length;
-  const areas = Array.from(new Set(shown.map((r) => r.t.area || ""))).sort((a, b) => (a ? 0 : 1) - (b ? 0 : 1));
+  // halls in the order set in Seat Reserve, then any other areas, unnamed last
+  const hallOrder = (restaurant.floor_halls ?? []).map((h) => h.name);
+  const rank = (a: string) => (hallOrder.includes(a) ? hallOrder.indexOf(a) : a ? hallOrder.length : hallOrder.length + 1);
+  const areas = Array.from(new Set(shown.map((r) => r.t.area || ""))).sort((a, b) => rank(a) - rank(b));
   const waiterName = (id: string | null) => staff.find((s) => s.id === id)?.name ?? null;
   const open = rows.find((r) => r.t.id === openId) ?? null;
 
@@ -163,7 +166,8 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
       {view === "floor" ? (
         <div className="fl-zones">
           {areas.map((a) => {
-            const inArea = shown.filter((r) => (r.t.area || "") === a);
+            // same order as the Seat Reserve floor plan
+            const inArea = shown.filter((r) => (r.t.area || "") === a).sort((x, y) => (x.t.floor_slot ?? 999) - (y.t.floor_slot ?? 999));
             const sofas = inArea.filter((r) => r.t.shape === "sofa");
             const small = inArea.filter((r) => r.t.shape !== "sofa");
             return (

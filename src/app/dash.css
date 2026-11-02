@@ -33,9 +33,10 @@
 .db-foot{padding:14px;border-top:1px solid #ffffff22}
 @media(max-width:900px){.db-foot{display:none}}
 .db-rest{display:flex;align-items:center;gap:10px;background:#ffffff12;border-radius:12px;padding:10px}
-.db-rc{width:36px;height:36px;border-radius:10px;background:#fff;color:#5C0F14;display:grid;place-items:center;font-weight:800;font-size:15px}
-.db-rn{font-size:14px;font-weight:700;color:#fff;line-height:1.2}
-.db-rp{font-size:12px;color:#E4C9CA}
+.db-rc{flex:none;width:36px;height:36px;border-radius:10px;background:#fff;color:#5C0F14;display:grid;place-items:center;font-weight:800;font-size:15px}
+/* any restaurant name fits: one line, cut with … (full name on hover) */
+.db-rn{font-size:14px;font-weight:700;color:#fff;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.db-rp{font-size:12px;color:#E4C9CA;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .db-logout{width:32px;height:32px;flex:none;border-radius:8px;border:1px solid #ffffff33;background:#ffffff14;color:#fff;display:grid;place-items:center;cursor:pointer;text-decoration:none;transition:background .15s,color .15s}
 .db-logout:hover{background:#ffffff2b;color:#fff}
 .db-logout svg{width:16px;height:16px}

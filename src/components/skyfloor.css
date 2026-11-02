@@ -13,8 +13,12 @@
 .sky-hall.entry-right{padding-right:40px}
 .sky-hh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;min-height:28px}
 .sky-hh>b{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--sky-ink);background:#fff;border:1px solid var(--sky-m);border-radius:8px;padding:2px 10px}
-.sky-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:18px;align-items:center}
-.sky-hall.compact .sky-slots{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+/* the owner sets the columns per hall; a family sofa takes two. Too narrow? the hall scrolls sideways */
+.sky-hall{min-width:0}
+.sky-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:-4px;padding:4px}
+.sky-slots{display:grid;grid-template-columns:repeat(var(--cols,6),minmax(0,1fr));gap:14px;align-items:center;min-width:calc(var(--cols,6) * 88px)}
+.sky-hall.compact .sky-slots{grid-template-columns:repeat(var(--cols-phone,4),minmax(0,1fr));gap:8px;min-width:0}
+@media(min-width:620px){.sky-hall.compact .sky-slots{grid-template-columns:repeat(var(--cols,6),minmax(0,1fr));gap:12px}}
 .sky-slot{position:relative;display:grid;justify-items:center;align-content:center;gap:3px;padding:6px 4px;border-radius:12px;border:1.5px solid transparent;background:transparent;font-family:var(--font-body),system-ui,sans-serif;cursor:pointer;min-width:0;color:inherit}
 .sky-slot.wide{grid-column:span 2}
 .sky-slot svg{width:100%;max-width:120px;height:auto;overflow:visible}

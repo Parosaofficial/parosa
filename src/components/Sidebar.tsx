@@ -123,8 +123,8 @@ export function Sidebar({ restaurant }: { restaurant?: Restaurant | null }) {
           <div className="db-rest">
             <div className="db-rc">{initials(name)}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="db-rn">{name}</div>
-              <div className="db-rp">Parosa {planName} · {tables} {tables === 1 ? "table" : "tables"}</div>
+              <div className="db-rn" title={name ?? undefined}>{name}</div>
+              <div className="db-rp" title={`Parosa ${planName} · ${tables} ${tables === 1 ? "table" : "tables"}`}>{planName} · {tables} {tables === 1 ? "table" : "tables"}</div>
             </div>
             <button onClick={logout} className="db-logout" title="Log out" aria-label="Log out"><Icon>{I.logout}</Icon></button>
           </div>
