@@ -88,3 +88,10 @@
 .fl-reqrow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink)}
 .fl-reqrow button{font-family:var(--font-body);font-size:13px;font-weight:800;border:none;border-radius:99px;padding:5px 12px;background:#5C0F14;color:#fff;cursor:pointer;white-space:nowrap}
 @media(prefers-reduced-motion:reduce){.fl-t.alert{animation:none}}
+
+/* the sky-grid floor (same as Seat Reserve) with live colours */
+.fl-zones .sky-hall{margin-top:4px}
+.fl-zones .sky-slot.fl-t{padding:6px 4px;align-content:start}
+.fl-zones .sky-slot.fl-t:hover{background:#ffffffb3;border-color:#BAD6EE}
+.fl-zones .sky-slot.fl-t .fl-inf{width:100%}
+.fl-zones .sky-slot.fl-t.alert{border-color:#E9C46A;background:#FFFBF1}

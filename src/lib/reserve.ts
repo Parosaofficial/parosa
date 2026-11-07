@@ -26,8 +26,8 @@ export type Reservation = {
 };
 
 export type Entry = "top" | "bottom" | "left" | "right";
-/** cols: grid columns in the hall (a family sofa takes two); default HALL_COLS */
-export type Hall = { name: string; entry: Entry; cols?: number };
+/** cols: grid columns in the hall (a family sofa takes two); rows: rows the owner added (some may be empty) */
+export type Hall = { name: string; entry: Entry; cols?: number; rows?: number };
 export const HALL_COLS = 6;          // 3 family sofas, or 6 small tables, per row
 export const hallCols = (h: Hall) => Math.min(12, Math.max(2, Math.round(h.cols ?? HALL_COLS)));
 
@@ -47,6 +47,19 @@ export type FloorInfo = {
 export type ReserveSettings = { reserve_on: boolean; reserve_hold_min: number; reserve_days: number; reserve_from: string; reserve_to: string; floor_halls: Hall[] };
 
 export const DEFAULT_HALL = "Main hall";
+
+/** A table's place in its hall: floor_slot = row × ROW + position (position from 1, row 0 = the first row). */
+export const ROW = 100;
+export const slotRow = (slot?: number | null) => Math.max(0, Math.floor((slot ?? 0) / ROW));
+
+/** The hall's tables split into rows, left to right. Empty rows the owner added are kept. */
+export function hallRows<T>(hall: Hall, tables: T[], slotOf: (t: T) => number): T[][] {
+  const used = tables.reduce((m, t) => Math.max(m, slotRow(slotOf(t)) + 1), 1);
+  const rows: T[][] = Array.from({ length: Math.max(hall.rows ?? 1, used) }, () => []);
+  for (const t of tables) rows[slotRow(slotOf(t))].push(t);
+  rows.forEach((r) => r.sort((a, b) => slotOf(a) - slotOf(b)));
+  return rows;
+}
 
 /**
  * Halls in order with their tables. A table whose area isn't a saved hall

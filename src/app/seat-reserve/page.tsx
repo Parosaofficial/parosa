@@ -4,12 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { AppLoading } from "@/components/AppLoading";
 import { TableArt } from "@/components/TableArt";
-import { ENTRY_LABEL, SkyHall, SkySlot } from "@/components/SkyFloor";
+import { ENTRY_LABEL, SkyHall, SkyRow, SkySlot } from "@/components/SkyFloor";
 import { setTablesCount } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { TABLE_KINDS, addTable, listTables, nextCode, tableLabel, updateTable, type RestaurantTable } from "@/lib/tables";
 import {
-  DEFAULT_HALL, bookUrl, dayLabel, groupHalls, hallCols, listReservations, saveReserveSettings, seatReservation, setReservationStatus, timeLabel,
+  DEFAULT_HALL, ROW, bookUrl, dayLabel, groupHalls, hallCols, hallRows, listReservations, saveReserveSettings, seatReservation, setReservationStatus, timeLabel,
   type Entry, type Hall, type Reservation,
 } from "@/lib/reserve";
 import { useOwner } from "@/lib/useOwner";
@@ -44,7 +44,7 @@ export default function SeatReservePage() {
   const [missing, setMissing] = useState(false);
   const [tab, setTab] = useState<"floor" | "bookings">("floor");
   const [sel, setSel] = useState<string | null>(null);
-  const [adding, setAdding] = useState<string | null>(null);      // hall whose + menu is open
+  const [adding, setAdding] = useState<string | null>(null);      // "hall#row" whose + menu is open
   const [hallForm, setHallForm] = useState<{ mode: "new" | "rename"; old?: string; name: string } | null>(null);
   const [price, setPrice] = useState("");
   const [dragId, setDragId] = useState<string | null>(null);
@@ -115,60 +115,82 @@ export default function SeatReservePage() {
     catch { showToast("Couldn't save — try again"); }
   };
 
-  /** Put the hall's tables in this order, slots 1…n (equal spacing comes from the grid). */
-  const reorder = (ordered: RestaurantTable[], area: string) => {
+  /** A hall's tables as rows (row × ROW + position is stored in floor_slot). */
+  const rowsOf = (g: (typeof floor)[number]) => hallRows(g.hall, g.tables, (t) => t.floor_slot ?? 0);
+  const where = (t: RestaurantTable) => {
+    const g = floor.find((x) => x.tables.some((y) => y.id === t.id));
+    if (!g) return null;
+    const rows = rowsOf(g);
+    const row = rows.findIndex((r) => r.some((y) => y.id === t.id));
+    return { g, rows, row, index: rows[row].findIndex((y) => y.id === t.id) };
+  };
+
+  /** Put a row's tables in this order: slots row×ROW+1 … (equal spacing comes from the grid). */
+  const reorder = (ordered: RestaurantTable[], area: string, row: number) => {
     ordered.forEach((t, i) => {
-      if (t.floor_slot !== i + 1 || (t.area ?? "") !== area) patch(t, { floor_slot: i + 1, area });
+      const slot = row * ROW + i + 1;
+      if (t.floor_slot !== slot || (t.area ?? "") !== area) patch(t, { floor_slot: slot, area });
     });
   };
 
   /* ---------- tables ---------- */
   const select = (t: RestaurantTable | null) => { setSel(t?.id ?? null); setPrice(t ? String(t.book_price ?? 0) : ""); setAdding(null); };
 
-  const createTable = async (hall: string, k: (typeof TABLE_KINDS)[number]) => {
-    const inHall = floor.find((g) => g.hall.name === hall)?.tables ?? [];
+  const createTable = async (hall: string, rowNo: number, k: (typeof TABLE_KINDS)[number]) => {
+    const g = floor.find((x) => x.hall.name === hall);
+    const inRow = g ? (rowsOf(g)[rowNo] ?? []) : [];
     const name = nextName(tables, k.shape === "sofa" ? "F" : "T");
     setBusy("add");
     try {
       const row = await addTable(restaurant.id, {
         code: nextCode(tables, restaurant.table_code_hi ?? 0), name, kind: k.kind, seats: k.seats, shape: k.shape,
-        area: hall, sort: tables.length + 1, on_floor: true, floor_slot: inHall.length + 1,
+        area: hall, sort: tables.length + 1, on_floor: true, floor_slot: rowNo * ROW + inRow.length + 1,
       });
       const next = [...tables, row];
       setTables(next);
       setTablesCount(restaurant.id, next.length).catch(() => {});
       setAdding(null);
       select(row);
-      showToast(`${name} added to ${hall} — its QR is ready in Tables & QR`);
+      showToast(`${name} added to ${hall}, row ${rowNo + 1} — its QR is ready in Tables & QR`);
     } catch { showToast("Couldn't add the table — try again"); }
     finally { setBusy(""); }
   };
 
-  const placeExisting = (t: RestaurantTable, hall: string) => {
-    const inHall = floor.find((g) => g.hall.name === hall)?.tables ?? [];
-    patch(t, { on_floor: true, area: hall, floor_slot: inHall.length + 1 }, `${tableLabel(t)} placed in ${hall}`);
+  const placeExisting = (t: RestaurantTable, hall: string, rowNo: number) => {
+    const g = floor.find((x) => x.hall.name === hall);
+    const inRow = g ? (rowsOf(g)[rowNo] ?? []) : [];
+    patch(t, { on_floor: true, area: hall, floor_slot: rowNo * ROW + inRow.length + 1 }, `${tableLabel(t)} placed in ${hall}, row ${rowNo + 1}`);
     setAdding(null);
   };
 
-  /** Move a table to `hall` at position `index` (drag-drop, arrows, or the hall picker). */
-  const moveTo = (t: RestaurantTable, hall: string, index: number) => {
-    const from = floor.find((g) => g.tables.some((x) => x.id === t.id));
-    const target = (floor.find((g) => g.hall.name === hall)?.tables ?? []).filter((x) => x.id !== t.id);
+  /** Move a table to `hall`, row `rowNo`, position `index` (drag-drop, arrows, or the hall picker). */
+  const moveTo = (t: RestaurantTable, hall: string, rowNo: number, index: number) => {
+    const from = where(t);
+    const g = floor.find((x) => x.hall.name === hall);
+    const target = (g ? (rowsOf(g)[rowNo] ?? []) : []).filter((x) => x.id !== t.id);
     target.splice(Math.max(0, Math.min(index, target.length)), 0, { ...t, area: hall });
-    reorder(target, hall);
-    if (from && from.hall.name !== hall) reorder(from.tables.filter((x) => x.id !== t.id), from.hall.name);
+    reorder(target, hall, rowNo);
+    if (from && (from.g.hall.name !== hall || from.row !== rowNo)) reorder(from.rows[from.row].filter((x) => x.id !== t.id), from.g.hall.name, from.row);
   };
   const nudge = (t: RestaurantTable, dir: -1 | 1) => {
-    const g = floor.find((x) => x.tables.some((y) => y.id === t.id));
-    if (!g) return;
-    const i = g.tables.findIndex((y) => y.id === t.id);
-    if (i + dir < 0 || i + dir >= g.tables.length) return;
-    moveTo(t, g.hall.name, i + dir);
+    const w = where(t);
+    if (!w || w.index + dir < 0 || w.index + dir >= w.rows[w.row].length) return;
+    moveTo(t, w.g.hall.name, w.row, w.index + dir);
   };
-  const drop = (hall: string, index: number) => {
+  /** Up or down a row; going down from the last row adds a new row. */
+  const moveRow = (t: RestaurantTable, dir: -1 | 1) => {
+    const w = where(t);
+    if (!w) return;
+    const to = w.row + dir;
+    if (to < 0) return;
+    if (to >= w.rows.length) setRows(w.g.hall.name, w.rows.length + 1, "");
+    moveTo(t, w.g.hall.name, to, 999);
+    showToast(`${tableLabel(t)} moved to row ${to + 1}`);
+  };
+  const drop = (hall: string, rowNo: number, index: number) => {
     const t = tables.find((x) => x.id === dragId);
     setDragId(null);
-    if (t) moveTo(t, hall, index);
+    if (t) moveTo(t, hall, rowNo, index);
   };
 
   const savePrice = () => {
@@ -197,6 +219,8 @@ export default function SeatReservePage() {
     const n = Math.min(12, Math.max(2, cols));
     saveHalls(hallList().map((h) => (h.name === name ? { ...h, cols: n } : h)), `${name}: ${n} columns · ${Math.floor(n / 2)} family sofas per row`);
   };
+  const setRows = (name: string, rows: number, msg: string) =>
+    saveHalls(hallList().map((h) => (h.name === name ? { ...h, rows: Math.max(1, Math.min(30, rows)) } : h)), msg);
   const setEntry = (name: string, entry: Entry) => saveHalls(hallList().map((h) => (h.name === name ? { ...h, entry } : h)), `${name}: entry on the ${entry}`);
   const moveHall = (i: number, dir: -1 | 1) => {
     const list = hallList();
@@ -309,55 +333,67 @@ export default function SeatReservePage() {
                         </span>
                       }
                     >
-                      {g.tables.map((t, i) => (
-                        <SkySlot
-                          key={t.id}
-                          wide={t.shape === "sofa"}
-                          className={`${sel === t.id ? "sel" : ""}${t.bookable === false ? " walkin" : ""}${dragId === t.id ? " dragging" : ""}`}
-                          draggable
-                          onDragStart={(e) => { setDragId(t.id); e.dataTransfer.effectAllowed = "move"; }}
-                          onDragEnd={() => setDragId(null)}
-                          onDragOver={(e) => { if (dragId) e.preventDefault(); }}
-                          onDrop={(e) => { e.preventDefault(); drop(g.hall.name, i); }}
-                          onClick={() => select(sel === t.id ? null : t)}
-                          aria-pressed={sel === t.id}
-                          aria-label={`${tableLabel(t)}, ${t.kind}, booking ₹${t.book_price ?? 0}`}
-                        >
-                          <TableArt shape={t.shape} name={t.name} />
-                          <span className="sky-pr">{t.bookable === false ? "Walk-in" : t.book_price ? `₹${t.book_price}` : "Free"}</span>
-                        </SkySlot>
-                      ))}
-                      <button
-                        type="button"
-                        className={`sr-plus${adding === g.hall.name ? " on" : ""}`}
-                        onClick={() => { setSel(null); setAdding(adding === g.hall.name ? null : g.hall.name); }}
-                        onDragOver={(e) => { if (dragId) e.preventDefault(); }}
-                        onDrop={(e) => { e.preventDefault(); drop(g.hall.name, g.tables.length); }}
-                        aria-expanded={adding === g.hall.name}
-                      >
-                        <span aria-hidden="true">+</span>Add table
-                      </button>
-                      {adding === g.hall.name && (
-                        <div className="sr-addmenu">
-                          <b>New table in {g.hall.name}</b>
-                          <div className="sr-kinds">
-                            {TABLE_KINDS.map((k) => (
-                              <button key={k.kind} disabled={busy === "add"} onClick={() => createTable(g.hall.name, k)}>
-                                <span className="sr-ka"><TableArt shape={k.shape} name="" /></span>
-                                <span>{k.kind}<small>{k.seats} seats · named {nextName(tables, k.shape === "sofa" ? "F" : "T")}</small></span>
-                              </button>
+                      {rowsOf(g).map((rowT, ri, all) => {
+                        const key = `${g.hall.name}#${ri}`;
+                        return (
+                          <SkyRow key={key} label={`${g.hall.name}, row ${ri + 1}`}>
+                            {rowT.map((t, i) => (
+                              <SkySlot
+                                key={t.id}
+                                wide={t.shape === "sofa"}
+                                className={`${sel === t.id ? "sel" : ""}${t.bookable === false ? " walkin" : ""}${dragId === t.id ? " dragging" : ""}`}
+                                draggable
+                                onDragStart={(e) => { setDragId(t.id); e.dataTransfer.effectAllowed = "move"; }}
+                                onDragEnd={() => setDragId(null)}
+                                onDragOver={(e) => { if (dragId) e.preventDefault(); }}
+                                onDrop={(e) => { e.preventDefault(); drop(g.hall.name, ri, i); }}
+                                onClick={() => select(sel === t.id ? null : t)}
+                                aria-pressed={sel === t.id}
+                                aria-label={`${tableLabel(t)}, ${t.kind}, row ${ri + 1}, booking ₹${t.book_price ?? 0}`}
+                              >
+                                <TableArt shape={t.shape} name={t.name} />
+                                <span className="sky-pr">{t.bookable === false ? "Walk-in" : t.book_price ? `₹${t.book_price}` : "Free"}</span>
+                              </SkySlot>
                             ))}
-                          </div>
-                          {offFloor.length > 0 && (
-                            <>
-                              <b className="sr-or">Or place a table you already made</b>
-                              <div className="sr-exist">
-                                {offFloor.map((t) => <button key={t.id} onClick={() => placeExisting(t, g.hall.name)}>{t.name} <small>{t.kind}</small></button>)}
+                            <button
+                              type="button"
+                              className={`sr-plus${adding === key ? " on" : ""}`}
+                              onClick={() => { setSel(null); setAdding(adding === key ? null : key); }}
+                              onDragOver={(e) => { if (dragId) e.preventDefault(); }}
+                              onDrop={(e) => { e.preventDefault(); drop(g.hall.name, ri, rowT.length); }}
+                              aria-expanded={adding === key}
+                              aria-label={`Add a table to row ${ri + 1}`}
+                            >
+                              <span aria-hidden="true">+</span>{all.length > 1 ? `Row ${ri + 1}` : "Add table"}
+                            </button>
+                            {rowT.length === 0 && ri === all.length - 1 && ri > 0 && (
+                              <button type="button" className="sr-rowx" onClick={() => setRows(g.hall.name, all.length - 1, `Row ${ri + 1} removed`)}>Remove empty row</button>
+                            )}
+                            {adding === key && (
+                              <div className="sr-addmenu">
+                                <b>New table in {g.hall.name}{all.length > 1 ? `, row ${ri + 1}` : ""}</b>
+                                <div className="sr-kinds">
+                                  {TABLE_KINDS.map((k) => (
+                                    <button key={k.kind} disabled={busy === "add"} onClick={() => createTable(g.hall.name, ri, k)}>
+                                      <span className="sr-ka"><TableArt shape={k.shape} name="" /></span>
+                                      <span>{k.kind}<small>{k.seats} seats · named {nextName(tables, k.shape === "sofa" ? "F" : "T")}</small></span>
+                                    </button>
+                                  ))}
+                                </div>
+                                {offFloor.length > 0 && (
+                                  <>
+                                    <b className="sr-or">Or place a table you already made</b>
+                                    <div className="sr-exist">
+                                      {offFloor.map((t) => <button key={t.id} onClick={() => placeExisting(t, g.hall.name, ri)}>{t.name} <small>{t.kind}</small></button>)}
+                                    </div>
+                                  </>
+                                )}
                               </div>
-                            </>
-                          )}
-                        </div>
-                      )}
+                            )}
+                          </SkyRow>
+                        );
+                      })}
+                      <button type="button" className="sr-addrow" onClick={() => setRows(g.hall.name, rowsOf(g).length + 1, `Row ${rowsOf(g).length + 1} added to ${g.hall.name} — tap its + to add tables`)}>＋ Add row</button>
                     </SkyHall>
                   ))}
                   <button className="sr-addhall" onClick={() => setHallForm({ mode: "new", name: "" })}>＋ Add a hall — Rooftop, AC hall, Garden…</button>
@@ -380,12 +416,14 @@ export default function SeatReservePage() {
                       <div className="sr-chips">
                         <button onClick={() => nudge(selected, -1)}>← Move left</button>
                         <button onClick={() => nudge(selected, 1)}>Move right →</button>
+                        <button onClick={() => moveRow(selected, -1)} disabled={(where(selected)?.row ?? 0) === 0}>↑ Row up</button>
+                        <button onClick={() => moveRow(selected, 1)}>Row down ↓</button>
                       </div>
                     </div>
                     {floor.length > 1 && (
                       <label className="sr-rule">Hall
                         <select className="sr-sel" value={(floor.find((g) => g.tables.some((x) => x.id === selected.id))?.hall.name) ?? DEFAULT_HALL}
-                          onChange={(e) => { moveTo(selected, e.target.value, 999); showToast(`${tableLabel(selected)} moved to ${e.target.value}`); }}>
+                          onChange={(e) => { moveTo(selected, e.target.value, 0, 999); showToast(`${tableLabel(selected)} moved to ${e.target.value}`); }}>
                           {floor.map((g) => <option key={g.hall.name} value={g.hall.name}>{g.hall.name}</option>)}
                         </select>
                       </label>
@@ -396,7 +434,7 @@ export default function SeatReservePage() {
                   <div className="db-panel sr-box">
                     <div className="sr-bh"><b>How it works</b></div>
                     <ol className="sr-how">
-                      <li>Tap <b>+</b> in a hall to make a table: 2-seater, 4-seater or Family sofa.</li>
+                      <li>Tap <b>+</b> in a row to make a table: 2-seater, 4-seater or Family sofa. <b>＋ Add row</b> starts a new row.</li>
                       <li>Pick each hall&apos;s <b>🚪 Entry</b> side, so guests know where the door is.</li>
                       <li>Drag a table onto another to swap places, or tap it and use ← →.</li>
                       <li>Tap a table to set its booking price, then share the link.</li>

@@ -25,10 +25,15 @@ export function SkyHall({ name, entry, head, children, cols = 6, compact = false
   return (
     <section className={`sky-hall entry-${entry}${compact ? " compact" : ""}`} style={style} aria-label={`${name}, entry on the ${entry}`}>
       <div className="sky-hh"><b>{name}</b>{head}</div>
-      <div className="sky-scroll"><div className="sky-slots">{children}</div></div>
+      <div className="sky-scroll"><div className="sky-rows">{children}</div></div>
       <span className="sky-door" aria-hidden="true"><i>🚪</i>Entry</span>
     </section>
   );
+}
+
+/** One row of the hall: tables left to right on the hall's column grid. */
+export function SkyRow({ children, label }: { children: ReactNode; label?: string }) {
+  return <div className="sky-slots sky-row" role="group" aria-label={label}>{children}</div>;
 }
 
 /** One slot on the grid; a family sofa takes two. */

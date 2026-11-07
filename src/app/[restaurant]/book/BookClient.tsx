@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { RestaurantLogo } from "@/components/RestaurantLogo";
-import { SkyHall, SkySlot } from "@/components/SkyFloor";
+import { SkyHall, SkyRow, SkySlot } from "@/components/SkyFloor";
 import { TableArt } from "@/components/TableArt";
 import { cleanPhone } from "@/lib/loyalty";
-import { createReservation, dayLabel, floorAt, groupHalls, hallCols, slotsFor, timeLabel, type BookingDone, type FloorInfo, type FloorTable } from "@/lib/reserve";
+import { createReservation, dayLabel, floorAt, groupHalls, hallCols, hallRows, slotsFor, timeLabel, type BookingDone, type FloorInfo, type FloorTable } from "@/lib/reserve";
 import type { Restaurant } from "@/lib/types";
 import "./book.css";
 
@@ -176,7 +176,10 @@ export function BookClient({ restaurant }: { restaurant: Restaurant }) {
         <div className="bk-halls">
           {groupHalls(info.halls, tables, (t) => t.slot).filter((g) => g.tables.length > 0).map((g) => (
             <SkyHall key={g.hall.name} name={g.hall.name} entry={g.hall.entry} cols={hallCols(g.hall)} compact>
-              {g.tables.map((t) => {
+              {/* the same rows the owner laid out in Seat Reserve */}
+              {hallRows(g.hall, g.tables, (t) => t.slot).filter((r) => r.length > 0).map((rowT, ri) => (
+              <SkyRow key={ri}>
+              {rowT.map((t) => {
                 const st = stateOf(t);
                 const can = st === "free" || st === "mine";
                 return (
@@ -194,6 +197,8 @@ export function BookClient({ restaurant }: { restaurant: Restaurant }) {
                   </SkySlot>
                 );
               })}
+              </SkyRow>
+              ))}
             </SkyHall>
           ))}
         </div>

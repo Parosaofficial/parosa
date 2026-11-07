@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { SkyHall, SkyRow, SkySlot } from "@/components/SkyFloor";
 import { TableArt } from "@/components/TableArt";
 import { playChime, primeAudio } from "@/lib/chime";
 import { listStaff, type OrderWithItems } from "@/lib/db";
-import { listReservations, timeLabel, type Reservation } from "@/lib/reserve";
+import { groupHalls, hallCols, hallRows, listReservations, timeLabel, type Reservation } from "@/lib/reserve";
 import { supabase } from "@/lib/supabase";
 import {
   assignWaiter, clearWaiterCall, closeSession, freeSession, listOpenSessions, listTables, tableLabel,
@@ -15,9 +16,10 @@ import type { Restaurant, Staff } from "@/lib/types";
 import "./floor.css";
 
 /*
- * Live tables on the Overview (migration 0015): each table drawn from above in
- * its type's shape, the tabletop coloured by stage. Tap one to manage its
- * session — waiter, payment (closes the session), or free the table.
+ * Live tables on the Overview (migration 0015): the same sky-grid floor as
+ * Seat Reserve — halls, rows, entry side and table shapes — with each tabletop
+ * coloured by its live stage. Tap one to manage its session — waiter, payment
+ * (closes the session), or free the table.
  */
 
 type Stage = "free" | "seated" | "cooking" | "ready" | "bill";
@@ -109,10 +111,12 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
   const kinds = Array.from(new Set(tables.map((t) => t.kind)));
   const shown = kind === "All" ? rows : rows.filter((r) => r.t.kind === kind);
   const count = (s: Stage) => rows.filter((r) => r.stage === s).length;
-  // halls in the order set in Seat Reserve, then any other areas, unnamed last
-  const hallOrder = (restaurant.floor_halls ?? []).map((h) => h.name);
-  const rank = (a: string) => (hallOrder.includes(a) ? hallOrder.indexOf(a) : a ? hallOrder.length : hallOrder.length + 1);
-  const areas = Array.from(new Set(shown.map((r) => r.t.area || ""))).sort((a, b) => rank(a) - rank(b));
+  // the Seat Reserve floor plan: halls → rows → tables. Before any table is placed there,
+  // every table shows, grouped by its area. Tables left off the plan show underneath.
+  const planned = shown.some((r) => r.t.on_floor);
+  const onPlan = (planned ? shown.filter((r) => r.t.on_floor) : shown).map((r) => ({ ...r, area: r.t.area }));
+  const offPlan = planned ? shown.filter((r) => !r.t.on_floor) : [];
+  const halls = groupHalls(restaurant.floor_halls, onPlan, (r) => r.t.floor_slot ?? 0).filter((g) => g.tables.length > 0);
   const waiterName = (id: string | null) => staff.find((s) => s.id === id)?.name ?? null;
   const open = rows.find((r) => r.t.id === openId) ?? null;
 
@@ -165,37 +169,39 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
 
       {view === "floor" ? (
         <div className="fl-zones">
-          {areas.map((a) => {
-            // same order as the Seat Reserve floor plan
-            const inArea = shown.filter((r) => (r.t.area || "") === a).sort((x, y) => (x.t.floor_slot ?? 999) - (y.t.floor_slot ?? 999));
-            const sofas = inArea.filter((r) => r.t.shape === "sofa");
-            const small = inArea.filter((r) => r.t.shape !== "sofa");
-            return (
-              <div key={a || "-"} className="fl-zone">
-                {areas.length > 1 || a ? <div className="fl-zh">{a || "Other tables"}</div> : null}
-                {small.length > 0 && (
-                  <div className="fl-floor">
-                    {small.map((r) => (
-                      <button key={r.t.id} className={`fl-t ${r.stage}${r.waiter || r.billAsked ? " alert" : ""}${r.booking ? " booked" : ""}`} onClick={() => setOpenId(r.t.id)} aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}>
+          {halls.map((g) => (
+            <SkyHall key={g.hall.name} name={g.hall.name} entry={g.hall.entry} cols={hallCols(g.hall)}>
+              {hallRows(g.hall, g.tables, (r) => r.t.floor_slot ?? 0).filter((row) => row.length > 0).map((row, ri) => (
+                <SkyRow key={ri}>
+                  {row.map((r) => (
+                    <SkySlot
+                        key={r.t.id}
+                        wide={r.t.shape === "sofa"}
+                        className={`fl-t ${r.stage}${r.waiter || r.billAsked ? " alert" : ""}${r.booking ? " booked" : ""}`}
+                        onClick={() => setOpenId(r.t.id)}
+                        aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}
+                      >
                         <TableArt shape={r.t.shape} name={r.t.name} seated={!!r.session} />
                         {info(r)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {sofas.length > 0 && (
-                  <div className="fl-floor wide">
-                    {sofas.map((r) => (
-                      <button key={r.t.id} className={`fl-t ${r.stage}${r.waiter || r.billAsked ? " alert" : ""}${r.booking ? " booked" : ""}`} onClick={() => setOpenId(r.t.id)} aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}>
-                        <TableArt shape="sofa" name={r.t.name} seated={!!r.session} />
-                        {info(r)}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                      </SkySlot>
+                  ))}
+                </SkyRow>
+              ))}
+            </SkyHall>
+          ))}
+          {offPlan.length > 0 && (
+            <div className="fl-zone">
+              <div className="fl-zh">Not on the floor plan</div>
+              <div className="fl-floor">
+                {offPlan.map((r) => (
+                  <button key={r.t.id} className={`fl-t ${r.stage}${r.waiter || r.billAsked ? " alert" : ""}${r.booking ? " booked" : ""}`} onClick={() => setOpenId(r.t.id)} aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}>
+                    <TableArt shape={r.t.shape} name={r.t.name} seated={!!r.session} />
+                    {info(r)}
+                  </button>
+                ))}
               </div>
-            );
-          })}
+            </div>
+          )}
         </div>
       ) : (
         <div className="fl-list">

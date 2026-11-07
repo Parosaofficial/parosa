@@ -116,3 +116,9 @@
 .sr-cols{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:800;color:#2F5E86;background:#fff;border:1px solid #BAD6EE;border-radius:9px;padding:2px 4px 2px 9px}
 .sr-cols b{min-width:18px;text-align:center;color:#24090B}
 .sr-hctl .sr-cols button{width:24px;height:24px;border-radius:6px;font-size:15px}
+
+/* rows */
+.sr-addrow{justify-self:start;border:2px dashed #8DB5D8;border-radius:12px;background:#ffffffa6;color:#2F5E86;font-family:var(--font-body);font-size:14px;font-weight:800;padding:8px 16px;cursor:pointer}
+.sr-addrow:hover{background:#fff}
+.sr-addrow:focus-visible,.sr-rowx:focus-visible{outline:2px solid #5C0F14;outline-offset:2px}
+.sr-rowx{align-self:center;justify-self:start;border:none;background:none;color:#B4231C;font-family:var(--font-body);font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
