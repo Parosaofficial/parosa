@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { playChime, primeAudio } from "@/lib/chime";
 import {
-  forStation, kitchenBoard, kitchenItemDone, kitchenSetStatus, orderSource, tableTitle,
+  clearKitchenSession, forStation, kitchenBoard, kitchenItemDone, kitchenSetStatus, kitchenSignOut, orderSource, tableTitle,
   type KitchenBoard, type KitchenOrder, type KitchenStatus, type Station,
 } from "@/lib/kitchen";
-import { clearStaffSession, useStaff } from "@/lib/useStaff";
+import { useKitchenSession } from "@/lib/useKitchen";
 import "./kitchen.css";
 
 /*
@@ -33,7 +33,7 @@ const clock = (ms: number) => {
 
 export default function Kitchen() {
   const router = useRouter();
-  const { staff, ready } = useStaff("/kitchen");
+  const { session: kit, ready } = useKitchenSession();
   const [board, setBoard] = useState<KitchenBoard | null>(null);
   const [state, setState] = useState<"loading" | "ok" | "signedout">("loading");
   const [started, setStarted] = useState(false);
@@ -57,8 +57,8 @@ export default function Kitchen() {
   };
 
   const load = useCallback(async () => {
-    if (!staff) return;
-    const b = await kitchenBoard(staff);
+    if (!kit) return;
+    const b = await kitchenBoard(kit);
     if (!b) { setState("signedout"); return; }
     // new tickets: sound + a short flash
     const ids = b.orders.filter((o) => o.status === "new").map((o) => o.id);
@@ -71,17 +71,17 @@ export default function Kitchen() {
     }
     setBoard(b);
     setState("ok");
-  }, [staff]);
+  }, [kit]);
 
   useEffect(() => {
-    if (!staff) return;
+    if (!kit) return;
     const first = setTimeout(load, 0);
     const t = setInterval(load, POLL_MS);
     const tick = setInterval(() => setNow(Date.now()), 1000);
     const onShow = () => { if (document.visibilityState === "visible") load(); };
     document.addEventListener("visibilitychange", onShow);
     return () => { clearTimeout(first); clearInterval(t); clearInterval(tick); document.removeEventListener("visibilitychange", onShow); };
-  }, [staff, load]);
+  }, [kit, load]);
 
   // keep the screen awake while the kitchen is open
   useEffect(() => {
@@ -119,43 +119,43 @@ export default function Kitchen() {
   const setLocal = (fn: (o: KitchenOrder) => KitchenOrder) => setBoard((b) => b && { ...b, orders: b.orders.map(fn), recent: b.recent.map(fn) });
 
   const move = async (o: KitchenOrder, status: KitchenStatus) => {
-    if (!staff) return;
+    if (!kit) return;
     setLocal((x) => (x.id === o.id ? { ...x, status, cooking_at: status === "cooking" ? x.cooking_at ?? new Date().toISOString() : x.cooking_at, ready_at: status === "ready" ? new Date().toISOString() : x.ready_at } : x));
     if (status === "served") setBoard((b) => b && { ...b, orders: b.orders.filter((x) => x.id !== o.id), recent: [{ ...o, status: "served", served_at: new Date().toISOString() }, ...b.recent] });
     if (status !== "served" && o.status === "served") setBoard((b) => b && { ...b, recent: b.recent.filter((x) => x.id !== o.id), orders: [...b.orders, { ...o, status }] });
-    try { await kitchenSetStatus(staff, o.id, status); } catch { /* the next refresh shows the truth */ }
+    try { await kitchenSetStatus(kit, o.id, status); } catch { /* the next refresh shows the truth */ }
     load();
   };
 
   const tick = async (o: KitchenOrder, itemId: string, done: boolean) => {
-    if (!staff) return;
+    if (!kit) return;
     const items = o.items.map((i) => (i.id === itemId ? { ...i, done } : i));
     setLocal((x) => (x.id === o.id ? { ...x, items } : x));
-    try { await kitchenItemDone(staff, itemId, done); } catch { /* next refresh */ }
+    try { await kitchenItemDone(kit, itemId, done); } catch { /* next refresh */ }
     // a station finishing the last open item of the order sends it to Ready
     if (done && items.every((i) => i.done) && o.status === "cooking") move({ ...o, items }, "ready");
   };
 
   /** Station screen: "Done" ticks all of this station's dishes. */
   const stationDone = async (o: KitchenOrder) => {
-    if (!staff) return;
+    if (!kit) return;
     const mine = forStation(o, st).filter((i) => !i.done);
     const items = o.items.map((i) => (mine.some((m) => m.id === i.id) ? { ...i, done: true } : i));
     setLocal((x) => (x.id === o.id ? { ...x, items } : x));
-    await Promise.all(mine.map((i) => kitchenItemDone(staff, i.id, true).catch(() => {})));
+    await Promise.all(mine.map((i) => kitchenItemDone(kit, i.id, true).catch(() => {})));
     if (items.every((i) => i.done)) move({ ...o, items }, "ready");
     else load();
   };
 
-  if (!ready || !staff) return <div className="kd kd-center"><span className="kd-spin" /></div>;
+  if (!ready || !kit) return <div className="kd kd-center"><span className="kd-spin" /></div>;
 
   if (state === "signedout") {
     return (
       <div className="kd kd-center">
         <div className="kd-card">
           <h1>Kitchen screen signed out</h1>
-          <p>Today&apos;s staff code has changed (it&apos;s new every day). Sign in again with the new code.</p>
-          <button className="kd-btn" onClick={() => { clearStaffSession(); router.replace("/login/staff?next=/kitchen"); }}>Sign in again</button>
+          <p>This screen was removed from the restaurant&apos;s kitchen screens. Sign in again with the Restaurant ID and a new code.</p>
+          <button className="kd-btn" onClick={() => { clearKitchenSession(); router.replace("/kitchen/login"); }}>Sign in again</button>
         </div>
       </div>
     );
@@ -166,14 +166,14 @@ export default function Kitchen() {
       <div className="kd kd-center">
         <div className="kd-card">
           <span className="kd-chef" aria-hidden="true">👨‍🍳</span>
-          <h1>{staff.restaurant_name} · Kitchen</h1>
+          <h1>{kit.restaurant_name} · Kitchen</h1>
           <p>New orders appear here with a Cha-Ching sound. Leave this screen open on the kitchen tablet or TV.</p>
           <button className="kd-btn" onClick={() => {
             primeAudio(); setStarted(true);
             const el = document.documentElement as HTMLElement & { requestFullscreen?: () => Promise<void> };
             el.requestFullscreen?.().catch(() => {});
           }}>Start kitchen screen</button>
-          <small>Signed in as {staff.staff_name}</small>
+          <button className="kd-out" onClick={async () => { if (!window.confirm("Sign this screen out of the kitchen?")) return; await kitchenSignOut(kit).catch(() => clearKitchenSession()); router.replace("/kitchen/login"); }}>Sign out of this screen</button>
         </div>
       </div>
     );
@@ -229,7 +229,7 @@ export default function Kitchen() {
   return (
     <div className="kd">
       <header className="kd-bar">
-        <b className="kd-name">{staff.restaurant_name} · Kitchen</b>
+        <b className="kd-name">{kit.restaurant_name} · Kitchen</b>
         <nav className="kd-stations" aria-label="Station">
           <button className={!st ? "on" : ""} onClick={() => pickStation("")}>All</button>
           {stations.map((s) => <button key={s.name} className={st?.name === s.name ? "on" : ""} onClick={() => pickStation(s.name)}>{s.name}</button>)}

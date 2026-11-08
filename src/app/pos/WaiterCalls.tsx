@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { playChime, primeAudio } from "@/lib/chime";
-import { kitchenSetStatus, staffReady, type ReadyFood } from "@/lib/kitchen";
+import { staffReady, staffServed, type ReadyFood } from "@/lib/kitchen";
 import { staffCallSeen, staffCalls, type StaffCall } from "@/lib/tables";
 import type { StaffSession } from "@/lib/types";
 import "./waitercalls.css";
@@ -57,7 +57,7 @@ export function WaiterCalls({ staff }: { staff: StaffSession }) {
   };
   const served = async (f: ReadyFood) => {
     setBusy(f.order_id);
-    try { await kitchenSetStatus(staff, f.order_id, "served"); setFood((l) => l.filter((x) => x.order_id !== f.order_id)); }
+    try { await staffServed(staff, f.order_id); setFood((l) => l.filter((x) => x.order_id !== f.order_id)); }
     catch { /* the next check shows it again */ }
     finally { setBusy(""); }
   };

@@ -5,16 +5,19 @@ import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
 import { AppLoading } from "@/components/AppLoading";
 import { getMenu } from "@/lib/db";
-import { saveKitchenSettings, type Station } from "@/lib/kitchen";
+import {
+  kitchenDevices, pendingKitchenOtp, removeKitchenDevice, saveKitchenSettings,
+  type KitchenDevice, type KitchenOtp, type Station,
+} from "@/lib/kitchen";
 import { useOwner } from "@/lib/useOwner";
 import type { Category } from "@/lib/types";
 import "../dash.css";
 import "./kitchendisplay.css";
 
 /*
- * Owner side of the Kitchen Display: the kitchen link, how to open it on a
- * tablet, ticket timer colours, and stations (which menu categories each
- * kitchen screen cooks).
+ * Owner side of the Kitchen Display: the kitchen link, the Restaurant ID and
+ * sign-in code a kitchen tablet needs, the signed-in screens, ticket timer
+ * colours, and stations (which menu categories each kitchen screen cooks).
  */
 
 const AMBER = [5, 8, 10, 15];
@@ -28,6 +31,23 @@ export default function KitchenDisplay() {
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2200); };
 
+  // kitchen sign-in: the live code (until WhatsApp is connected) + signed-in screens
+  const [otp, setOtp] = useState<KitchenOtp | null>(null);
+  const [devices, setDevices] = useState<KitchenDevice[] | null>(null);
+  const [tick, setTick] = useState(() => Date.now());
+  useEffect(() => {
+    if (!restaurant) return;
+    let alive = true;
+    const load = () => {
+      pendingKitchenOtp(restaurant.id).then((o) => { if (alive) setOtp(o); });
+      kitchenDevices(restaurant.id).then((d) => { if (alive) setDevices(d); });
+      setTick(Date.now());
+    };
+    load();
+    const t = setInterval(load, 5000);
+    return () => { alive = false; clearInterval(t); };
+  }, [restaurant]);
+
   useEffect(() => {
     if (!restaurant) return;
     getMenu(restaurant.slug).then((m) => setCats(m?.categories ?? [])).catch(() => {});
@@ -38,7 +58,6 @@ export default function KitchenDisplay() {
   const missing = restaurant.kitchen_stations === undefined;
   const list = stations ?? restaurant.kitchen_stations ?? [];
   const link = `${window.location.origin}/kitchen`; // rendered only on the client, after sign-in
-  const codeToday = restaurant.staff_code && restaurant.staff_code_date === new Date().toLocaleDateString("en-CA") ? restaurant.staff_code : null;
 
   const save = async (p: Parameters<typeof saveKitchenSettings>[1], msg: string) => {
     try { await saveKitchenSettings(restaurant.id, p); await reload(); showToast(msg); }
@@ -62,6 +81,16 @@ export default function KitchenDisplay() {
     saveStations(list.filter((x) => x.name !== s.name), `${s.name} removed`);
   };
   const copy = async () => { try { await navigator.clipboard.writeText(link); showToast("Kitchen link copied"); } catch { showToast(link); } };
+  const removeDevice = async (d: KitchenDevice) => {
+    if (!window.confirm(`Sign out ${d.name}? It will need a new code to open the kitchen again.`)) return;
+    try { await removeKitchenDevice(d.id); setDevices((l) => l?.filter((x) => x.id !== d.id) ?? l); showToast(`${d.name} signed out`); }
+    catch { showToast("Couldn't sign it out — try again"); }
+  };
+  const ago = (iso: string) => {
+    const m = Math.round((tick - new Date(iso).getTime()) / 60000);
+    return m < 2 ? "now" : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago`;
+  };
+  const otpLeft = otp ? Math.max(0, Math.ceil((new Date(otp.expires_at).getTime() - tick) / 60000)) : 0;
   const unassigned = cats.filter((c) => !list.some((s) => s.categories.includes(c.id)));
 
   return (
@@ -81,10 +110,18 @@ export default function KitchenDisplay() {
               <div className="kdo-link"><code>{link.replace(/^https?:\/\//, "")}</code><button className="db-btn" onClick={copy}>Copy</button></div>
               <ol className="kdo-steps">
                 <li>Open the link on any tablet, old phone or TV in the kitchen.</li>
-                <li>Sign in with a staff member&apos;s phone and today&apos;s code {codeToday ? <b className="kdo-code">{codeToday}</b> : <Link href="/staff">— get today&apos;s code in Staff &amp; Admin</Link>}.</li>
-                <li>Tap <b>Start kitchen screen</b> and leave it open. New orders ring with the Cha-Ching sound.</li>
+                <li>Enter the <b>Restaurant ID</b> <b className="kdo-code">{restaurant.slug}</b> and the registered mobile {restaurant.phone ? <b>{restaurant.phone}</b> : <Link href="/settings">— add one in Settings first</Link>}.</li>
+                <li>Enter the 6-digit code, tap <b>Start kitchen screen</b> and leave it open. New orders ring with the Cha-Ching sound.</li>
               </ol>
-              <p className="kdo-muted">The code changes every day, so the kitchen signs in again each morning.</p>
+              {otp ? (
+                <div className="kdo-otp" role="status">
+                  <span>Kitchen sign-in code</span>
+                  <b>{otp.code}</b>
+                  <small>{otp.sent_whatsapp ? "Also sent on WhatsApp · " : ""}Works for {otpLeft} more min. Only give it to your kitchen.</small>
+                </div>
+              ) : (
+                <p className="kdo-muted">When the kitchen asks for a code, it shows up right here (WhatsApp codes are coming soon).</p>
+              )}
             </section>
 
             <section className="db-panel kdo-card">
@@ -98,6 +135,19 @@ export default function KitchenDisplay() {
               <div className="kdo-legend"><span className="g">0–{restaurant.kds_amber_min ?? 10} min</span><span className="a">{restaurant.kds_amber_min ?? 10}–{restaurant.kds_red_min ?? 20} min</span><span className="r">{restaurant.kds_red_min ?? 20}+ min</span></div>
             </section>
           </div>
+
+          <section className="db-panel kdo-card kdo-devs">
+            <h3>Signed-in kitchen screens</h3>
+            {devices === null ? <p className="kdo-muted">Shows once the database update is done.</p>
+              : devices.length === 0 ? <p className="kdo-empty">No kitchen screen signed in yet.</p>
+              : devices.map((d) => (
+                <div key={d.id} className="kdo-dev">
+                  <span aria-hidden="true">🖥</span>
+                  <div><b>{d.name}</b><small>Signed in {new Date(d.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} · last seen {ago(d.last_seen)}</small></div>
+                  <button className="kdo-x" onClick={() => removeDevice(d)}>Sign out</button>
+                </div>
+              ))}
+          </section>
 
           <section className="db-panel kdo-card kdo-stations">
             <div className="kdo-sh">

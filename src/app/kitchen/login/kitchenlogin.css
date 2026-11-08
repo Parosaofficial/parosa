@@ -1,0 +1,18 @@
+/* Kitchen sign-in (Restaurant ID + mobile + code) */
+.kl{text-align:left;justify-items:stretch}
+.kl .kd-chef,.kl h1{justify-self:center}
+.kl-form{display:grid;gap:12px}
+.kl-form>p{margin:0;text-align:center}
+.kl-form label{display:grid;gap:6px;font-size:14px;font-weight:700;color:#24090B}
+.kl-form input{font:inherit;font-size:18px;font-weight:600;color:#24090B;border:1.5px solid #E4D3D4;border-radius:12px;padding:12px 14px;width:100%;box-sizing:border-box;background:#fff}
+.kl-form input:focus{outline:none;border-color:#5C0F14;box-shadow:0 0 0 3px #5C0F1422}
+.kl-phone{display:flex;align-items:center;border:1.5px solid #E4D3D4;border-radius:12px;overflow:hidden}
+.kl-phone:focus-within{border-color:#5C0F14;box-shadow:0 0 0 3px #5C0F1422}
+.kl-phone b{padding:0 4px 0 14px;font-size:18px;color:#6E5557}
+.kl-phone input{border:none;box-shadow:none!important;padding-left:6px}
+.kl-code{text-align:center;letter-spacing:.5em;font-size:28px!important;font-family:ui-monospace,Consolas,monospace!important}
+.kl-err{margin:0;background:#FDECEA;color:#B4231C;border-radius:10px;padding:8px 12px;font-size:14px}
+.kl-note{display:grid;gap:4px;background:#FFF4DE;border:1px solid #E9C46A;border-radius:12px;padding:10px 12px;font-size:14px;color:#4A3200}
+.kl-form small{text-align:center}
+.kl-row{display:flex;justify-content:space-between;gap:8px}
+.kd-btn:disabled,.kd-out:disabled{opacity:.55;cursor:default}

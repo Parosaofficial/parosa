@@ -1,0 +1,73 @@
+import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
+
+/*
+ * Kitchen sign-in, step 1: Restaurant ID + registered mobile → a 6-digit code.
+ *
+ * The database checks the pair and makes the code (kitchen_request_otp). The
+ * code is then sent on WhatsApp — once these are set on the server (Vercel →
+ * Settings → Environment Variables), and not before:
+ *   WHATSAPP_TOKEN            Meta WhatsApp Cloud API access token
+ *   WHATSAPP_PHONE_NUMBER_ID  the sending number's id
+ *   WHATSAPP_OTP_TEMPLATE     an approved "authentication" template (default: parosa_kitchen_otp)
+ *   SUPABASE_SERVICE_ROLE_KEY to read the code server-side (never sent to a browser)
+ * Until then the code shows on the owner's Dashboard → Kitchen display page.
+ */
+
+export const dynamic = "force-dynamic";
+
+type Made = { ok: boolean; error?: string; otp_id?: string; restaurant_name?: string; phone_end?: string };
+
+export async function POST(req: Request) {
+  let id = "", phone = "";
+  try {
+    const b = (await req.json()) as { id?: unknown; phone?: unknown };
+    id = String(b.id ?? "").trim().slice(0, 80);
+    phone = String(b.phone ?? "").replace(/\D/g, "").slice(-10);
+  } catch { /* fall through */ }
+  if (!id || phone.length !== 10) return Response.json({ ok: false, error: "nomatch" });
+
+  const { data, error } = await supabase.rpc("kitchen_request_otp", { p_slug: id, p_phone: phone });
+  if (error || !data) return Response.json({ ok: false, error: "offline" });
+  const made = data as Made;
+  if (!made.ok || !made.otp_id) return Response.json({ ok: false, error: made.error === "toomany" ? "toomany" : "nomatch" });
+
+  const via = (await sendOnWhatsApp(made.otp_id, phone)) ? "whatsapp" : "dashboard";
+  return Response.json({ ok: true, restaurant_name: made.restaurant_name, phone_end: made.phone_end, via });
+}
+
+async function sendOnWhatsApp(otpId: string, phone10: string): Promise<boolean> {
+  const token = process.env.WHATSAPP_TOKEN;
+  const numberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://cyyyrunhjwnadjnsrtog.supabase.co";
+  if (!token || !numberId || !service) return false;
+  try {
+    const admin = createClient(url, service, { auth: { persistSession: false } });
+    const { data } = await admin.from("kitchen_otps").select("code").eq("id", otpId).single();
+    if (!data?.code) return false;
+    const template = process.env.WHATSAPP_OTP_TEMPLATE || "parosa_kitchen_otp";
+    const r = await fetch(`https://graph.facebook.com/v21.0/${numberId}/messages`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to: `91${phone10}`,
+        type: "template",
+        template: {
+          name: template,
+          language: { code: "en" },
+          components: [
+            { type: "body", parameters: [{ type: "text", text: data.code }] },
+            { type: "button", sub_type: "url", index: "0", parameters: [{ type: "text", text: data.code }] },
+          ],
+        },
+      }),
+    });
+    if (!r.ok) return false;
+    await admin.from("kitchen_otps").update({ sent_whatsapp: true }).eq("id", otpId);
+    return true;
+  } catch {
+    return false;
+  }
+}

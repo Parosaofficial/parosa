@@ -81,3 +81,4 @@
   .kd-lane h2{display:none}
 }
 @media(prefers-reduced-motion:reduce){.kd-tk.flash{animation:none;box-shadow:0 0 0 4px #E9C46A}.kd-spin{animation-duration:2s}}
+.kd-out{border:none;background:none;color:#8B7476;font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
