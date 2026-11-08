@@ -32,6 +32,20 @@ export function ThankYou({ restaurantName, tableTitle, sessionId, sessionCode, o
   const [busy, setBusy] = useState("");
   const [err, setErr] = useState("");
 
+  // where the order is in the kitchen: received → cooking → ready (on the thank-you view)
+  const [kitchen, setKitchen] = useState<string | null>(null);
+  useEffect(() => {
+    if (view !== "thanks" || !sessionId) return;
+    let alive = true;
+    const load = () => sessionBill(sessionId).then((b) => {
+      const o = b?.orders.find((x) => x.order_no === order.no);
+      if (alive && o) setKitchen(o.status);
+    });
+    load();
+    const t = setInterval(load, 10000);
+    return () => { alive = false; clearInterval(t); };
+  }, [view, sessionId, order.no]);
+
   // keep the bill fresh while it's open (another phone at the table may order)
   useEffect(() => {
     if (view !== "bill" || !sessionId) return;
@@ -68,7 +82,13 @@ export function ThankYou({ restaurantName, tableTitle, sessionId, sessionCode, o
         <div className="ty-body">
           <span className="ty-tick" aria-hidden="true">✓</span>
           <h2>Thank you! Your order is in</h2>
-          <p className="ty-sub">Order #{order.no} · {rupees(order.total)} · the kitchen has it.</p>
+          <p className="ty-sub">Order #{order.no} · {rupees(order.total)}</p>
+          <p className={`ty-stage ${kitchen ?? "new"}`} role="status">
+            {kitchen === "ready" ? "🍽 Your food is ready — it's coming to your table"
+              : kitchen === "served" ? "✓ Served — enjoy your meal!"
+              : kitchen === "cooking" ? "👨‍🍳 The kitchen is cooking your order"
+              : "✓ The kitchen has your order"}
+          </p>
 
           <div className="ty-acts">
             <button className="ty-act" onClick={onAddMore}>

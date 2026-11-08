@@ -36,3 +36,6 @@
 .ty-asked b{color:#5C0F14;font-size:16px}
 .ty-asked span{font-size:14px;color:#6E5557}
 @media(prefers-reduced-motion:reduce){.ty,.ty-tick{animation:none}}
+.ty-stage{margin:4px 0 0;font-size:15px;font-weight:700;border-radius:99px;padding:6px 14px;background:#F7ECEC;color:#5C0F14}
+.ty-stage.cooking{background:#FFF4DE;color:#6A4300}
+.ty-stage.ready,.ty-stage.served{background:#E6F4EC;color:#1F7A45}

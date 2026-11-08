@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { playChime, primeAudio } from "@/lib/chime";
+import { kitchenSetStatus, staffReady, type ReadyFood } from "@/lib/kitchen";
 import { staffCallSeen, staffCalls, type StaffCall } from "@/lib/tables";
 import type { StaffSession } from "@/lib/types";
 import "./waitercalls.css";
@@ -11,6 +12,8 @@ import "./waitercalls.css";
  * table shows up here — "T5 is calling you" — and the phone vibrates and
  * rings. Calls for this waiter's tables, plus tables nobody is assigned to.
  * "On my way" clears the call (and takes an unassigned table).
+ * Food the kitchen marked Ready shows here too — "T5 food is ready" — until
+ * the waiter taps Served.
  */
 
 const POLL_MS = 7000;
@@ -18,14 +21,16 @@ const mins = (iso: string) => Math.max(0, Math.round((Date.now() - new Date(iso)
 
 export function WaiterCalls({ staff }: { staff: StaffSession }) {
   const [calls, setCalls] = useState<StaffCall[]>([]);
+  const [food, setFood] = useState<ReadyFood[]>([]);
   const [busy, setBusy] = useState("");
   const seen = useRef<Set<string> | null>(null);
 
   const load = useCallback(async () => {
-    const list = await staffCalls(staff.restaurant_id, staff.code, staff.staff_id);
+    const [list, ready] = await Promise.all([staffCalls(staff.restaurant_id, staff.code, staff.staff_id), staffReady(staff)]);
     setCalls(list);
-    const keys = new Set(list.map((c) => c.session_id + c.called_at));
-    const fresh = seen.current ? list.some((c) => !seen.current!.has(c.session_id + c.called_at)) : false;
+    setFood(ready);
+    const keys = new Set([...list.map((c) => c.session_id + c.called_at), ...ready.map((f) => "food" + f.order_id + f.ready_at)]);
+    const fresh = seen.current ? [...keys].some((k) => !seen.current!.has(k)) : false;
     seen.current = keys;
     if (fresh) {
       try { navigator.vibrate?.([400, 150, 400, 150, 400]); } catch { /* not supported (iPhone) */ }
@@ -42,11 +47,17 @@ export function WaiterCalls({ staff }: { staff: StaffSession }) {
     return () => { clearTimeout(first); clearInterval(t); document.removeEventListener("visibilitychange", onShow); };
   }, [load]);
 
-  if (calls.length === 0) return null;
+  if (calls.length === 0 && food.length === 0) return null;
 
   const onMyWay = async (c: StaffCall) => {
     setBusy(c.session_id);
     try { await staffCallSeen(staff.restaurant_id, staff.code, staff.staff_id, c.session_id); setCalls((l) => l.filter((x) => x.session_id !== c.session_id)); }
+    catch { /* the next check shows it again */ }
+    finally { setBusy(""); }
+  };
+  const served = async (f: ReadyFood) => {
+    setBusy(f.order_id);
+    try { await kitchenSetStatus(staff, f.order_id, "served"); setFood((l) => l.filter((x) => x.order_id !== f.order_id)); }
     catch { /* the next check shows it again */ }
     finally { setBusy(""); }
   };
@@ -61,6 +72,16 @@ export function WaiterCalls({ staff }: { staff: StaffSession }) {
             <span>#{c.code} · {mins(c.called_at) === 0 ? "just now" : `${mins(c.called_at)} min ago`}{c.mine ? "" : " · no waiter assigned"}</span>
           </div>
           <button onClick={() => onMyWay(c)} disabled={busy === c.session_id}>{busy === c.session_id ? "…" : "On my way"}</button>
+        </div>
+      ))}
+      {food.map((f) => (
+        <div key={f.order_id} className="wc-call wc-food">
+          <span className="wc-bell" aria-hidden="true">🍽</span>
+          <div className="wc-tx">
+            <b>{f.table_name ?? "A table"} food is ready</b>
+            <span>#{f.order_no} · pick it up from the kitchen{f.mine ? "" : " · no waiter assigned"}</span>
+          </div>
+          <button onClick={() => served(f)} disabled={busy === f.order_id}>{busy === f.order_id ? "…" : "Served"}</button>
         </div>
       ))}
     </div>

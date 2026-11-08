@@ -13,6 +13,7 @@ type Item = { label: string; href: string; icon: ReactNode };
 
 const I = {
   overview: <><rect x="3" y="3" width="7" height="9" rx="1.5" /><rect x="14" y="3" width="7" height="5" rx="1.5" /><rect x="14" y="12" width="7" height="9" rx="1.5" /><rect x="3" y="16" width="7" height="5" rx="1.5" /></>,
+  kitchen: <><path d="M6 13.9a4 4 0 1 1 2.4-7.6 4 4 0 0 1 7.2 0A4 4 0 1 1 18 13.9V20H6Z" /><path d="M6 17h12" /></>,
   orders: <><path d="M6 2h12v20l-3-2-3 2-3-2-3 2Z" /><path d="M9 7h6M9 11h6M9 15h4" /></>,
   menu: <path d="M4 5h16M4 12h16M4 19h10" />,
   tables: <><rect x="4" y="4" width="7" height="7" rx="1" /><rect x="13" y="4" width="7" height="7" rx="1" /><rect x="4" y="13" width="7" height="7" rx="1" /></>,
@@ -32,6 +33,7 @@ const GROUPS: { name: string; items: Item[] }[] = [
   { name: "Today", items: [
     { label: "Overview", href: "/dashboard", icon: I.overview },
     { label: "Orders & Bills", href: "/orders", icon: I.orders },
+    { label: "Kitchen display", href: "/kitchen-display", icon: I.kitchen },
   ] },
   { name: "Menu", items: [
     { label: "Menu & Dishes", href: "/menu-editor", icon: I.menu },

@@ -101,7 +101,9 @@ export default function AuthScreen() {
       const s = await staffLogin(stPhone, stCode);
       if (!s) { setErr("Wrong phone or code — check today's code with your manager."); setBusy(false); return; }
       saveStaffSession({ ...s, code: stCode.trim() });
-      router.replace("/pos");
+      // the kitchen screen signs in here too, then goes back to /kitchen
+      const next = new URLSearchParams(window.location.search).get("next");
+      router.replace(next === "/kitchen" ? "/kitchen" : "/pos");
     } catch { setErr("Couldn't log in — please try again."); setBusy(false); }
   };
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Rozha_One, Cinzel, Mukta, Archivo, Noto_Serif_Devanagari } from "next/font/google";
+import { Rozha_One, Cinzel, Mukta, Archivo } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 // Parosa Virasat type system
@@ -28,9 +29,12 @@ const archivo = Archivo({
   variable: "--font-archivo",
   display: "swap",
 });
-const notoDev = Noto_Serif_Devanagari({
-  weight: ["600", "700"],
-  subsets: ["devanagari"],
+// Self-hosted: Google now serves this font from URLs next/font/google can't read.
+const notoDev = localFont({
+  src: [
+    { path: "../fonts/NotoSerifDevanagari-600.woff2", weight: "600", style: "normal" },
+    { path: "../fonts/NotoSerifDevanagari-700.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-noto-dev",
   display: "swap",
 });

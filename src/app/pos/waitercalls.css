@@ -10,3 +10,6 @@
 .wc-call button{flex:none;border:none;border-radius:99px;background:#fff;color:#5C0F14;font:inherit;font-size:14px;font-weight:800;padding:10px 16px;cursor:pointer;min-height:42px}
 .wc-call button:focus-visible{outline:2px solid #E9C46A;outline-offset:2px}
 @media(prefers-reduced-motion:reduce){.wc-call,.wc-bell{animation:none}}
+.wc-food{background:#1F7A45;animation:none}
+.wc-food .wc-tx span{color:#D4F0DF}
+.wc-food button{color:#1F7A45}

@@ -49,6 +49,9 @@ export type Restaurant = {
   geofence_on?: boolean;         // table sessions (0015): guests must be near the restaurant
   geofence_m?: number;
   session_idle_hours?: number;
+  kitchen_stations?: { name: string; categories: string[] }[];  // KDS stations (0018)
+  kds_amber_min?: number;        // kitchen ticket turns amber after… minutes
+  kds_red_min?: number;          // …and red after
   table_code_hi?: number;        // 0016: highest table number ever used (never reused)
   reserve_on?: boolean;          // Seat Reserve (0016)
   floor_halls?: { name: string; entry: "top" | "bottom" | "left" | "right" }[];
