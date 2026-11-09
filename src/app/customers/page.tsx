@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
+import { PlanLock } from "@/components/PlanLock";
+import { accessOf } from "@/lib/plans";
 import { AppLoading } from "@/components/AppLoading";
 import { listOrdersWithItems, type OrderWithItems } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
@@ -115,6 +117,9 @@ export default function Customers() {
   };
 
   if (!ready || !restaurant) return <AppLoading label="Loading customers…" />;
+  if (!accessOf(restaurant).can("customers")) {
+    return <div className="db-app"><Sidebar restaurant={restaurant} /><main className="db-main"><PlanLock feature="customers" /></main></div>;
+  }
 
   const counts = { all: customers.length, regular: customers.filter((c) => c.tier === "regular").length, repeat: customers.filter((c) => c.tier === "repeat").length, new: customers.filter((c) => c.tier === "new").length };
 

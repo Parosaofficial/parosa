@@ -18,7 +18,7 @@
 
 /* ---- plan cards ---- */
 .set-plans{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
-.set-plancard{position:relative;background:var(--parch-hi);border:1.5px solid var(--line);border-radius:12px;padding:16px 14px;text-align:center}
+.set-plancard{position:relative;background:var(--parch-hi);border:1.5px solid var(--line);border-radius:12px;padding:16px 14px;text-align:center;display:flex;flex-direction:column;gap:2px}
 .set-plancard.on{border-color:var(--oxblood);box-shadow:0 0 0 3px #6e161818;background:var(--cream-card)}
 .set-planpop{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--gold-hi);color:#4a0c0d;font-family:var(--font-body);font-weight:700;font-size:12.5px;padding:3px 9px;border-radius:999px;white-space:nowrap}
 .set-planname{font-family:var(--font-body);font-size:20px;color:var(--oxblood)}
@@ -172,3 +172,11 @@
 /* table-session controls (0015) */
 .set-geo{margin-top:8px;border-top:1px solid var(--line);padding-top:6px}
 .set-range{width:100%;accent-color:var(--oxblood);padding:0!important;border:none!important;background:none!important}
+.set-planinc{list-style:none;margin:10px 0 12px;padding:0;display:grid;gap:5px;text-align:left;font-size:13px;color:var(--ink);flex:1;align-content:start}
+.set-planinc li{display:flex;gap:6px}
+.set-planinc li::before{content:"✓";color:var(--oxblood);font-weight:800;flex:none}
+.set-planstat{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-radius:12px;padding:12px 14px;margin-bottom:12px;background:var(--cream-card);border:1.5px solid var(--line)}
+.set-planstat.trial,.set-planstat.founder{background:#FFF4DE;border-color:#E9C46A}
+.set-planstat b{display:block;font-size:16px;color:var(--ink)}
+.set-planstat small{display:block;font-size:13px;color:var(--ink-2,#6E5557)}
+.set-plancmp{font-weight:800;font-size:14px;color:var(--oxblood);border:1.5px solid var(--oxblood);border-radius:99px;padding:6px 14px;text-decoration:none;white-space:nowrap}

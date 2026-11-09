@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
+import { PlanLock } from "@/components/PlanLock";
+import { accessOf } from "@/lib/plans";
 import { AppLoading } from "@/components/AppLoading";
 import { StampStrip } from "@/components/MenuStamp";
 import { useOwner } from "@/lib/useOwner";
@@ -50,6 +52,9 @@ export default function Loyalty() {
   }, [cards, names, q]);
 
   if (!ready || !restaurant || !form) return <AppLoading label="Loading loyalty…" />;
+  if (!accessOf(restaurant).can("loyalty")) {
+    return <div className="db-app"><Sidebar restaurant={restaurant} /><main className="db-main"><PlanLock feature="loyalty" /></main></div>;
+  }
 
   const goal = live.loyalty_goal;
   const members = cards.length;

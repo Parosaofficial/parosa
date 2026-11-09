@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
+import { PlanLock } from "@/components/PlanLock";
+import { accessOf } from "@/lib/plans";
 import { AppLoading } from "@/components/AppLoading";
 import { getMenu, getOrderItems, listOrders } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
@@ -153,6 +155,9 @@ export default function Analytics() {
   }, [orders, items, cats, dishes, range]);
 
   if (!ready || !restaurant) return <AppLoading label="Loading analytics…" />;
+  if (!accessOf(restaurant).can("analytics")) {
+    return <div className="db-app"><Sidebar restaurant={restaurant} /><main className="db-main"><PlanLock feature="analytics" /></main></div>;
+  }
 
   const delta = (d: number | null) => (d === null ? <span className="db-kd flat">— new</span> : <span className={`db-kd ${d >= 0 ? "up" : "down"}`}>{d >= 0 ? "▲" : "▼"} {Math.abs(d)}% <span style={{ color: "var(--muted)", fontWeight: 500 }}>vs last {range}</span></span>);
 

@@ -5,6 +5,8 @@ import Link from "next/link";
 import QRCode from "qrcode";
 import { QRCodeCanvas } from "qrcode.react";
 import { Sidebar } from "@/components/Sidebar";
+import { PlanNote } from "@/components/PlanLock";
+import { accessOf } from "@/lib/plans";
 import { Seal } from "@/components/Logo";
 import { RestaurantLogo } from "@/components/RestaurantLogo";
 import { AppLoading } from "@/components/AppLoading";
@@ -110,6 +112,9 @@ export default function Tables() {
   const pickDesign = (d: Design) => { setDesign(d); try { localStorage.setItem("parosa-standee", d); } catch { /* ignore */ } };
 
   if (!ready || !restaurant || !loaded) return <AppLoading label="Loading tables…" />;
+  const plan = accessOf(restaurant);
+  const tblLim = plan.limit("tables");
+  const tblFull = tblLim !== null && tables.length >= tblLim;
 
   const BASE = `${origin}/${restaurant.slug}/menu`;
   const review = reviewLinkOf(restaurant);
@@ -142,6 +147,7 @@ export default function Tables() {
     if (!name) { showToast("Give the table a name, like T1"); return; }
     if (!kind) { showToast("Choose or type a table type"); return; }
     if (tables.some((t) => t.name.trim().toLowerCase() === name.toLowerCase() && t.id !== editId)) { showToast(`There's already a table called ${name}`); return; }
+    if (!editId && tblFull) { showToast(`${plan.plan.name} includes up to ${tblLim} tables — upgrade in Settings → Plan`); return; }
     const seats = Math.max(1, Math.min(30, Math.round(draft.seats) || 1));
     const shape = draft.custom ? shapeFor(seats) : draft.shape;
     setBusy(true);
@@ -271,11 +277,12 @@ export default function Tables() {
         <div className="db-topbar">
           <div><h1>Tables &amp; QR</h1><p>Set up your tables by type, then print a QR for each one.</p></div>
           <div className="db-acts">
-            <button className="db-btn" onClick={openNew} disabled={missing}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add table</button>
+            <button className="db-btn" onClick={openNew} disabled={missing || tblFull}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add table</button>
             <button className="db-btn prime" disabled={active.length === 0} onClick={downloadAll}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" /></svg> Download all</button>
           </div>
         </div>
         <div className="db-content">
+          {tblFull && tblLim !== null && <PlanNote kind="tables" used={tables.length} limit={tblLim} planName={plan.plan.name} />}
           {missing && (
             <div className="tb-missing"><b>One-time database update needed</b><span>Table types, areas and live sessions need migration 0015. Your {tables.length} tables and their QR codes below keep working meanwhile.</span></div>
           )}

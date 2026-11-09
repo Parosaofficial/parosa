@@ -8,7 +8,7 @@ import { AppLoading } from "@/components/AppLoading";
 import { deleteRestaurant, updateRestaurant, uploadPhoto } from "@/lib/db";
 import { signOutOwner } from "@/lib/auth";
 import { useOwner } from "@/lib/useOwner";
-import { PLANS, planById } from "@/lib/plans";
+import { PLANS, accessOf, planById } from "@/lib/plans";
 import { missingProfile, setupChecklist } from "@/lib/profile";
 import { geoMessage, pinCurrentAddress } from "@/lib/geo";
 import { cleanUpi, isValidReviewUrl, isValidUpi, upiLink } from "@/lib/upi";
@@ -476,6 +476,22 @@ export default function Settings() {
 
           {open === "plan" && (
             <div className="db-panel"><div className="db-pb">
+              {(() => {
+                const a = accessOf(restaurant);
+                return (
+                  <div className={`set-planstat ${a.mode}`}>
+                    <div>
+                      <b>{a.mode === "founder" ? "Founding restaurant — every feature unlocked"
+                        : a.mode === "trial" ? `Free trial · ${a.trialDaysLeft} ${a.trialDaysLeft === 1 ? "day" : "days"} left`
+                        : `You're on ${a.plan.name}`}</b>
+                      <small>{a.mode === "founder" ? `Thank you for joining early. Your plan: ${a.plan.name}.`
+                        : a.mode === "trial" ? `Every feature is on during the trial. Then ${a.plan.name} at ₹${a.plan.price.toLocaleString("en-IN")} / month + GST.`
+                        : `₹${a.plan.price.toLocaleString("en-IN")} / month + GST · or ₹${a.plan.yearly.toLocaleString("en-IN")} / year`}</small>
+                    </div>
+                    <Link href="/#pricing" className="set-plancmp" target="_blank">Compare plans</Link>
+                  </div>
+                );
+              })()}
               <div className="set-plans">
                 {PLANS.map((p) => {
                   const on = (restaurant.plan ?? "basic") === p.id;
@@ -483,14 +499,15 @@ export default function Settings() {
                     <div key={p.id} className={`set-plancard${on ? " on" : ""}`}>
                       {p.popular && <span className="set-planpop">Popular</span>}
                       <div className="set-planname">{p.name}</div>
-                      <div className="set-planprice">₹{p.price}<small>/mo</small></div>
+                      <div className="set-planprice">₹{p.price.toLocaleString("en-IN")}<small>/mo + GST</small></div>
                       <div className="set-planblurb">{p.blurb}</div>
-                      <button className={on ? "set-plancur" : "set-planbtn"} disabled={on} onClick={() => changePlan(p.id)}>{on ? "Current plan" : "Switch"}</button>
+                      <ul className="set-planinc">{p.includes.map((f) => <li key={f}>{f}</li>)}</ul>
+                      <button className={on ? "set-plancur" : "set-planbtn"} disabled={on} onClick={() => changePlan(p.id)}>{on ? "Current plan" : `Switch to ${p.name}`}</button>
                     </div>
                   );
                 })}
               </div>
-              <p className="set-hint" style={{ margin: "12px 2px 0" }}>0% commission on every plan. Online billing (Razorpay) is coming soon — you&apos;re in free early access until then.</p>
+              <p className="set-hint" style={{ margin: "12px 2px 0" }}>0% commission on every plan. Prices are per outlet. Online payment (Razorpay) is coming soon — switching plans here is free until then.</p>
             </div></div>
           )}
 

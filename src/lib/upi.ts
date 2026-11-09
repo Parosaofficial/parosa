@@ -1,3 +1,4 @@
+import { accessOf } from "./plans";
 // Parosa — UPI scan-to-pay + Google review helpers.
 // Money never touches Parosa: a UPI link pays the restaurant's own UPI ID directly.
 
@@ -50,5 +51,7 @@ export function isValidReviewUrl(v: string): boolean {
 }
 
 /** The review ask is on only when the owner saved a valid link and left the toggle on. */
-export const reviewLinkOf = (r: { google_review_url?: string | null; review_prompt?: boolean | null }) =>
-  r.google_review_url && r.review_prompt !== false && isValidReviewUrl(r.google_review_url) ? r.google_review_url : null;
+/** The Google review link to show on bills — off when the restaurant's plan doesn't include the review ask. */
+export const reviewLinkOf = (r: { google_review_url?: string | null; review_prompt?: boolean | null; plan?: string | null; created_at?: string }) =>
+  r.google_review_url && r.review_prompt !== false && isValidReviewUrl(r.google_review_url)
+    && (!("plan" in r) || accessOf(r).can("reviewAsk")) ? r.google_review_url : null;

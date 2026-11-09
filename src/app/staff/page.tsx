@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
+import { PlanNote } from "@/components/PlanLock";
+import { accessOf } from "@/lib/plans";
 import { AppLoading } from "@/components/AppLoading";
 import { Dialog } from "@/components/Dialog";
 import { addStaff, deleteStaff, generateStaffCode, listStaff, updateStaff } from "@/lib/db";
@@ -47,6 +49,8 @@ export default function StaffPage() {
     if (!form || !restaurant) return;
     if (!form.name.trim()) { showToast("Enter the staff member's name"); return; }
     if (!form.phone.trim()) { showToast("Enter their phone number (their login ID)"); return; }
+    const lim = accessOf(restaurant).limit("staff");
+    if (!form.id && lim !== null && staff.length >= lim) { showToast(`Your plan includes ${lim} staff logins — upgrade in Settings → Plan`); return; }
     setBusy(true);
     try {
       if (form.id) await updateStaff(form.id, { name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim() || null, dob: form.dob || null, aadhaar: form.aadhaar.trim() || null });
@@ -69,6 +73,9 @@ export default function StaffPage() {
   };
 
   if (!ready || !restaurant) return <AppLoading label="Loading staff…" />;
+  const plan = accessOf(restaurant);
+  const staffLim = plan.limit("staff");
+  const staffFull = staffLim !== null && staff.length >= staffLim;
 
   return (
     <div className="db-app">
@@ -76,9 +83,10 @@ export default function StaffPage() {
       <main className="db-main">
         <div className="db-topbar">
           <div><h1>Staff &amp; Admin</h1><p>You&apos;re the admin. Add floor staff — they log in with their phone &amp; today&apos;s code to take orders.</p></div>
-          <div className="db-acts"><button className="db-btn prime" onClick={() => setForm(blank())}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add staff</button></div>
+          <div className="db-acts"><button className="db-btn prime" onClick={() => setForm(blank())} disabled={staffFull}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg> Add staff</button></div>
         </div>
         <div className="db-content">
+          {staffFull && staffLim !== null && <PlanNote kind="staff" used={staff.length} limit={staffLim} planName={plan.plan.name} />}
           {/* today's code */}
           <div className="st-code">
             <div className="l">
@@ -100,7 +108,7 @@ export default function StaffPage() {
           {loading ? (
             <div style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>Loading…</div>
           ) : staff.length === 0 ? (
-            <div className="st-empty"><h3>No staff yet</h3><p>Add your waiters/cashiers so they can take orders on the POS. Toggle a person off any time to block their access.</p><button className="db-btn prime" onClick={() => setForm(blank())}>+ Add your first staff</button></div>
+            <div className="st-empty"><h3>No staff yet</h3><p>Add your waiters/cashiers so they can take orders on the POS. Toggle a person off any time to block their access.</p><button className="db-btn prime" onClick={() => setForm(blank())} disabled={staffFull}>+ Add your first staff</button></div>
           ) : (
             <div className="st-list">
               <div className="st-hd"><span>Name</span><span>Phone (login)</span><span>Details</span><span>Access</span><span></span></div>

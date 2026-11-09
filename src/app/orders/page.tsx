@@ -10,6 +10,7 @@ import { Dialog } from "@/components/Dialog";
 import { addItemToOrder, getMenu, listOrdersWithItems, markOrderPaid, type OrderWithItems } from "@/lib/db";
 import { cardForPhone, cardUrl, loyaltyOf, setOrderPhone } from "@/lib/loyalty";
 import { useOwner } from "@/lib/useOwner";
+import { accessOf, planFor } from "@/lib/plans";
 import { buildBillText, billFileName, generateBillPdf } from "@/lib/bill";
 import { cleanUpi, isValidUpi, payNote, reviewLinkOf, upiLink } from "@/lib/upi";
 import type { Dish } from "@/lib/types";
@@ -245,9 +246,9 @@ export default function Orders() {
             </div>
             <div className="or-bf">
               <div className="rowb">
-                <button className="wa" onClick={() => setWaOpen(true)}>
+                <button className={`wa${accessOf(restaurant).can("whatsappBill") ? "" : " locked"}`} onClick={() => (accessOf(restaurant).can("whatsappBill") ? setWaOpen(true) : showToast(`Bills on WhatsApp are on ${planFor("whatsappBill").name} — upgrade in Settings → Plan`))}>
                   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.2-1-.4-1.6-.7-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.3.1.5.1.6-.1l.7-.9c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2Z" /></svg>
-                  Send on WhatsApp
+                  {accessOf(restaurant).can("whatsappBill") ? "Send on WhatsApp" : `WhatsApp · ${planFor("whatsappBill").name} 🔒`}
                 </button>
                 <button onClick={printBill} disabled={printing}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M6 14h12v7H6z" /></svg>

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
+import { PlanLock } from "@/components/PlanLock";
+import { accessOf } from "@/lib/plans";
 import { AppLoading } from "@/components/AppLoading";
 import { TableArt } from "@/components/TableArt";
 import { ENTRY_LABEL, SkyHall, SkyRow, SkySlot } from "@/components/SkyFloor";
@@ -91,6 +93,12 @@ export default function SeatReservePage() {
   const upcoming = bookings.filter((b) => b.status === "booked").length;
 
   if (!ready || !restaurant || !loaded) return <AppLoading label="Loading Seat Reserve…" />;
+  if (!accessOf(restaurant).can("seatReserve")) {
+    return <div className="db-app"><Sidebar restaurant={restaurant} /><main className="db-main"><PlanLock feature="seatReserve" /></main></div>;
+  }
+  const plan = accessOf(restaurant);
+  const tblLim = plan.limit("tables");
+  const tblFull = tblLim !== null && tables.length >= tblLim;
 
   const link = bookUrl(window.location.origin, restaurant.slug); // rendered only on the client, after sign-in
   const on = !!restaurant.reserve_on;
@@ -140,6 +148,7 @@ export default function SeatReservePage() {
     const g = floor.find((x) => x.hall.name === hall);
     const inRow = g ? (rowsOf(g)[rowNo] ?? []) : [];
     const name = nextName(tables, k.shape === "sofa" ? "F" : "T");
+    if (tblFull) { showToast(`${plan.plan.name} includes up to ${tblLim} tables — upgrade in Settings → Plan`); return; }
     setBusy("add");
     try {
       const row = await addTable(restaurant.id, {

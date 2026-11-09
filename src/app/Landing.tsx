@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Seal } from "@/components/Logo";
-import { PLANS } from "@/lib/plans";
+import { COMPARE, COMPARE_FIRST, PLANS } from "@/lib/plans";
 import "./landing.css";
 
 /* ------------------------------------------------------------------ content */
@@ -49,7 +49,7 @@ const OUTCOMES: { t: string; s: string; icon: ReactNode }[] = [
 ];
 
 const STEPS: { t: string; s: string; icon: ReactNode }[] = [
-  { t: "Menu & QR", s: "Your menu in Hindi and English, a QR on every table.", icon: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 20h1" /></> },
+  { t: "Menu & QR", s: "Your menu with dish photos, a QR on every table.", icon: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 20h1" /></> },
   { t: "Guests order", s: "They scan, order and pay by UPI. No app to install.", icon: <><rect x="6" y="2" width="12" height="20" rx="3" /><path d="M9 8h2v2H9zM13 8h2v2h-2zM9 12h2v2H9z" /></> },
   { t: "They earn stamps", s: "Phone number at checkout, a tick on every paid bill.", icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m7 12 2 2 3-4M15 12h2" /></> },
   { t: "They come back", s: "A reward waiting, and a review ask on the bill.", icon: <><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /></> },
@@ -68,10 +68,10 @@ const FAQS = [
   { q: "Who is Parosa for?", a: "Restaurants, dhabas and cafés where guests sit at tables — one outlet or many." },
   { q: "Do my customers need to download an app?", a: "No. Guests scan the QR with their phone camera and your menu opens in the browser. Nothing to install." },
   { q: "Is it really 0% commission?", a: "Yes. You pay one flat monthly fee. We never take a cut of your orders — every rupee your guests pay is yours." },
-  { q: "Is the menu in Hindi and English?", a: "Every dish can carry both names and descriptions, so regulars and first-timers both read it their way." },
+  { q: "Is there a kitchen display?", a: "Yes. Open the kitchen link on any tablet, old phone or TV. Every order arrives with a sound and a timer, the cooks tap Cooking and Ready, and the waiter's phone hears when the food is ready. No more paper KOTs." },
   { q: "How do guests pay?", a: "Directly to you — UPI, cash or card. Bills carry a scan-to-pay UPI QR with the amount filled in, and Parosa records every payment." },
   { q: "What do I need to get started?", a: "A phone or laptop, your menu, and a printer for the QR codes. Setup takes minutes." },
-  { q: "Can I change how my menu looks?", a: "Yes. Pick from five menu designs, add your logo, and edit dishes and prices anytime." },
+  { q: "Can I change my menu anytime?", a: "Yes. Add your logo, edit dishes, prices and photos anytime — changes show on every table's QR instantly." },
 ];
 
 /* ------------------------------------------------------------------ bits */
@@ -120,6 +120,7 @@ function Video({ id }: { id: string }) {
 
 export function Landing() {
   const [yearly, setYearly] = useState(false);
+  const [allRows, setAllRows] = useState(false);
   const [faq, setFaq] = useState<number | null>(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -332,23 +333,41 @@ export function Landing() {
               <button role="tab" aria-selected={yearly} className={yearly ? "on" : ""} onClick={() => setYearly(true)}>Yearly <em>2 months free</em></button>
             </div>
           </div>
+          <div className="lp-founder" data-reveal>🎉 Founding offer: the first 100 restaurants keep their price <b>for life</b></div>
           <div className="lp-plans">
             {PLANS.map((p) => (
               <div key={p.id} className={`lp-plan${p.popular ? " pop" : ""}`} data-reveal>
                 {p.popular && <span className="badge">Most popular</span>}
                 <div className="pn">{p.name}</div>
                 <div className="pt">{p.blurb}</div>
-                <div className="pp"><b>₹{(yearly ? Math.round(p.yearly / 12) : p.price).toLocaleString("en-IN")}</b><span>/month</span></div>
-                <div className="pb">{yearly ? `billed ₹${p.yearly.toLocaleString("en-IN")} yearly` : "billed monthly"}</div>
+                <div className="pp"><b>₹{(yearly ? p.yearly : p.price).toLocaleString("en-IN")}</b><span>{yearly ? "/year" : "/month"} + GST</span></div>
+                <div className="pb">{yearly ? `You save ₹${(p.price * 12 - p.yearly).toLocaleString("en-IN")}` : "billed monthly"}</div>
                 <ul>
-                  {p.featured.map((f) => <li key={f}><Tick />{f}</li>)}
+                  {p.includes.map((f) => <li key={f}><Tick />{f}</li>)}
                   {p.coming?.map((f) => <li key={f} className="soon"><Tick />{f}<em>Coming soon</em></li>)}
                 </ul>
-                <Link href="/signup" className={`lp-btn ${p.popular ? "white" : "outline"} block`}>Get Started</Link>
+                <Link href="/signup" className={`lp-btn ${p.popular ? "white" : "outline"} block`}>Start free trial</Link>
               </div>
             ))}
           </div>
-          <p className="lp-planfoot">0% commission on every plan. Free during early access — no card needed to start.</p>
+          <p className="lp-planfoot">14-day free trial with every feature · 0% commission on every plan · prices per outlet</p>
+
+          <div className="lp-compare" data-reveal>
+            <div className="lp-cmp-h">Compare plans</div>
+            <div className="lp-cmp-scroll">
+              <table>
+                <thead><tr><th scope="col">Feature</th>{PLANS.map((p) => <th key={p.id} scope="col">{p.name}</th>)}</tr></thead>
+                <tbody>
+                  {COMPARE.slice(0, allRows ? COMPARE.length : COMPARE_FIRST).map((r) => (
+                    <tr key={r.label}><th scope="row">{r.label}</th>{r.cells.map((c, i) => <td key={i} className={c === "✓" ? "y" : c === "—" ? "n" : ""}>{c}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <button className="lp-cmp-more" aria-expanded={allRows} onClick={() => setAllRows((v) => !v)}>
+              {allRows ? "Show fewer" : "View all features"} <span aria-hidden="true">↓</span>
+            </button>
+          </div>
         </div>
       </section>
 

@@ -270,3 +270,19 @@
   .lp-js [data-reveal]{opacity:1;transform:none}
   .lp-how{height:auto}.lp-howpin{position:static;height:auto;padding:90px 0}
 }
+/* pricing: founding offer + comparison */
+.lp-founder{max-width:720px;margin:26px auto 0;background:var(--m);color:#fff;border-radius:14px;padding:11px 16px;text-align:center;font-weight:600;font-size:15.5px}
+.lp-founder b{background:#fff;color:var(--m);border-radius:6px;padding:0 8px}
+.lp-compare{max-width:900px;margin:34px auto 0;border:1.5px solid var(--line);border-radius:18px;overflow:hidden;background:#fff}
+.lp-cmp-h{font-weight:800;font-size:18px;padding:14px 18px;background:var(--blush)}
+.lp-cmp-scroll{overflow-x:auto}
+.lp-compare table{width:100%;border-collapse:collapse;font-size:15px;min-width:540px}
+.lp-compare th,.lp-compare td{padding:11px 16px;border-top:1px solid var(--line);text-align:center;font-weight:600}
+.lp-compare th[scope=row],.lp-compare thead th:first-child{text-align:left;font-weight:500}
+.lp-compare thead th{font-weight:800;border-top:none}
+.lp-compare td.y{color:var(--m);font-weight:800}
+.lp-compare td.n{color:var(--ink2)}
+.lp-cmp-more{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;font:inherit;font-weight:800;font-size:15.5px;color:var(--m);background:#fff;border:none;border-top:1px solid var(--line);padding:13px;cursor:pointer}
+.lp-cmp-more span{display:inline-block;transition:transform .2s}
+.lp-cmp-more[aria-expanded="true"] span{transform:rotate(180deg)}
+.lp-cmp-more:focus-visible{outline:2px solid var(--m);outline-offset:-4px}

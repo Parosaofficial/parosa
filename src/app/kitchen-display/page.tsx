@@ -10,6 +10,8 @@ import {
   type KitchenDevice, type KitchenOtp, type Station,
 } from "@/lib/kitchen";
 import { useOwner } from "@/lib/useOwner";
+import { accessOf } from "@/lib/plans";
+import { PlanLockInline, PlanNote } from "@/components/PlanLock";
 import type { Category } from "@/lib/types";
 import "../dash.css";
 import "./kitchendisplay.css";
@@ -56,6 +58,10 @@ export default function KitchenDisplay() {
   if (!ready || !restaurant) return <AppLoading label="Loading kitchen display…" />;
 
   const missing = restaurant.kitchen_stations === undefined;
+  const plan = accessOf(restaurant);
+  const canStations = plan.can("stations");
+  const scrLim = plan.limit("kitchenScreens");
+  const scrFull = scrLim !== null && (devices?.length ?? 0) >= scrLim;
   const list = stations ?? restaurant.kitchen_stations ?? [];
   const link = `${window.location.origin}/kitchen`; // rendered only on the client, after sign-in
 
@@ -113,7 +119,9 @@ export default function KitchenDisplay() {
                 <li>Enter the <b>Restaurant ID</b> <b className="kdo-code">{restaurant.slug}</b> and the registered mobile {restaurant.phone ? <b>{restaurant.phone}</b> : <Link href="/settings">— add one in Settings first</Link>}.</li>
                 <li>Enter the 6-digit code, tap <b>Start kitchen screen</b> and leave it open. New orders ring with the Cha-Ching sound.</li>
               </ol>
-              {otp ? (
+              {scrFull && scrLim !== null ? (
+                <PlanNote kind="kitchenScreens" used={devices?.length ?? 0} limit={scrLim} planName={plan.plan.name} />
+              ) : otp ? (
                 <div className="kdo-otp" role="status">
                   <span>Kitchen sign-in code</span>
                   <b>{otp.code}</b>
@@ -152,12 +160,12 @@ export default function KitchenDisplay() {
           <section className="db-panel kdo-card kdo-stations">
             <div className="kdo-sh">
               <div><h3>Stations</h3><p className="kdo-muted">Optional. Give each kitchen screen its own dishes — the tandoor sees only breads and kebabs. The &ldquo;All&rdquo; screen sees everything.</p></div>
-              <form className="kdo-add" onSubmit={(e) => { e.preventDefault(); addStation(); }}>
+              {canStations && <form className="kdo-add" onSubmit={(e) => { e.preventDefault(); addStation(); }}>
                 <input value={newName} maxLength={20} onChange={(e) => setNewName(e.target.value)} placeholder="Tandoor, Chinese, Bar…" aria-label="New station name" disabled={missing} />
                 <button className="db-btn prime" type="submit" disabled={missing}>＋ Add station</button>
-              </form>
+              </form>}
             </div>
-            {list.length === 0 ? (
+            {!canStations ? <PlanLockInline feature="stations" /> : list.length === 0 ? (
               <p className="kdo-empty">No stations yet — every kitchen screen shows all orders.</p>
             ) : list.map((s) => (
               <div key={s.name} className="kdo-st">
@@ -167,7 +175,7 @@ export default function KitchenDisplay() {
                 </div>
               </div>
             ))}
-            {list.length > 0 && unassigned.length > 0 && (
+            {canStations && list.length > 0 && unassigned.length > 0 && (
               <p className="kdo-warn">Not on any station yet: {unassigned.map((c) => c.name).join(", ")} — these show only on the &ldquo;All&rdquo; screen.</p>
             )}
           </section>
