@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
       { source: "/templates", destination: "/settings", permanent: false },
       { source: "/register", destination: "/signup", permanent: false },
       { source: "/staff-login", destination: "/login/staff", permanent: false },
+      // legal pages live at short links: /terms, /privacy, /delete
+      { source: "/terms-and-conditions", destination: "/terms", permanent: true },
+      { source: "/term", destination: "/terms", permanent: true },
+      { source: "/privacy-policy", destination: "/privacy", permanent: true },
+      { source: "/delete-account", destination: "/delete", permanent: true },
+      { source: "/account-deletion", destination: "/delete", permanent: true },
     ];
   },
 };

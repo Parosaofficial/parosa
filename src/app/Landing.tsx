@@ -411,6 +411,7 @@ export function Landing() {
             {NAV.map((n) => <button key={n.id} onClick={() => go(n.id)}>{n.label}</button>)}
             <Link href="/privacy">Privacy</Link>
             <Link href="/terms">Terms</Link>
+            <Link href="/delete">Delete account</Link>
           </nav>
           <div className="lp-social">
             {SOCIAL.map((s) =>

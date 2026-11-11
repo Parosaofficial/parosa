@@ -10,10 +10,12 @@ export function LegalShell({
   title,
   updated,
   tldr,
+  readTime = "5-minute read",
   children,
 }: {
   title: string;
   updated: string;
+  readTime?: string;
   /** the plain-English summary shown before the long version */
   tldr?: string[];
   children: ReactNode;
@@ -29,6 +31,7 @@ export function LegalShell({
           <nav className="lgl-navlinks">
             <Link href="/terms">Terms</Link>
             <Link href="/privacy">Privacy</Link>
+            <Link href="/delete">Delete account</Link>
             <Link href="/login" className="lgl-cta">Login</Link>
           </nav>
         </div>
@@ -37,7 +40,7 @@ export function LegalShell({
       <main className="lgl-wrap lgl-body">
         <p className="lgl-kicker">Legal</p>
         <h1>{title}</h1>
-        <p className="lgl-updated">Last updated {updated} · about a 5-minute read</p>
+        <p className="lgl-updated">Last updated {updated} · about a {readTime}</p>
 
         {tldr && tldr.length > 0 && (
           <section className="lgl-tldr" aria-label="Summary">

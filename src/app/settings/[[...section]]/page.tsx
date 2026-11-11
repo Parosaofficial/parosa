@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { Sidebar } from "@/components/Sidebar";
 import { AppLoading } from "@/components/AppLoading";
-import { deleteRestaurant, updateRestaurant, uploadPhoto } from "@/lib/db";
+import { deleteMyAccount, deleteRestaurant, updateRestaurant, uploadPhoto } from "@/lib/db";
 import { signOutOwner } from "@/lib/auth";
 import { useOwner } from "@/lib/useOwner";
 import { PLANS, accessOf, planById } from "@/lib/plans";
@@ -207,8 +207,9 @@ export default function Settings() {
   const confirmDelete = async () => {
     setDelBusy(true);
     try {
-      await deleteRestaurant(restaurant.id);
-      await signOutOwner();
+      // the restaurant, everything in it, and the login (falls back to the restaurant only without migration 0013)
+      await deleteMyAccount().catch(() => deleteRestaurant(restaurant.id));
+      await signOutOwner().catch(() => {});
       router.replace("/signup");
     } catch { setDelBusy(false); setDelOpen(false); showToast("Could not delete — try again"); }
   };
@@ -519,7 +520,7 @@ export default function Settings() {
               </div></div>
               <div className="db-panel set-danger">
                 <div className="db-pb set-dangerrow">
-                  <div><div className="tt">Delete business</div><div className="ts">Permanently removes your menu, QRs and data.</div></div>
+                  <div><div className="tt">Delete account</div><div className="ts">Permanently removes your restaurant, its data and your login.</div></div>
                   <button className="set-del" onClick={() => setDelOpen(true)}>Delete {restaurant.name}</button>
                 </div>
               </div>
@@ -530,8 +531,8 @@ export default function Settings() {
       </main>
       <Dialog
         open={delOpen}
-        title="Delete restaurant?"
-        message={`This permanently removes ${restaurant.name}'s menu, tables, QR codes and orders. This can't be undone. Type the restaurant name to confirm.`}
+        title="Delete account?"
+        message={`This permanently removes ${restaurant.name}'s menu, tables, QR codes, staff, orders and your login. This can't be undone. Type the restaurant name to confirm.`}
         input
         placeholder={restaurant.name}
         requireMatch={restaurant.name}

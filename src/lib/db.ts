@@ -117,6 +117,12 @@ export async function deleteRestaurant(id: string) {
   if (error) throw error;
 }
 
+/** Deletes the signed-in owner's restaurant(s), everything in them, and their login (migration 0013). */
+export async function deleteMyAccount() {
+  const { error } = await supabase.rpc("delete_my_account");
+  if (error) throw error;
+}
+
 /* ---------------- Staff (owner-managed) ---------------- */
 
 export async function listStaff(restaurantId: string): Promise<Staff[]> {

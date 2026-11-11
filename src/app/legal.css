@@ -53,3 +53,9 @@
   .lgl-tldr { padding: 16px 16px 14px; }
   .lgl-prose p, .lgl-prose li { font-size: 15.5px; }
 }
+.lgl-prose ol { margin: 0 0 14px; padding-left: 22px; list-style: decimal; }
+.lgl-prose ol li { margin-bottom: 6px; }
+.lgl-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 26px; }
+.lgl-btn { display: inline-block; border: 1.5px solid #5C0F14; color: #5C0F14; border-radius: 12px; padding: 10px 18px; font-weight: 800; text-decoration: none; }
+.lgl-btn.danger { background: #5C0F14; color: #fff; }
+.lgl-btn:focus-visible { outline: 2px solid #E9C46A; outline-offset: 2px; }
