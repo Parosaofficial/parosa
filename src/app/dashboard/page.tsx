@@ -7,6 +7,7 @@ import { AppLoading } from "@/components/AppLoading";
 import { listOrdersWithItems, updateOrderStatus, type OrderWithItems } from "@/lib/db";
 import { useOwner } from "@/lib/useOwner";
 import { setupChecklist } from "@/lib/profile";
+import { accessOf } from "@/lib/plans";
 import { listLoyaltyCards, loyaltyOf, type LoyaltyCard } from "@/lib/loyalty";
 import { supabase } from "@/lib/supabase";
 import { playChime, primeAudio } from "@/lib/chime";
@@ -170,6 +171,7 @@ export default function Dashboard() {
           <div>
             <h1>नमस्ते, {restaurant.name} 👋</h1>
             <p>{new Date(now).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })} · here&apos;s today so far</p>
+            {(() => { const a = accessOf(restaurant); return a.mode === "trial" ? <Link href="/settings/plan" className="ov-trial">Free trial · {a.trialDaysLeft} {a.trialDaysLeft === 1 ? "day" : "days"} left · every feature on</Link> : null; })()}
           </div>
           <div className="db-acts ov-acts">
             <button className={`ov-sound${soundOn ? " on" : ""}`} onClick={toggleSound} title={soundOn ? "Order sound is on" : "Turn on order sound"}>

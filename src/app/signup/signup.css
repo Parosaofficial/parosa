@@ -124,3 +124,14 @@
   .su-progress{top:24px;left:16px}
   .su-sub{font-size:17px;margin-bottom:24px}
 }
+
+/* 2-screen sign-up (Nov 2026) */
+.su-trial{display:table;margin:10px auto 24px;background:#E6F4EC;color:#1F7A45;font-weight:800;font-size:14px;border-radius:99px;padding:4px 14px;text-align:center}
+.su-pass{display:flex;align-items:stretch;background:#F1EEE8;border-radius:14px;border:2px solid transparent;transition:border-color .15s,background .15s}
+.su-pass:focus-within{background:#fff;border-color:var(--maroon)}
+.su-pass input{background:transparent!important;border:none!important;flex:1;min-width:0}
+.su-pass button{border:none;background:none;font-family:var(--font-body);font-size:15px;font-weight:700;color:var(--maroon);padding:0 18px;cursor:pointer}
+.su-pass button:focus-visible{outline:2px solid var(--maroon);outline-offset:-4px;border-radius:10px}
+.su-fine{text-align:center;font-size:14px;color:#7A6E66;margin:14px 0 0;line-height:1.5}
+.su-fine a{color:var(--maroon);font-weight:700}
+.su-alt .su-link{font-size:16px}

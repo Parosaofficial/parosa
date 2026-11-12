@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Seal } from "@/components/Logo";
-import { authMessage, getCurrentUserId, signIn } from "@/lib/auth";
+import { authMessage, getCurrentUserId, sendPasswordReset, signIn } from "@/lib/auth";
 import { getRestaurantByOwner, staffLogin } from "@/lib/db";
 import { saveStaffSession } from "@/lib/useStaff";
 import "./login.css";
@@ -34,12 +35,13 @@ const emailOk = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
  * screen shows. Switching between owner and staff uses history.pushState (which
  * Next keeps in sync with usePathname) instead of a page navigation, so this
  * component stays mounted and the browser Back button works.
- * Creating a restaurant lives in /signup (SignupFlow).
+ * Creating a restaurant lives in /signup (SignupFlow). "Forgot password?" is
+ * /login/reset here; the emailed link opens /login/new-password.
  */
-type Screen = "signin" | "staff";
-const PATHS: Record<Screen, string> = { signin: "/login", staff: "/login/staff" };
-const TITLES: Record<Screen, string> = { signin: "Sign in", staff: "Staff login" };
-const screenOf = (path: string): Screen => (path === PATHS.staff ? "staff" : "signin");
+type Screen = "signin" | "staff" | "reset";
+const PATHS: Record<Screen, string> = { signin: "/login", staff: "/login/staff", reset: "/login/reset" };
+const TITLES: Record<Screen, string> = { signin: "Sign in", staff: "Staff login", reset: "Reset your password" };
+const screenOf = (path: string): Screen => (path === PATHS.staff ? "staff" : path === PATHS.reset ? "reset" : "signin");
 
 export default function AuthScreen() {
   const router = useRouter();
@@ -52,6 +54,10 @@ export default function AuthScreen() {
   // sign in
   const [siEmail, setSiEmail] = useState("");
   const [siPass, setSiPass] = useState("");
+  const [showPass, setShowPass] = useState(false);
+
+  // forgot password
+  const [rsSent, setRsSent] = useState("");
 
   // staff sign in
   const [stPhone, setStPhone] = useState("");
@@ -91,6 +97,16 @@ export default function AuthScreen() {
   const toSignin = () => go("signin");
   const toCreate = () => router.push("/signup");
   const toStaff = () => go("staff");
+  const toReset = () => { setRsSent(""); go("reset"); };
+
+  const doReset = async () => {
+    setErr("");
+    if (!emailOk(siEmail)) { setErr("Enter the email you signed up with."); return; }
+    setBusy(true);
+    try { await sendPasswordReset(siEmail); setRsSent(siEmail.trim().toLowerCase()); }
+    catch (e) { setErr(authMessage(e)); }
+    finally { setBusy(false); }
+  };
 
   const doStaffLogin = async () => {
     setErr("");
@@ -150,7 +166,7 @@ export default function AuthScreen() {
         </div>
 
         <div className="lg-tabs">
-          <button className={mode === "signin" ? "on" : ""} onClick={toSignin}>
+          <button className={mode !== "staff" ? "on" : ""} onClick={toSignin}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 21V9l9-6 9 6v12" /><path d="M9 21v-6h6v6" /></svg>
             <span><b>Owner</b><i>Login / create account</i></span>
           </button>
@@ -169,17 +185,34 @@ export default function AuthScreen() {
               <div className="lg-field"><label>Today&apos;s staff code</label><input type="text" inputMode="numeric" placeholder="6-digit code from your manager" value={stCode} onChange={(e) => setStCode(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doStaffLogin()} /></div>
               {err && <div className="lg-err">{err}</div>}
               <button className="lg-prime" onClick={doStaffLogin} disabled={busy}>{busy ? "Logging in…" : "Start taking orders →"}</button>
-              <p className="lg-alt lg-muted">Ask your manager for today&apos;s code.</p>
+              <p className="lg-alt lg-muted">Ask your manager for today&apos;s code. It changes every day.</p>
+            </>
+          ) : mode === "reset" ? (
+            <>
+              <h1 className="lg-welcome">Reset your password</h1>
+              <p className="lg-sub">We&apos;ll email you a link to set a new one</p>
+              {rsSent ? (
+                <div className="lg-ok" role="status">✓ Link sent to <b>{rsSent}</b>. Open it on this device to set a new password. Not there? Check spam.</div>
+              ) : (
+                <>
+                  <div className="lg-field"><label>Email</label><div className="lg-inp"><MailIcon /><input type="email" autoComplete="email" placeholder="you@restaurant.com" value={siEmail} onChange={(e) => setSiEmail(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doReset()} /></div></div>
+                  {err && <div className="lg-err">{err}</div>}
+                  <button className="lg-prime" onClick={doReset} disabled={busy}>{busy ? "Sending…" : "Send reset link"}</button>
+                </>
+              )}
+              <p className="lg-alt"><a onClick={toSignin}>← Back to sign in</a></p>
             </>
           ) : (
             <>
               <h1 className="lg-welcome">Welcome back</h1>
               <p className="lg-sub">Sign in to manage your restaurant</p>
               <div className="lg-field"><label>Email</label><div className="lg-inp"><MailIcon /><input type="email" autoComplete="email" placeholder="you@restaurant.com" value={siEmail} onChange={(e) => setSiEmail(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSignin()} /></div></div>
-              <div className="lg-field"><label>Password</label><div className="lg-inp"><LockIcon /><input type="password" autoComplete="current-password" placeholder="Your password" value={siPass} onChange={(e) => setSiPass(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSignin()} /></div></div>
+              <div className="lg-field"><label>Password</label><div className="lg-inp"><LockIcon /><input type={showPass ? "text" : "password"} autoComplete="current-password" placeholder="Your password" value={siPass} onChange={(e) => setSiPass(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSignin()} /><button type="button" className="lg-eye" onClick={() => setShowPass((v) => !v)} aria-label={showPass ? "Hide password" : "Show password"}>{showPass ? "Hide" : "Show"}</button></div></div>
+              <p className="lg-forgot"><a onClick={toReset}>Forgot password?</a></p>
               {err && <div className="lg-err">{err}</div>}
               <button className="lg-prime" onClick={doSignin} disabled={busy}>{busy ? "Signing in…" : "Sign in →"}</button>
-              <p className="lg-alt">New to Parosa? <a onClick={toCreate}>Create your restaurant</a></p>
+              <p className="lg-alt">New to Parosa? <a onClick={toCreate}>Create an account</a></p>
+              <p className="lg-kitchen">Kitchen screen? <Link href="/kitchen/login">Kitchen sign-in →</Link></p>
             </>
           )}
         </div>

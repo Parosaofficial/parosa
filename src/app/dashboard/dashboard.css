@@ -186,3 +186,4 @@
   .ov-lane{min-height:0}
   .ov-acts .db-btn:not(.prime){display:none}
 }
+.ov-trial{display:inline-block;margin-top:6px;background:#E6F4EC;color:#1F7A45;font-weight:800;font-size:13px;border-radius:99px;padding:3px 12px;text-decoration:none}

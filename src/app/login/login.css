@@ -60,3 +60,12 @@
   .lg-page{align-items:flex-start;padding-top:20px}
   .lg-card{border:none;box-shadow:none;padding:18px 4px;background:transparent}
 }
+
+/* show password, forgot password, kitchen link (Nov 2026) */
+.lg-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;font:inherit;font-size:14px;font-weight:700;color:var(--maroon,#8C1C1C);padding:6px;cursor:pointer}
+.lg-inp:has(.lg-eye) input{padding-right:64px}
+.lg-eye:focus-visible{outline:2px solid var(--maroon,#8C1C1C);outline-offset:2px;border-radius:6px}
+.lg-forgot{text-align:right;margin:-6px 0 12px;font-size:14.5px}
+.lg-forgot a,.lg-kitchen a{color:var(--maroon,#8C1C1C);font-weight:700;cursor:pointer}
+.lg-kitchen{text-align:center;font-size:14px;color:#7A6E66;margin:8px 0 0}
+.lg-ok{background:#E6F4EC;color:#14532D;border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.5;margin:4px 0 8px}

@@ -41,3 +41,24 @@ export async function getCurrentUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getSession();
   return data.session?.user.id ?? null;
 }
+
+/** The signed-in owner's id and email, or null. */
+export async function getCurrentUser(): Promise<{ id: string; email: string } | null> {
+  const { data } = await supabase.auth.getSession();
+  const u = data.session?.user;
+  return u ? { id: u.id, email: (u.email ?? "").toLowerCase() } : null;
+}
+
+/** "Forgot password?" — emails a link that opens /login/new-password signed in for a reset. */
+export async function sendPasswordReset(email: string): Promise<void> {
+  const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+    redirectTo: `${window.location.origin}/login/new-password`,
+  });
+  if (error) throw error;
+}
+
+/** Sets a new password for the signed-in user (after opening the reset link). */
+export async function setNewPassword(password: string): Promise<void> {
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) throw error;
+}
