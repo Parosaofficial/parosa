@@ -112,10 +112,11 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
   const shown = kind === "All" ? rows : rows.filter((r) => r.t.kind === kind);
   const count = (s: Stage) => rows.filter((r) => r.stage === s).length;
   // the Seat Reserve floor plan: halls → rows → tables. Before any table is placed there,
-  // every table shows, grouped by its area. Tables left off the plan show underneath.
+  // every table shows, grouped by its area. A table left off the plan only shows
+  // underneath while it has guests, a call or a booking (so nothing is missed).
   const planned = shown.some((r) => r.t.on_floor);
   const onPlan = (planned ? shown.filter((r) => r.t.on_floor) : shown).map((r) => ({ ...r, area: r.t.area }));
-  const offPlan = planned ? shown.filter((r) => !r.t.on_floor) : [];
+  const offPlan = planned ? shown.filter((r) => !r.t.on_floor && (r.stage !== "free" || r.waiter || r.billAsked || r.booking)) : [];
   const halls = groupHalls(restaurant.floor_halls, onPlan, (r) => r.t.floor_slot ?? 0).filter((g) => g.tables.length > 0);
   const waiterName = (id: string | null) => staff.find((s) => s.id === id)?.name ?? null;
   const open = rows.find((r) => r.t.id === openId) ?? null;
@@ -191,7 +192,7 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
           ))}
           {offPlan.length > 0 && (
             <div className="fl-zone">
-              <div className="fl-zh">Not on the floor plan</div>
+              <div className="fl-zh">Busy tables not on your floor plan · <Link href="/seat-reserve">place them in Seat Reserve</Link></div>
               <div className="fl-floor">
                 {offPlan.map((r) => (
                   <button key={r.t.id} className={`fl-t ${r.stage}${r.waiter || r.billAsked ? " alert" : ""}${r.booking ? " booked" : ""}`} onClick={() => setOpenId(r.t.id)} aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}>

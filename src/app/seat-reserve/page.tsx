@@ -30,12 +30,18 @@ const ENTRIES: Entry[] = ["top", "bottom", "left", "right"];
 const HOLDS = [90, 120, 150];
 const DAYS = [3, 7, 14];
 
-/** T7 / F3: the next free number for that letter. */
-function nextName(tables: RestaurantTable[], letter: string) {
-  const used = new Set(tables.map((t) => t.name.trim().toUpperCase()));
+/** The number in a table's name: "T7" → 7, "F3" → 3, "12" → 12; null for "Window". */
+function tableNo(name: string): number | null {
+  const m = name.trim().match(/^[A-Za-z]*\s*(\d+)$/);
+  return m ? Number(m[1]) : null;
+}
+
+/** One series for every table type: the lowest number no table uses yet (T1, T2, T3…). */
+function nextName(tables: RestaurantTable[]) {
+  const used = new Set(tables.map((t) => tableNo(t.name)));
   let n = 1;
-  while (used.has(`${letter}${n}`)) n++;
-  return `${letter}${n}`;
+  while (used.has(n)) n++;
+  return `T${n}`;
 }
 
 export default function SeatReservePage() {
@@ -49,6 +55,7 @@ export default function SeatReservePage() {
   const [adding, setAdding] = useState<string | null>(null);      // "hall#row" whose + menu is open
   const [hallForm, setHallForm] = useState<{ mode: "new" | "rename"; old?: string; name: string } | null>(null);
   const [price, setPrice] = useState("");
+  const [numDraft, setNumDraft] = useState("");
   const [dragId, setDragId] = useState<string | null>(null);
   const [toast, setToast] = useState("");
   const [bookings, setBookings] = useState<Reservation[]>([]);
@@ -142,12 +149,36 @@ export default function SeatReservePage() {
   };
 
   /* ---------- tables ---------- */
-  const select = (t: RestaurantTable | null) => { setSel(t?.id ?? null); setPrice(t ? String(t.book_price ?? 0) : ""); setAdding(null); };
+  const select = (t: RestaurantTable | null) => { setSel(t?.id ?? null); setPrice(t ? String(t.book_price ?? 0) : ""); setNumDraft(t ? String(tableNo(t.name) ?? "") : ""); setAdding(null); };
+
+  /**
+   * Change a seat's table number. The QR link (its code) never changes, so the
+   * printed QR keeps working and shows the new number.
+   *  - number free            → renamed
+   *  - another seat has it    → the two swap numbers
+   *  - an old table off the floor has it → that table (and its printed QR) takes this spot
+   */
+  const renumber = async (t: RestaurantTable) => {
+    const n = Number(numDraft.trim());
+    if (!Number.isInteger(n) || n < 1 || n > 999) { showToast("Table number must be 1 to 999"); setNumDraft(String(tableNo(t.name) ?? "")); return; }
+    if (tableNo(t.name) === n) return;
+    const name = `T${n}`;
+    const other = tables.find((x) => x.id !== t.id && tableNo(x.name) === n);
+    if (!other) { await patch(t, { name }, `${tableLabel(t)} is now ${name}`); return; }
+    if (other.on_floor) {
+      await patch(other, { name: t.name });
+      await patch(t, { name }, `${name} and ${t.name} swapped numbers`);
+      return;
+    }
+    await patch(other, { on_floor: true, area: t.area, floor_slot: t.floor_slot });
+    await patch(t, { on_floor: false }, `${name} (its printed QR) is in this spot now · ${t.name} is off the floor`);
+    select(other);
+  };
 
   const createTable = async (hall: string, rowNo: number, k: (typeof TABLE_KINDS)[number]) => {
     const g = floor.find((x) => x.hall.name === hall);
     const inRow = g ? (rowsOf(g)[rowNo] ?? []) : [];
-    const name = nextName(tables, k.shape === "sofa" ? "F" : "T");
+    const name = nextName(tables);
     if (tblFull) { showToast(`${plan.plan.name} includes up to ${tblLim} tables — upgrade in Settings → Plan`); return; }
     setBusy("add");
     try {
@@ -385,7 +416,7 @@ export default function SeatReservePage() {
                                   {TABLE_KINDS.map((k) => (
                                     <button key={k.kind} disabled={busy === "add"} onClick={() => createTable(g.hall.name, ri, k)}>
                                       <span className="sr-ka"><TableArt shape={k.shape} name="" /></span>
-                                      <span>{k.kind}<small>{k.seats} seats · named {nextName(tables, k.shape === "sofa" ? "F" : "T")}</small></span>
+                                      <span>{k.kind}<small>{k.seats} seats · named {nextName(tables)}</small></span>
                                     </button>
                                   ))}
                                 </div>
@@ -413,6 +444,10 @@ export default function SeatReservePage() {
                 {selected ? (
                   <div className="db-panel sr-box sr-selbox">
                     <div className="sr-bh"><b>{tableLabel(selected)}</b><span>{selected.kind} · {selected.seats} seats</span></div>
+                    <label className="sr-price">Table number
+                      <span className="sr-rs"><i>T</i><input type="text" inputMode="numeric" maxLength={3} value={numDraft} onChange={(e) => setNumDraft(e.target.value.replace(/\D/g, ""))} onBlur={() => renumber(selected)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} aria-label="Table number" /></span>
+                    </label>
+                    <p className="sr-muted">The same number shows on this table&apos;s QR code, orders and bills. Use a number another table has and they swap.</p>
                     <label className="sr-price">Booking price
                       <span className="sr-rs"><i>₹</i><input type="number" inputMode="numeric" min={0} value={price} onChange={(e) => setPrice(e.target.value)} onBlur={savePrice} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></span>
                     </label>
