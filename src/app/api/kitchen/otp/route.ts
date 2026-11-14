@@ -47,7 +47,7 @@ async function sendOnWhatsApp(otpId: string, phone10: string): Promise<boolean> 
     const { data } = await admin.from("kitchen_otps").select("code").eq("id", otpId).single();
     if (!data?.code) return false;
     const template = process.env.WHATSAPP_OTP_TEMPLATE || "parosa_kitchen_otp";
-    const r = await fetch(`https://graph.facebook.com/v21.0/${numberId}/messages`, {
+    const r = await fetch(`https://graph.facebook.com/v25.0/${numberId}/messages`, {
       method: "POST",
       headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
       body: JSON.stringify({
@@ -64,10 +64,16 @@ async function sendOnWhatsApp(otpId: string, phone10: string): Promise<boolean> 
         },
       }),
     });
-    if (!r.ok) return false;
+    if (!r.ok) {
+      // Meta's error (no token or code in it) → Vercel logs, so a bad template/number is easy to spot.
+      const e = (await r.json().catch(() => null)) as { error?: { code?: number; message?: string } } | null;
+      console.error("[kitchen-otp] WhatsApp send failed", r.status, e?.error?.code, e?.error?.message);
+      return false;
+    }
     await admin.from("kitchen_otps").update({ sent_whatsapp: true }).eq("id", otpId);
     return true;
-  } catch {
+  } catch (err) {
+    console.error("[kitchen-otp] WhatsApp send error", err instanceof Error ? err.message : err);
     return false;
   }
 }
