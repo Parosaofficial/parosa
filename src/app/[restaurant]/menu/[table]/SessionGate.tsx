@@ -8,9 +8,10 @@ import "./sessiongate.css";
  * Table sessions on the guest menu (migration 0015).
  *
  * A scan opens the table's session, or joins it when other phones at the table
- * already have one. Ordering needs the guest to be near the restaurant; the
- * check runs in the database. "See the menu only" lets anyone browse without
- * ordering. When the owner closes the session, the phone starts fresh.
+ * already have one. The guest must be at the restaurant (the distance check
+ * runs in the database): until then a solid screen covers the menu — there is
+ * no "see the menu only" way round it. When the owner closes the session, the
+ * phone starts fresh.
  */
 
 type Phase =
@@ -95,7 +96,7 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
     } catch (e) {
       const code = (e as GeolocationPositionError)?.code;
       setDenied(code === 1
-        ? "Location is off for this site. Allow it in your browser settings to order."
+        ? "Location is off for this site. Turn it on in your browser settings."
         : "We couldn't get your location. Step near a window and try again.");
       setPhase("denied");
     }
@@ -163,9 +164,11 @@ export function SessionGate({ ui, restaurantName, reviewUrl, stamp }: { ui: Ui; 
   if (phase === "off" || phase === "ok" || phase === "browse") return null;
   const where = ui.tableName ?? "your table";
   const km = ui.distance >= 1000 ? `${(ui.distance / 1000).toFixed(1)} km` : `${ui.distance} m`;
+  // until the guest is confirmed at the table, nothing of the menu shows through
+  const solid = phase !== "joined" && phase !== "paid";
 
   return (
-    <div className="sg-wrap" role="dialog" aria-modal="true" aria-label="Table check">
+    <div className={`sg-wrap${solid ? " solid" : ""}`} role="dialog" aria-modal="true" aria-label="Table check">
       <div className="sg-card">
         <div className="sg-name">{restaurantName}</div>
         {phase === "checking" && (<><span className="sg-spin" aria-hidden="true" /><p className="sg-sub">Getting {where} ready…</p></>)}
@@ -173,30 +176,27 @@ export function SessionGate({ ui, restaurantName, reviewUrl, stamp }: { ui: Ui; 
         {(phase === "ask" || phase === "locating") && (
           <>
             <span className="sg-ic" aria-hidden="true">📍</span>
-            <h2>Confirm you&apos;re here</h2>
-            <p className="sg-sub">We check your location once, so orders come only from guests at the table.</p>
+            <h2>Confirm you&apos;re at the restaurant</h2>
+            <p className="sg-sub">We check your location once. The menu and ordering open only for guests at the table.</p>
             <button className="sg-btn" onClick={ui.allow} disabled={phase === "locating"}>{phase === "locating" ? "Checking…" : "Allow location"}</button>
-            <button className="sg-link" onClick={ui.browse}>See the menu only</button>
           </>
         )}
 
         {phase === "far" && (
           <>
             <span className="sg-ic" aria-hidden="true">🧭</span>
-            <h2>Please visit the restaurant</h2>
-            <p className="sg-sub">You&apos;re about {km} away. Ordering works when you&apos;re at the table.</p>
-            <button className="sg-btn" onClick={ui.allow}>Try again</button>
-            <button className="sg-link" onClick={ui.browse}>See the menu only</button>
+            <h2>You&apos;re not at the restaurant</h2>
+            <p className="sg-sub">Please visit {restaurantName} to see the menu and order. You&apos;re about {km} away.</p>
+            <button className="sg-btn" onClick={ui.allow}>I&apos;m here — check again</button>
           </>
         )}
 
         {phase === "denied" && (
           <>
             <span className="sg-ic" aria-hidden="true">🔒</span>
-            <h2>Location needed to order</h2>
-            <p className="sg-sub">{ui.denied} You can still look at the menu.</p>
+            <h2>Location needed</h2>
+            <p className="sg-sub">{ui.denied} The menu opens once we know you&apos;re at the restaurant.</p>
             <button className="sg-btn" onClick={ui.allow}>Try again</button>
-            <button className="sg-link" onClick={ui.browse}>See the menu only</button>
           </>
         )}
 
@@ -214,7 +214,6 @@ export function SessionGate({ ui, restaurantName, reviewUrl, stamp }: { ui: Ui; 
             <span className="sg-ic" aria-hidden="true">🍽</span>
             <h2>{where} isn&apos;t taking orders right now</h2>
             <p className="sg-sub">Please ask the staff — they&apos;ll seat you or take your order.</p>
-            <button className="sg-btn" onClick={ui.browse}>See the menu</button>
           </>
         )}
 
@@ -223,7 +222,6 @@ export function SessionGate({ ui, restaurantName, reviewUrl, stamp }: { ui: Ui; 
             <span className="sg-ic" aria-hidden="true">🔎</span>
             <h2>This table wasn&apos;t found</h2>
             <p className="sg-sub">This QR isn&apos;t linked to a table any more. Please ask the staff for help.</p>
-            <button className="sg-btn" onClick={ui.browse}>See the menu</button>
           </>
         )}
 

@@ -5,6 +5,20 @@ const nextConfig: NextConfig = {
   // home directory looking for a lockfile (OneDrive/Desktop nesting).
   turbopack: { root: __dirname },
 
+  // Browser security headers on every page and API route.
+  async headers() {
+    return [{
+      source: "/:path*",
+      headers: [
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "X-Frame-Options", value: "DENY" },                       // no one can frame Parosa (click-jacking)
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        { key: "Permissions-Policy", value: "camera=(), microphone=(), payment=(), geolocation=(self)" },
+        { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+      ],
+    }];
+  },
+
   // Friendly aliases → the real page.
   async redirects() {
     return [

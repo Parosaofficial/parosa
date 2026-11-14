@@ -30,3 +30,5 @@
 .pm-note textarea:focus{outline:2px solid #5C0F14;outline-offset:1px}
 .pm-sess{display:block;font-family:ui-monospace,Consolas,monospace;font-size:12px;font-weight:600;opacity:.7;letter-spacing:0;text-transform:none;margin-top:2px}
 .pm-credits{display:block;text-align:center;font-size:12px;opacity:.6;color:inherit;margin:-6px 0 24px;text-decoration:underline;text-underline-offset:2px}
+/* before the guest is confirmed at the table: a solid screen, the menu stays hidden */
+.sg-wrap.solid{background:linear-gradient(170deg,#5C0F14,#2A0709);animation:none}
