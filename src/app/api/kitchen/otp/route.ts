@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabase";
  *   WHATSAPP_TOKEN            Meta WhatsApp Cloud API access token
  *   WHATSAPP_PHONE_NUMBER_ID  the sending number's id
  *   WHATSAPP_OTP_TEMPLATE     an approved "authentication" template (default: parosa_kitchen_otp)
+ *   WHATSAPP_OTP_LANG         optional: its language code (default: tries en, en_US, en_GB)
  *   SUPABASE_SERVICE_ROLE_KEY to read the code server-side (never sent to a browser)
  * Until then the code shows on the owner's Dashboard → Kitchen display page.
  */
@@ -47,29 +48,35 @@ async function sendOnWhatsApp(otpId: string, phone10: string): Promise<boolean> 
     const { data } = await admin.from("kitchen_otps").select("code").eq("id", otpId).single();
     if (!data?.code) return false;
     const template = process.env.WHATSAPP_OTP_TEMPLATE || "parosa_kitchen_otp";
-    const r = await fetch(`https://graph.facebook.com/v25.0/${numberId}/messages`, {
-      method: "POST",
-      headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-      body: JSON.stringify({
-        messaging_product: "whatsapp",
-        to: `91${phone10}`,
-        type: "template",
-        template: {
-          name: template,
-          language: { code: "en" },
-          components: [
-            { type: "body", parameters: [{ type: "text", text: data.code }] },
-            { type: "button", sub_type: "url", index: "0", parameters: [{ type: "text", text: data.code }] },
-          ],
-        },
-      }),
-    });
-    if (!r.ok) {
+    // A template is looked up by name + language. "English" is `en`, "English (US)" is `en_US`
+    // and "English (UK)" is `en_GB` in WhatsApp Manager — try each until one exists (error 132001).
+    const langs = [...new Set([process.env.WHATSAPP_OTP_LANG || "en", "en_US", "en_GB"])];
+    let sent = false;
+    for (const lang of langs) {
+      const r = await fetch(`https://graph.facebook.com/v25.0/${numberId}/messages`, {
+        method: "POST",
+        headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+        body: JSON.stringify({
+          messaging_product: "whatsapp",
+          to: `91${phone10}`,
+          type: "template",
+          template: {
+            name: template,
+            language: { code: lang },
+            components: [
+              { type: "body", parameters: [{ type: "text", text: data.code }] },
+              { type: "button", sub_type: "url", index: "0", parameters: [{ type: "text", text: data.code }] },
+            ],
+          },
+        }),
+      });
+      if (r.ok) { sent = true; break; }
       // Meta's error (no token or code in it) → Vercel logs, so a bad template/number is easy to spot.
       const e = (await r.json().catch(() => null)) as { error?: { code?: number; message?: string } } | null;
-      console.error("[kitchen-otp] WhatsApp send failed", r.status, e?.error?.code, e?.error?.message);
-      return false;
+      console.error("[kitchen-otp] WhatsApp send failed", lang, r.status, e?.error?.code, e?.error?.message);
+      if (e?.error?.code !== 132001) break; // only a wrong language is worth retrying
     }
+    if (!sent) return false;
     await admin.from("kitchen_otps").update({ sent_whatsapp: true }).eq("id", otpId);
     return true;
   } catch (err) {
