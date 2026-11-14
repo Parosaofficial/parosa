@@ -49,6 +49,36 @@ export async function POST(req: Request) {
   return Response.json({ ok: true, restaurant_name: made.restaurant_name, phone_end: made.phone_end });
 }
 
+/**
+ * Debug aid for a failed send: every WhatsApp account this token can reach, with its phone
+ * numbers and templates (names/ids only — never the token). The number and the template must
+ * be listed under the SAME account for a send to work.
+ */
+async function logWhatsAppAccounts(token: string) {
+  const g = (path: string) =>
+    fetch(`https://graph.facebook.com/v25.0/${path}`, { headers: { authorization: `Bearer ${token}` } })
+      .then((x) => x.json()).catch(() => null);
+  try {
+    const dbg = await g(`debug_token?input_token=${encodeURIComponent(token)}`);
+    const scopes = (dbg?.data?.granular_scopes ?? []) as { scope: string; target_ids?: string[] }[];
+    const wabas = [...new Set(scopes.filter((s) => s.scope.startsWith("whatsapp")).flatMap((s) => s.target_ids ?? []))];
+    console.error("[kitchen-otp] token app", dbg?.data?.application, "whatsapp accounts", JSON.stringify(wabas), dbg?.error?.message ?? "");
+    for (const w of wabas) {
+      const [acc, nums, tpls] = await Promise.all([
+        g(`${w}?fields=name`),
+        g(`${w}/phone_numbers?fields=display_phone_number,verified_name`),
+        g(`${w}/message_templates?fields=name,language,status,category&limit=50`),
+      ]);
+      console.error("[kitchen-otp] account", w, acc?.name,
+        "| numbers", JSON.stringify((nums?.data ?? []).map((p: { id: string; display_phone_number: string }) => `${p.display_phone_number} (${p.id})`)),
+        "| templates", JSON.stringify((tpls?.data ?? []).map((t: { name: string; language: string; status: string }) => `${t.name}/${t.language}/${t.status}`)),
+        nums?.error?.message ?? "", tpls?.error?.message ?? "");
+    }
+  } catch (err) {
+    console.error("[kitchen-otp] account check failed", err instanceof Error ? err.message : err);
+  }
+}
+
 async function sendOnWhatsApp(admin: SupabaseClient, otpId: string, phone10: string): Promise<boolean> {
   const token = process.env.WHATSAPP_TOKEN;
   const numberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
@@ -85,7 +115,7 @@ async function sendOnWhatsApp(admin: SupabaseClient, otpId: string, phone10: str
       if (r.ok) { sent = true; break; }
       // Meta's error (no token or code in it) → Vercel logs, so a bad template/number is easy to spot.
       const e = (await r.json().catch(() => null)) as { error?: { code?: number; message?: string } } | null;
-      console.error("[kitchen-otp] WhatsApp send failed", lang, r.status, e?.error?.code, e?.error?.message);
+      console.error("[kitchen-otp] WhatsApp send failed", template, lang, r.status, e?.error?.code, e?.error?.message);
       if (e?.error?.code !== 132001) break; // only a wrong language is worth retrying
     }
     if (!sent) {
@@ -95,6 +125,7 @@ async function sendOnWhatsApp(admin: SupabaseClient, otpId: string, phone10: str
         headers: { authorization: `Bearer ${token}` },
       }).then((x) => x.json()).catch(() => null);
       console.error("[kitchen-otp] sending number", JSON.stringify(n));
+      await logWhatsAppAccounts(token);
       return false;
     }
     await admin.from("kitchen_otps").update({ sent_whatsapp: true }).eq("id", otpId);
