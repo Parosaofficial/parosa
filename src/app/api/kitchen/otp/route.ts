@@ -76,7 +76,15 @@ async function sendOnWhatsApp(otpId: string, phone10: string): Promise<boolean> 
       console.error("[kitchen-otp] WhatsApp send failed", lang, r.status, e?.error?.code, e?.error?.message);
       if (e?.error?.code !== 132001) break; // only a wrong language is worth retrying
     }
-    if (!sent) return false;
+    if (!sent) {
+      // Which number is WHATSAPP_PHONE_NUMBER_ID? A template only works from a number in the same
+      // WhatsApp account — e.g. Meta's +1 555 test number can't use Parosa's templates.
+      const n = await fetch(`https://graph.facebook.com/v25.0/${numberId}?fields=display_phone_number,verified_name`, {
+        headers: { authorization: `Bearer ${token}` },
+      }).then((x) => x.json()).catch(() => null);
+      console.error("[kitchen-otp] sending number", JSON.stringify(n));
+      return false;
+    }
     await admin.from("kitchen_otps").update({ sent_whatsapp: true }).eq("id", otpId);
     return true;
   } catch (err) {
