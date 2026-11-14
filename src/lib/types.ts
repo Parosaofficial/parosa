@@ -40,6 +40,7 @@ export type Restaurant = {
   theme?: string | null; // colour theme for the menu (added in 0007)
   plan: string | null; // 'basic' | 'growth' | 'business'
   created_at?: string; // when the restaurant joined (trial / founder access)
+  accept_tables?: boolean; // 0019: staff accept each new table before it can order
   upi_id: string | null;
   google_review_url?: string | null; // added in 0005 — optional until that migration runs
   review_prompt?: boolean | null;

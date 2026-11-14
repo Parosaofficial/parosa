@@ -11,7 +11,8 @@ export const dynamic = "force-dynamic";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { data } = await supabase.from("restaurants").select("*").eq("slug", slug.toLowerCase()).maybeSingle();
+  let { data, error } = await supabase.from("restaurant_profiles").select("*").eq("slug", slug.toLowerCase()).maybeSingle();
+  if (error) ({ data } = await supabase.from("restaurants").select("*").eq("slug", slug.toLowerCase()).maybeSingle());
   if (!data) return Response.redirect("https://www.parosa.food/", 302);
   const r = data as { name: string; city?: string | null; google_review_url?: string | null; review_prompt?: boolean | null; plan?: string | null; created_at?: string };
   const link = reviewLinkOf(r);

@@ -98,10 +98,14 @@ export default function POS() {
       const order = await createOrder({
         restaurantId: restaurant.id, table: table.trim(), items, subtotal: sub, gst, total: grand,
         phone: phone.trim() || undefined, customerName: custName.trim() || undefined, staffName: staff.staff_name,
+        staffId: staff.staff_id, staffCode: staff.code,
       });
       setDoneNo(order.order_no ?? "");
       setCartOpen(false);
-    } catch { showToast("Could not place order — try again"); }
+    } catch (e) {
+      const why = String((e as { message?: string })?.message ?? "");
+      showToast(/sign-in has expired|sold out|no longer on the menu|quantities|plan includes/i.test(why) ? why : "Could not place order — try again");
+    }
     finally { setPlacing(false); }
   };
 

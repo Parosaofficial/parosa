@@ -142,6 +142,7 @@ export function MenuClient({
         phone: loy.loyalty_enabled && cleanPhone(guestPhone) ? cleanPhone(guestPhone) : undefined,
         sessionId: ts.sessionId,
         note,
+        at: ts.coords, // menus without tables: the checked location (0019)
       });
       setPlaced({ no: order.order_no ?? "", total: order.total, session: ts.sessionId });
       if (loy.loyalty_enabled && cleanPhone(guestPhone)) {
@@ -159,8 +160,11 @@ export function MenuClient({
         setTimeout(() => setErr(""), 4500);
         return;
       }
-      setErr("Sorry, we couldn't place your order. Please try again.");
-      setTimeout(() => setErr(""), 3500);
+      // the database's own reason when it refuses (sold out, too many orders, waiting for the staff…)
+      const why = String((e as { message?: string })?.message ?? "");
+      setErr(/sold out|no longer on the menu|Too many|Waiting for the staff|location|only at the restaurant|taking QR orders|custom request|quantities/i.test(why)
+        ? why : "Sorry, we couldn't place your order. Please try again.");
+      setTimeout(() => setErr(""), 4500);
       console.error(e);
     } finally {
       setPlacing(false);

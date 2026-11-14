@@ -34,7 +34,7 @@ export default function NewPassword() {
 
   const save = async () => {
     setErr("");
-    if (pass.length < 6) { setErr("Password must be at least 6 characters."); return; }
+    if (pass.length < 8) { setErr("Password must be at least 8 characters."); return; }
     if (pass !== pass2) { setErr("The two passwords don't match."); return; }
     setBusy(true);
     try { await setNewPassword(pass); router.replace("/dashboard"); }
@@ -62,7 +62,7 @@ export default function NewPassword() {
           {phase === "ready" && (
             <form onSubmit={(e) => { e.preventDefault(); save(); }}>
               <h1 className="lg-welcome">Set a new password</h1>
-              <p className="lg-sub">Use at least 6 characters</p>
+              <p className="lg-sub">Use at least 8 characters</p>
               <div className="lg-field"><label htmlFor="np1">New password</label><div className="lg-inp"><input id="np1" type={show ? "text" : "password"} autoComplete="new-password" value={pass} onChange={(e) => setPass(e.target.value)} style={{ paddingLeft: 16 }} /><button type="button" className="lg-eye" onClick={() => setShow((v) => !v)} aria-label={show ? "Hide password" : "Show password"}>{show ? "Hide" : "Show"}</button></div></div>
               <div className="lg-field"><label htmlFor="np2">Type it again</label><input id="np2" type={show ? "text" : "password"} autoComplete="new-password" value={pass2} onChange={(e) => setPass2(e.target.value)} /></div>
               {err && <div className="lg-err">{err}</div>}

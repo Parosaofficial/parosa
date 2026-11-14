@@ -64,6 +64,7 @@ export default function KitchenLogin() {
     if (r.ok) { saveKitchenSession(r.session); router.replace("/kitchen"); return; }
     setBusy(false); setCode("");
     setErr(r.error === "expired" ? "This code has expired. Ask for a new one."
+      : r.error === "limit" ? "This restaurant's plan includes 1 kitchen screen. The owner can sign another screen out or upgrade."
       : r.error === "offline" ? "Couldn't connect. Check the internet and try again."
       : r.error === "nomatch" ? "This Restaurant ID and mobile number don't match."
       : `Wrong code.${r.left != null ? ` ${r.left} ${r.left === 1 ? "try" : "tries"} left.` : ""}`);

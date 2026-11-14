@@ -41,6 +41,7 @@ export type TableSession = {
   closed_at: string | null;
   close_reason: "paid" | "freed" | "timeout" | null;
   payment_method: string | null;
+  accepted?: boolean;    // 0019: false while the staff haven't accepted this new table
   // 0016: the guest's requests + a booking charge when the table was reserved
   waiter_call_at?: string | null;
   bill_asked_at?: string | null;
@@ -152,6 +153,8 @@ export async function clearWaiterCall(sessionId: string) {
 
 export type JoinResult =
   | { status: "ok" | "joined" | "new"; session_id: string; code: string; table_name: string; kind: string; phones: number }
+  | { status: "waiting"; session_id: string; code: string; table_name: string; kind: string; phones: number } // 0019: staff must accept the table
+  | { status: "setup"; table_name?: string }  // 0019: the restaurant hasn't pinned its location yet
   | { status: "far"; distance_m: number; table_name: string }
   | { status: "need_location"; table_name: string }
   | { status: "off"; table_name: string }   // the owner turned this table off — same link, no orders for now
@@ -165,6 +168,31 @@ export async function joinSession(restaurantId: string, table: string, at: { lat
   });
   if (error) return null; // migration 0015 not applied yet → menu works without sessions
   return data as JoinResult;
+}
+
+/** Menus without tables (0019): is the guest at the restaurant? */
+export type HereResult = { status: "ok" | "setup" | "need_location" | "unknown" } | { status: "far"; distance_m: number };
+export async function restaurantHere(restaurantId: string, at: { lat: number; lng: number } | null): Promise<HereResult | null> {
+  const { data, error } = await supabase.rpc("restaurant_here", { p_restaurant: restaurantId, p_lat: at?.lat ?? null, p_lng: at?.lng ?? null });
+  if (error) return null; // database without 0019 → the menu works as before
+  return data as HereResult;
+}
+
+/** Owner accepts a new table (0019, "staff accept each new table"). */
+export async function acceptSession(sessionId: string) {
+  const { error } = await supabase.rpc("table_session_accept", { p_session: sessionId });
+  if (error) throw error;
+}
+
+export type PendingTable = { session_id: string; code: string; opened_at: string; phones: number; table_name: string };
+export async function staffPendingTables(restaurantId: string, code: string, staffId: string): Promise<PendingTable[]> {
+  const { data, error } = await supabase.rpc("staff_pending_tables", { p_restaurant: restaurantId, p_code: code, p_staff: staffId });
+  if (error || !Array.isArray(data)) return [];
+  return data as PendingTable[];
+}
+export async function staffAcceptSession(restaurantId: string, code: string, staffId: string, sessionId: string) {
+  const { data, error } = await supabase.rpc("staff_session_accept", { p_restaurant: restaurantId, p_code: code, p_staff: staffId, p_session: sessionId });
+  if (error || data === false) throw error ?? new Error("not allowed");
 }
 
 export type SessionStatus = {

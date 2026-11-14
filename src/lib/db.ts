@@ -7,7 +7,16 @@ import type { Category, Dish, NewOrderItem, Order, Restaurant, Staff, StaffSessi
 
 /* ---------------- Menu (public / customer side) ---------------- */
 
+/**
+ * Public restaurant details for menus, booking pages and bills (0019: the
+ * restaurant_profiles view — no staff code, owner email or admin notes).
+ * Falls back to the table on a database without 0019.
+ */
+export const PUBLIC_RESTAURANTS = "restaurant_profiles";
+
 export async function getRestaurantBySlug(slug: string): Promise<Restaurant | null> {
+  const v = await supabase.from(PUBLIC_RESTAURANTS).select("*").eq("slug", slug).maybeSingle();
+  if (!v.error) return (v.data as Restaurant | null) ?? null;
   const { data } = await supabase.from("restaurants").select("*").eq("slug", slug).maybeSingle();
   return data as Restaurant | null;
 }
@@ -33,7 +42,8 @@ function slugify(s: string): string {
 /** A URL-safe slug from the restaurant name that isn't already taken. */
 export async function generateUniqueSlug(name: string): Promise<string> {
   const base = slugify(name);
-  const { data } = await supabase.from("restaurants").select("slug").ilike("slug", `${base}%`);
+  let { data, error } = await supabase.from(PUBLIC_RESTAURANTS).select("slug").ilike("slug", `${base}%`);
+  if (error) ({ data } = await supabase.from("restaurants").select("slug").ilike("slug", `${base}%`));
   const taken = new Set((data ?? []).map((r) => (r as { slug: string }).slug));
   if (!taken.has(base)) return base;
   let i = 2;
@@ -222,7 +232,38 @@ export async function createOrder(input: {
   staffName?: string;
   sessionId?: string | null; // table session (0015) — only sent when the guest has one
   note?: string | null;       // for the kitchen (0016)
+  staffId?: string | null;    // POS: the staff member + today's code (0019 checks it)
+  staffCode?: string | null;
+  at?: { lat: number; lng: number } | null; // menus without tables: the guest's location (0019)
 }): Promise<Order> {
+  // 0019: orders go through place_order() — the database checks the table
+  // session / staff code / location, takes prices from the menu and limits
+  // how fast a table can order. Only a database without 0019 uses the old insert.
+  const placed = await supabase.rpc("place_order", {
+    p_restaurant: input.restaurantId,
+    p_table: input.table,
+    p_items: input.items.map((i) => (i.dish_id ? { dish_id: i.dish_id, qty: i.qty } : { dish_id: null, name: i.name, qty: i.qty, price: i.price })),
+    p_session: input.sessionId ?? null,
+    p_note: input.note?.trim() || null,
+    p_phone: input.phone ?? null,
+    p_name: input.customerName ?? null,
+    p_staff: input.staffId ?? null,
+    p_code: input.staffCode ?? null,
+    p_lat: input.at?.lat ?? null,
+    p_lng: input.at?.lng ?? null,
+    p_court: null,
+  });
+  if (!placed.error) {
+    const d = placed.data as { id: string; order_no: string; subtotal: number; gst: number; total: number; table_number: string | null; created_at: string };
+    return {
+      id: d.id, restaurant_id: input.restaurantId, table_number: d.table_number ?? input.table, order_no: d.order_no,
+      subtotal: d.subtotal, gst: d.gst, total: d.total, status: "new", payment_status: "unpaid", payment_method: null,
+      customer_phone: input.phone ?? null, customer_name: input.customerName ?? null, staff_name: input.staffName ?? null,
+      created_at: d.created_at, note: input.note?.trim() || null,
+    };
+  }
+  if (placed.error.code !== "PGRST202") throw placed.error; // a real refusal (session ended, sold out, too many…)
+
   // We generate the id and order number on the client so a customer (anon)
   // only ever needs INSERT permission — never SELECT — under RLS.
   const id =

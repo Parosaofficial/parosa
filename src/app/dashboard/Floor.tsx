@@ -11,7 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { accessOf } from "@/lib/plans";
 import { sendBillOnWhatsApp } from "@/lib/billWhatsApp";
 import {
-  assignWaiter, clearWaiterCall, closeSession, freeSession, listOpenSessions, listTables, tableLabel,
+  acceptSession, assignWaiter, clearWaiterCall, closeSession, freeSession, listOpenSessions, listTables, tableLabel,
   type RestaurantTable, type TableSession,
 } from "@/lib/tables";
 import type { Restaurant, Staff } from "@/lib/types";
@@ -144,6 +144,7 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
   const info = (r: (typeof rows)[number]) => (
     <div className="fl-inf">
       <span className="st">{STAGE_LABEL[r.stage]}{r.session ? ` · ${mins(r.session.opened_at, now)} min` : ""}</span>
+      {r.session?.accepted === false && <span className="fl-call w">🆕 New guests · tap to accept</span>}
       {r.waiter && <span className="fl-call w">🛎 Waiter called · {mins(r.session!.waiter_call_at!, now)} min</span>}
       {r.billAsked && <span className="fl-call b">₹ Bill asked · {mins(r.session!.bill_asked_at!, now)} min</span>}
       {r.booking && <span className="fl-call r">Booked {timeLabel(r.booking.starts_at)} · {r.booking.guest_name}</span>}
@@ -173,6 +174,9 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
         </div>
       </div>
       {note && <div className="fl-note" role="status">{note}</div>}
+      {(restaurant.latitude == null || restaurant.longitude == null) && (
+        <div className="fl-pin" role="alert"><b>Pin your restaurant&apos;s location</b><span>Guests can&apos;t open the menu or order by QR until you do — it&apos;s how Parosa checks they&apos;re really at your table.</span><Link href="/settings/location">Pin it now →</Link></div>
+      )}
       <div className="fl-counts">
         <span className="c free">Free {count("free")}</span>
         <span className="c seated">Just seated {count("seated")}</span>
@@ -192,7 +196,7 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
                     <SkySlot
                         key={r.t.id}
                         wide={r.t.shape === "sofa"}
-                        className={`fl-t ${r.stage}${r.waiter || r.billAsked ? " alert" : ""}${r.booking ? " booked" : ""}`}
+                        className={`fl-t ${r.stage}${r.waiter || r.billAsked || r.session?.accepted === false ? " alert" : ""}${r.booking ? " booked" : ""}`}
                         onClick={() => setOpenId(r.t.id)}
                         aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}
                       >
@@ -209,7 +213,7 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
               <div className="fl-zh">Busy tables not on your floor plan · <Link href="/seat-reserve">place them in Seat Reserve</Link></div>
               <div className="fl-floor">
                 {offPlan.map((r) => (
-                  <button key={r.t.id} className={`fl-t ${r.stage}${r.waiter || r.billAsked ? " alert" : ""}${r.booking ? " booked" : ""}`} onClick={() => setOpenId(r.t.id)} aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}>
+                  <button key={r.t.id} className={`fl-t ${r.stage}${r.waiter || r.billAsked || r.session?.accepted === false ? " alert" : ""}${r.booking ? " booked" : ""}`} onClick={() => setOpenId(r.t.id)} aria-label={`${tableLabel(r.t)}, ${STAGE_LABEL[r.stage]}`}>
                     <TableArt shape={r.t.shape} name={r.t.name} seated={!!r.session} />
                     {info(r)}
                   </button>
@@ -262,6 +266,13 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
                 </div>
 
                 <div className="fl-side">
+                  {open.session.accepted === false && (
+                    <div className="fl-box fl-req">
+                      <b className="fl-bt">New guests at this table</b>
+                      <div className="fl-reqrow"><span>They can order once you accept the table.</span>
+                        <button disabled={!!busy} onClick={() => act("accept", () => acceptSession(open.session!.id))}>{busy === "accept" ? "…" : "Accept table"}</button></div>
+                    </div>
+                  )}
                   {(open.waiter || open.billAsked) && (
                     <div className="fl-box fl-req">
                       <b className="fl-bt">Guest asked</b>

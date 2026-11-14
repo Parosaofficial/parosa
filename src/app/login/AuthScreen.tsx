@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Seal } from "@/components/Logo";
-import { authMessage, getCurrentUserId, sendPasswordReset, signIn } from "@/lib/auth";
+import { authMessage, getCurrentUserId, requestResetOtp, sendPasswordReset, setNewPassword, signIn, verifyResetOtp } from "@/lib/auth";
 import { getRestaurantByOwner, staffLogin } from "@/lib/db";
 import { saveStaffSession } from "@/lib/useStaff";
 import "./login.css";
@@ -56,8 +56,14 @@ export default function AuthScreen() {
   const [siPass, setSiPass] = useState("");
   const [showPass, setShowPass] = useState(false);
 
-  // forgot password
+  // forgot password — WhatsApp code to the registered mobile (or an email link)
   const [rsSent, setRsSent] = useState("");
+  const [rsVia, setRsVia] = useState<"wa" | "email">("wa");
+  const [rsStep, setRsStep] = useState<"phone" | "code" | "newpass">("phone");
+  const [rsPhone, setRsPhone] = useState("");
+  const [rsCode, setRsCode] = useState("");
+  const [rsPass, setRsPass] = useState("");
+  const [rsWait, setRsWait] = useState(0);
 
   // staff sign in
   const [stPhone, setStPhone] = useState("");
@@ -97,7 +103,48 @@ export default function AuthScreen() {
   const toSignin = () => go("signin");
   const toCreate = () => router.push("/signup");
   const toStaff = () => go("staff");
-  const toReset = () => { setRsSent(""); go("reset"); };
+  const toReset = () => { setRsSent(""); setRsVia("wa"); setRsStep("phone"); setRsCode(""); go("reset"); };
+
+  // "Resend code" countdown
+  useEffect(() => {
+    if (rsWait <= 0) return;
+    const t = setTimeout(() => setRsWait((w) => w - 1), 1000);
+    return () => clearTimeout(t);
+  }, [rsWait]);
+
+  const rsPhone10 = rsPhone.replace(/\D/g, "").slice(-10);
+  const sendResetCode = async () => {
+    setErr("");
+    if (rsPhone10.length !== 10) { setErr("Enter your 10-digit registered mobile number."); return; }
+    setBusy(true);
+    const r = await requestResetOtp(rsPhone10);
+    setBusy(false);
+    if (!r.ok) {
+      setErr(r.error === "toomany" ? "Too many codes asked for. Please try again in an hour."
+        : r.error === "phone" ? "Enter your 10-digit registered mobile number."
+        : "Couldn't send the code right now. Try again, or use email instead.");
+      return;
+    }
+    setRsStep("code"); setRsCode(""); setRsWait(30);
+  };
+  const checkResetCode = async (code = rsCode) => {
+    if (busy || code.length !== 6) return;
+    setErr(""); setBusy(true);
+    const r = await verifyResetOtp(rsPhone10, code);
+    setBusy(false);
+    if (r.ok) { setRsStep("newpass"); return; }
+    setRsCode("");
+    setErr(r.error === "wrong" ? `Wrong code.${r.left != null ? ` ${r.left} ${r.left === 1 ? "try" : "tries"} left.` : ""}`
+      : r.error === "offline" ? "Couldn't connect. Check the internet and try again."
+      : "This code has expired. Ask for a new one.");
+  };
+  const saveResetPass = async () => {
+    setErr("");
+    if (rsPass.length < 8) { setErr("Password must be at least 8 characters."); return; }
+    setBusy(true);
+    try { await setNewPassword(rsPass); router.replace("/dashboard"); }
+    catch (e) { setErr(authMessage(e)); setBusy(false); }
+  };
 
   const doReset = async () => {
     setErr("");
@@ -118,7 +165,11 @@ export default function AuthScreen() {
       if (!s) { setErr("Wrong phone or code — check today's code with your manager."); setBusy(false); return; }
       saveStaffSession({ ...s, code: stCode.trim() });
       router.replace("/pos");
-    } catch { setErr("Couldn't log in — please try again."); setBusy(false); }
+    } catch (e) {
+      const why = String((e as { message?: string })?.message ?? "");
+      setErr(why.includes("Too many wrong codes") ? why : "Couldn't log in — please try again.");
+      setBusy(false);
+    }
   };
 
   const doSignin = async () => {
@@ -187,6 +238,40 @@ export default function AuthScreen() {
               <button className="lg-prime" onClick={doStaffLogin} disabled={busy}>{busy ? "Logging in…" : "Start taking orders →"}</button>
               <p className="lg-alt lg-muted">Ask your manager for today&apos;s code. It changes every day.</p>
             </>
+          ) : mode === "reset" && rsVia === "wa" ? (
+            <>
+              {rsStep === "phone" && (
+                <>
+                  <h1 className="lg-welcome">Forgot password?</h1>
+                  <p className="lg-sub">We&apos;ll send a code on WhatsApp to your registered mobile</p>
+                  <div className="lg-field"><label>Registered mobile number</label><input type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="98765 43210" value={rsPhone} onChange={(e) => setRsPhone(e.target.value.replace(/[^\d +]/g, "").slice(0, 14))} onKeyDown={(e) => e.key === "Enter" && sendResetCode()} /></div>
+                  {err && <div className="lg-err">{err}</div>}
+                  <button className="lg-prime" onClick={sendResetCode} disabled={busy}>{busy ? "Sending…" : "Send code on WhatsApp"}</button>
+                </>
+              )}
+              {rsStep === "code" && (
+                <>
+                  <h1 className="lg-welcome">Enter the code</h1>
+                  <p className="lg-sub">If +91 ••••••{rsPhone10.slice(-4)} is registered with Parosa, a 6-digit code is on WhatsApp now.</p>
+                  <div className="lg-field"><label>6-digit code</label><input className="lg-otp" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="••••••" value={rsCode}
+                    onChange={(e) => { const c = e.target.value.replace(/\D/g, "").slice(0, 6); setRsCode(c); if (c.length === 6) checkResetCode(c); }} /></div>
+                  {err && <div className="lg-err">{err}</div>}
+                  <button className="lg-prime" onClick={() => checkResetCode()} disabled={busy || rsCode.length !== 6}>{busy ? "Checking…" : "Continue"}</button>
+                  <p className="lg-alt"><a onClick={() => { setRsStep("phone"); setErr(""); }}>← Change number</a>{" · "}{rsWait > 0 ? <span className="lg-muted">Resend in {rsWait}s</span> : <a onClick={sendResetCode}>Resend code</a>}</p>
+                </>
+              )}
+              {rsStep === "newpass" && (
+                <>
+                  <h1 className="lg-welcome">You&apos;re signed in ✓</h1>
+                  <p className="lg-sub">Set a new password now, or skip and change it later in Settings</p>
+                  <div className="lg-field"><label>New password</label><div className="lg-inp"><LockIcon /><input type={showPass ? "text" : "password"} autoComplete="new-password" placeholder="At least 8 characters" value={rsPass} onChange={(e) => setRsPass(e.target.value)} onKeyDown={(e) => e.key === "Enter" && saveResetPass()} /><button type="button" className="lg-eye" onClick={() => setShowPass((v) => !v)} aria-label={showPass ? "Hide password" : "Show password"}>{showPass ? "Hide" : "Show"}</button></div></div>
+                  {err && <div className="lg-err">{err}</div>}
+                  <button className="lg-prime" onClick={saveResetPass} disabled={busy}>{busy ? "Saving…" : "Save new password"}</button>
+                  <p className="lg-alt"><a onClick={() => router.replace("/dashboard")}>Skip — go to my dashboard</a></p>
+                </>
+              )}
+              {rsStep !== "newpass" && <p className="lg-alt"><a onClick={() => { setRsVia("email"); setErr(""); }}>Use email instead</a> · <a onClick={toSignin}>← Back to sign in</a></p>}
+            </>
           ) : mode === "reset" ? (
             <>
               <h1 className="lg-welcome">Reset your password</h1>
@@ -200,7 +285,7 @@ export default function AuthScreen() {
                   <button className="lg-prime" onClick={doReset} disabled={busy}>{busy ? "Sending…" : "Send reset link"}</button>
                 </>
               )}
-              <p className="lg-alt"><a onClick={toSignin}>← Back to sign in</a></p>
+              <p className="lg-alt"><a onClick={() => { setRsVia("wa"); setErr(""); }}>Use WhatsApp instead</a> · <a onClick={toSignin}>← Back to sign in</a></p>
             </>
           ) : (
             <>

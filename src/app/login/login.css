@@ -69,3 +69,4 @@
 .lg-forgot a,.lg-kitchen a{color:var(--maroon,#8C1C1C);font-weight:700;cursor:pointer}
 .lg-kitchen{text-align:center;font-size:14px;color:#7A6E66;margin:8px 0 0}
 .lg-ok{background:#E6F4EC;color:#14532D;border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.5;margin:4px 0 8px}
+.lg-otp{text-align:center;letter-spacing:.5em;font-size:24px!important;font-family:ui-monospace,Consolas,monospace}

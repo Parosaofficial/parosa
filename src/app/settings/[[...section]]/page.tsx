@@ -28,7 +28,7 @@ type Form = {
   phone: string; whatsapp: string;
   address: string; city: string; district: string; state: string; pincode: string;
   latitude: number | null; longitude: number | null;
-  geofence_on: boolean; geofence_m: number; session_idle_hours: number;
+  accept_tables: boolean; geofence_m: number; session_idle_hours: number;
   gstin: string; fssai: string; hours: Hours;
   upi_id: string; review_url: string; review_prompt: boolean;
 };
@@ -107,7 +107,7 @@ export default function Settings() {
       address: restaurant.address ?? "", city: restaurant.city ?? "",
       district: restaurant.district ?? "", state: restaurant.state ?? "", pincode: restaurant.pincode ?? "",
       latitude: restaurant.latitude ?? null, longitude: restaurant.longitude ?? null,
-      geofence_on: restaurant.geofence_on !== false, geofence_m: restaurant.geofence_m ?? 150, session_idle_hours: restaurant.session_idle_hours ?? 3,
+      accept_tables: restaurant.accept_tables === true, geofence_m: restaurant.geofence_m ?? 150, session_idle_hours: restaurant.session_idle_hours ?? 3,
       gstin: restaurant.gstin ?? "", fssai: restaurant.fssai ?? "",
       hours: restaurant.hours ?? defaultHours,
       upi_id: restaurant.upi_id ?? "", review_url: restaurant.google_review_url ?? "",
@@ -187,7 +187,9 @@ export default function Settings() {
         });
       } catch { extrasSaved = false; }
       try {
-        await updateRestaurant(restaurant.id, { geofence_on: f.geofence_on, geofence_m: f.geofence_m, session_idle_hours: f.session_idle_hours });
+        await updateRestaurant(restaurant.id, { geofence_m: f.geofence_m, session_idle_hours: f.session_idle_hours });
+        // 0019 setting — saved on its own so an older database still saves the rest
+        if (f.accept_tables !== (restaurant.accept_tables === true)) await updateRestaurant(restaurant.id, { accept_tables: f.accept_tables }).catch(() => {});
       } catch { extrasSaved = false; }
       await reload();
       showToast(extrasSaved ? "Saved ✓" : "Saved — some fields need a database update first");
@@ -369,17 +371,16 @@ export default function Settings() {
               </div>
 
               <div className="set-geo">
-                <div className="db-togrow">
-                  <div><div className="tt">Guests must be at the restaurant to order</div><div className="ts">Their phone&apos;s location is checked once when they scan a table QR. Turn off if your GPS pin isn&apos;t accurate.</div></div>
-                  <button className={`db-switch${f.geofence_on ? " on" : ""}`} onClick={() => set("geofence_on", !f.geofence_on)} aria-label="Location check" />
+                <div className="set-hint" style={{ marginTop: 0 }}><b>Guests must be at the restaurant.</b> Their phone&apos;s location is checked when they scan a table QR — the menu opens only within the distance below.</div>
+                {f.latitude == null && <div className="set-hint" style={{ color: "#B4231C" }}>No GPS pin yet — tap &ldquo;Use current location&rdquo; above while you&apos;re at the restaurant. Until then guests can&apos;t open the menu by QR.</div>}
+                <div className="db-field" style={{ marginTop: 10 }}>
+                  <label>Allowed distance · {f.geofence_m} m</label>
+                  <input type="range" min={100} max={150} step={10} value={f.geofence_m} onChange={(e) => set("geofence_m", Number(e.target.value))} className="set-range" />
                 </div>
-                {f.geofence_on && (
-                  <div className="db-field" style={{ marginTop: 10 }}>
-                    <label>Allowed distance · {f.geofence_m} m</label>
-                    <input type="range" min={100} max={150} step={10} value={f.geofence_m} onChange={(e) => set("geofence_m", Number(e.target.value))} className="set-range" />
-                    {f.latitude == null && <div className="set-hint">No GPS pin saved yet — tap &ldquo;Use current location&rdquo; above while you&apos;re at the restaurant, or the check is skipped.</div>}
-                  </div>
-                )}
+                <div className="db-togrow" style={{ marginTop: 6 }}>
+                  <div><div className="tt">Staff accept each new table</div><div className="ts">Extra safety: a new table can order only after you or a waiter taps &ldquo;Accept&rdquo; (Overview or the waiter&apos;s phone).</div></div>
+                  <button className={`db-switch${f.accept_tables ? " on" : ""}`} onClick={() => set("accept_tables", !f.accept_tables)} aria-label="Staff accept each new table" />
+                </div>
                 <div className="db-field" style={{ marginTop: 6 }}>
                   <label>Close a quiet table after</label>
                   <div className="set-days">{[2, 3, 4].map((h) => <button key={h} type="button" className={`set-day${f.session_idle_hours === h ? " on" : ""}`} style={{ width: "auto", padding: "0 14px" }} onClick={() => set("session_idle_hours", h)}>{h} hours</button>)}</div>

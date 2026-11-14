@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { currentLocation, joinSession, rememberSession, rememberedSession, requestHelp, sessionStatus, tableLabel, type JoinResult } from "@/lib/tables";
+import { currentLocation, joinSession, rememberSession, rememberedSession, requestHelp, restaurantHere, sessionStatus, tableLabel, type HereResult, type JoinResult } from "@/lib/tables";
 import "./sessiongate.css";
 
 /*
@@ -20,6 +20,8 @@ type Phase =
   | "ask"        // need the phone's location
   | "locating"
   | "far"
+  | "setup"      // 0019: the restaurant hasn't pinned its location yet
+  | "waiting"    // 0019: the staff must accept this new table first
   | "denied"     // location refused or unavailable
   | "joined"     // other phones already at this table → confirm joining
   | "ok"
@@ -42,9 +44,12 @@ export type TableSessionState = {
   request: (kind: "waiter" | "bill") => Promise<void>;
   /** Call when an order is refused because the session ended. */
   expired: () => void;
+  /** Menus without tables: the guest's checked location, sent with each order (0019). */
+  coords: { lat: number; lng: number } | null;
 };
 
 const POLL_MS = 30000;
+const POLL_WAIT_MS = 5000; // waiting for the staff to accept the table
 const POLL_BILL_MS = 8000; // waiting for the owner to close the bill
 
 export function useTableSession({ restaurantId, slug, table, enabled }: { restaurantId: string; slug: string; table: string; enabled: boolean }) {
@@ -57,24 +62,44 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
   const [others, setOthers] = useState(0);
   const [distance, setDistance] = useState(0);
   const [denied, setDenied] = useState("");
+  const [noTables, setNoTables] = useState(false);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const alive = useRef(true);
   // set back to true on (re)mount — React's dev double-mount runs the cleanup once first
   useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
 
+  // menus without tables (0019): the location is checked on its own, then the menu opens
+  const applyHere = useCallback((h: HereResult | null, at: { lat: number; lng: number } | null) => {
+    if (!alive.current) return;
+    if (!h || h.status === "unknown") { setPhase("off"); return; }
+    if (h.status === "setup") { setPhase("setup"); return; }
+    if (h.status === "need_location") { setPhase("ask"); return; }
+    if (h.status === "far") { setDistance(h.distance_m); setPhase("far"); return; }
+    setCoords(at);
+    setPhase("ok");
+  }, []);
+
   const apply = useCallback((r: JoinResult | null) => {
     if (!alive.current) return;
-    if (!r || r.status === "no_table") { setPhase("off"); return; }
+    if (!r) { setPhase("off"); return; }
+    if (r.status === "no_table") {
+      setNoTables(true);
+      restaurantHere(restaurantId, null).then((h) => applyHere(h, null));
+      return;
+    }
     if (r.status === "unknown") { setPhase("unknown"); return; }
     if ("table_name" in r && r.table_name) setTableName(tableLabel({ name: r.table_name }));
     if (r.status === "off") { setPhase("closed"); return; }
+    if (r.status === "setup") { setPhase("setup"); return; }
     if (r.status === "need_location") { setPhase("ask"); return; }
     if (r.status === "far") { setDistance(r.distance_m); setPhase("far"); return; }
     setSessionId(r.session_id);
     setSessionCode(r.code);
     rememberSession(slug, table, r.session_id);
+    if (r.status === "waiting") { setPhase("waiting"); return; }
     if (r.status === "joined" && r.phones > 1) { setOthers(r.phones - 1); setPhase("joined"); }
     else setPhase("ok");
-  }, [slug, table]);
+  }, [slug, table, restaurantId, applyHere]);
 
   const start = useCallback(async (fresh = false) => {
     if (!enabled) return;
@@ -92,7 +117,8 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
     setPhase("locating");
     try {
       const at = await currentLocation();
-      apply(await joinSession(restaurantId, table, at, rememberedSession(slug, table)));
+      if (noTables) applyHere(await restaurantHere(restaurantId, at), at);
+      else apply(await joinSession(restaurantId, table, at, rememberedSession(slug, table)));
     } catch (e) {
       const code = (e as GeolocationPositionError)?.code;
       setDenied(code === 1
@@ -100,7 +126,14 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
         : "We couldn't get your location. Step near a window and try again.");
       setPhase("denied");
     }
-  }, [restaurantId, slug, table, apply]);
+  }, [restaurantId, slug, table, apply, applyHere, noTables]);
+
+  // waiting for the staff to accept this table → check every few seconds
+  useEffect(() => {
+    if (phase !== "waiting" || !sessionId) return;
+    const t = setInterval(() => { joinSession(restaurantId, table, null, sessionId).then(apply); }, POLL_WAIT_MS);
+    return () => clearInterval(t);
+  }, [phase, sessionId, restaurantId, table, apply]);
 
   const reset = useCallback(() => {
     rememberSession(slug, table, null);
@@ -151,6 +184,7 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
     waiterName,
     request,
     expired: reset,
+    coords,
   };
   const ui = { phase, others, distance, denied, tableName, allow, browse: () => setPhase("browse"), join: () => setPhase("ok"), retry: () => { setPhase("checking"); start(); }, reset };
   return { state, ui };
@@ -197,6 +231,22 @@ export function SessionGate({ ui, restaurantName, reviewUrl, stamp }: { ui: Ui; 
             <h2>Location needed</h2>
             <p className="sg-sub">{ui.denied} The menu opens once we know you&apos;re at the restaurant.</p>
             <button className="sg-btn" onClick={ui.allow}>Try again</button>
+          </>
+        )}
+
+        {phase === "setup" && (
+          <>
+            <span className="sg-ic" aria-hidden="true">🛠</span>
+            <h2>Not taking QR orders yet</h2>
+            <p className="sg-sub">{restaurantName} is still setting up QR ordering. Please ask the staff to take your order.</p>
+          </>
+        )}
+
+        {phase === "waiting" && (
+          <>
+            <span className="sg-spin" aria-hidden="true" />
+            <h2>Confirming {where}…</h2>
+            <p className="sg-sub">A staff member is confirming your table. The menu opens on its own in a moment.</p>
           </>
         )}
 

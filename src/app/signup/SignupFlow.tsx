@@ -124,7 +124,7 @@ export default function SignupFlow() {
     if (phoneDigits(phone).length !== 10) return setErr("Enter your 10-digit mobile number.");
     if (!account) {
       if (!emailOk(email)) return setErr("Enter a valid email address.");
-      if (pass.length < 6) return setErr("Password must be at least 6 characters.");
+      if (pass.length < 8) return setErr("Password must be at least 8 characters.");
     }
     setBusy(true);
     try {
@@ -254,7 +254,7 @@ export default function SignupFlow() {
                 <div className="su-field">
                   <label htmlFor="su-pass">Password</label>
                   <div className="su-pass">
-                    <input id="su-pass" type={showPass ? "text" : "password"} autoComplete="new-password" placeholder="At least 6 characters" value={pass} onChange={(e) => setPass(e.target.value)} />
+                    <input id="su-pass" type={showPass ? "text" : "password"} autoComplete="new-password" placeholder="At least 8 characters" value={pass} onChange={(e) => setPass(e.target.value)} />
                     <button type="button" onClick={() => setShowPass((v) => !v)} aria-label={showPass ? "Hide password" : "Show password"}>{showPass ? "Hide" : "Show"}</button>
                   </div>
                 </div>

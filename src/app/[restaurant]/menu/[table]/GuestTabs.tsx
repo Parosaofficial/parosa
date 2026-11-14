@@ -74,13 +74,15 @@ export function CustomPanel({ restaurant, table, ts, onAsk, onSent }: {
         items: [{ dish_id: null, name: `Custom: ${what.slice(0, 80)}`, qty, price: each }],
         subtotal: total, gst: 0, total,
         sessionId: ts.sessionId,
+        at: ts.coords,
         note: each ? `Custom request at the guest's price ₹${each} each` : "Custom request — please set the price with the guest",
       });
       setText(""); setQty(1); setPrice("");
       onSent(order);
     } catch (e) {
-      setErr(String((e as { message?: string })?.message ?? "").includes("session has ended")
-        ? "Your table was reset. Please confirm your table again."
+      const why = String((e as { message?: string })?.message ?? "");
+      setErr(why.includes("session has ended") ? "Your table was reset. Please confirm your table again."
+        : /Too many|Waiting for the staff|location|only at the restaurant|taking QR orders|custom request/i.test(why) ? why
         : "Couldn't send it. Please try again.");
     } finally { setBusy(false); }
   };

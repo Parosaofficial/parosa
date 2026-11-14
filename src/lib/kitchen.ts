@@ -66,11 +66,12 @@ export async function requestKitchenOtp(restaurantId: string, phone: string): Pr
   } catch { return { ok: false, error: "offline" }; }
 }
 
-export type OtpVerify = { ok: true; session: KitchenSession } | { ok: false; error: "nomatch" | "expired" | "wrong" | "offline"; left?: number };
+export type OtpVerify = { ok: true; session: KitchenSession } | { ok: false; error: "nomatch" | "expired" | "wrong" | "offline" | "limit"; left?: number };
 
 /** Step 2 — the 6-digit code → this tablet is signed in. */
 export async function verifyKitchenOtp(restaurantId: string, phone: string, code: string): Promise<OtpVerify> {
   const { data, error } = await supabase.rpc("kitchen_verify_otp", { p_slug: restaurantId, p_phone: phone, p_code: code });
+  if (error?.message?.includes("plan includes")) return { ok: false, error: "limit" };
   if (error || !data) return { ok: false, error: "offline" };
   const d = data as { ok: boolean; error?: "nomatch" | "expired" | "wrong"; left?: number; token?: string; restaurant_id?: string; restaurant_name?: string; slug?: string };
   if (!d.ok || !d.token) return { ok: false, error: d.error ?? "wrong", left: d.left };

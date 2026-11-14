@@ -143,7 +143,7 @@ export default function StaffPage() {
               <div className="db-field"><label>Email <span className="opt">· optional</span></label><input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="name@email.com" /></div>
               <div className="db-frow two">
                 <div className="db-field"><label>Date of birth <span className="opt">· optional</span></label><input type="date" value={form.dob} onChange={(e) => setForm({ ...form, dob: e.target.value })} /></div>
-                <div className="db-field"><label>Aadhaar number <span className="opt">· optional</span></label><input inputMode="numeric" value={form.aadhaar} onChange={(e) => setForm({ ...form, aadhaar: e.target.value })} placeholder="XXXX XXXX XXXX" /></div>
+                <div className="db-field"><label>Aadhaar <span className="opt">· last 4 digits, optional</span></label><input inputMode="numeric" maxLength={4} value={form.aadhaar.replace(/\D/g, "").slice(-4)} onChange={(e) => setForm({ ...form, aadhaar: e.target.value.replace(/\D/g, "").slice(0, 4) })} placeholder="1234" /></div>
               </div>
             </div>
             <div className="st-mf"><button className="st-ghost" onClick={() => setForm(null)}>Cancel</button><button className="st-save" onClick={save} disabled={busy}>{busy ? "Saving…" : "Save staff"}</button></div>
