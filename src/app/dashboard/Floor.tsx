@@ -8,6 +8,8 @@ import { playChime, primeAudio } from "@/lib/chime";
 import { listStaff, type OrderWithItems } from "@/lib/db";
 import { groupHalls, hallCols, hallRows, listReservations, timeLabel, type Reservation } from "@/lib/reserve";
 import { supabase } from "@/lib/supabase";
+import { accessOf } from "@/lib/plans";
+import { sendBillOnWhatsApp } from "@/lib/billWhatsApp";
 import {
   assignWaiter, clearWaiterCall, closeSession, freeSession, listOpenSessions, listTables, tableLabel,
   type RestaurantTable, type TableSession,
@@ -47,6 +49,8 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
   const [busy, setBusy] = useState("");
   const [now, setNow] = useState(() => Date.now());
   const [bookings, setBookings] = useState<Reservation[]>([]);
+  const [note, setNoteRaw] = useState("");
+  const setNote = (m: string) => { setNoteRaw(m); setTimeout(() => setNoteRaw(""), 5000); };
 
   const loadSessions = useCallback(() => {
     listOpenSessions(restaurant.id).then(setSessions).catch(() => {});
@@ -121,6 +125,15 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
   const waiterName = (id: string | null) => staff.find((s) => s.id === id)?.name ?? null;
   const open = rows.find((r) => r.t.id === openId) ?? null;
 
+  // Growth / Pro: the closed table's bill goes to the guest's WhatsApp (when someone gave a number)
+  const sendTableBill = (sessionId: string) => {
+    if (!accessOf(restaurant).can("whatsappBill")) return;
+    sendBillOnWhatsApp("session", sessionId).then((r) => {
+      if (r.ok) setNote(`Bill sent on WhatsApp to ••••${r.phone_end} ✓`);
+      else if (r.error === "notsent" || r.error === "offline") setNote("Couldn't send the bill on WhatsApp — send it again from Orders & Bills");
+    });
+  };
+
   const act = async (what: string, fn: () => Promise<void>) => {
     setBusy(what);
     try { await fn(); loadSessions(); }
@@ -159,6 +172,7 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
           )}
         </div>
       </div>
+      {note && <div className="fl-note" role="status">{note}</div>}
       <div className="fl-counts">
         <span className="c free">Free {count("free")}</span>
         <span className="c seated">Just seated {count("seated")}</span>
@@ -272,8 +286,8 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
                   <div className="fl-box">
                     <b className="fl-bt">Payment received</b>
                     <div className="fl-pay">
-                      <button disabled={!!busy || open.orders.length === 0} onClick={() => act("upi", async () => { await closeSession(open.session!.id, "UPI"); setOpenId(null); })}>{busy === "upi" ? "Closing…" : "UPI ✓ · close table"}</button>
-                      <button disabled={!!busy || open.orders.length === 0} onClick={() => act("cash", async () => { await closeSession(open.session!.id, "Cash"); setOpenId(null); })}>{busy === "cash" ? "Closing…" : "Cash ✓ · close table"}</button>
+                      <button disabled={!!busy || open.orders.length === 0} onClick={() => act("upi", async () => { const sid = open.session!.id; await closeSession(sid, "UPI"); setOpenId(null); sendTableBill(sid); })}>{busy === "upi" ? "Closing…" : "UPI ✓ · close table"}</button>
+                      <button disabled={!!busy || open.orders.length === 0} onClick={() => act("cash", async () => { const sid = open.session!.id; await closeSession(sid, "Cash"); setOpenId(null); sendTableBill(sid); })}>{busy === "cash" ? "Closing…" : "Cash ✓ · close table"}</button>
                     </div>
                     <p className="fl-muted">Marks every order paid, adds stamp-card ticks, and frees the table for the next guests.</p>
                   </div>

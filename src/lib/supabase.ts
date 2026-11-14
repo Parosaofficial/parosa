@@ -10,8 +10,10 @@ const PAROSA_URL = "https://cyyyrunhjwnadjnsrtog.supabase.co";
 const PAROSA_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5eXlydW5oanduYWRqbnNydG9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MjAxMDAsImV4cCI6MjEwNDA5NjEwMH0.WHFV9oZqomvykiQbmN_yI9Mjh9NBiLd-cRngeYwoJAk";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL || PAROSA_URL;
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || PAROSA_ANON_KEY;
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || PAROSA_URL;
+export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || PAROSA_ANON_KEY;
+const url = SUPABASE_URL;
+const anon = SUPABASE_ANON_KEY;
 
 /** Browser + server Supabase client (anon key — safe for the client). */
 export const supabase = createClient(url, anon);

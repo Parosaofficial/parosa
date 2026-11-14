@@ -11,7 +11,9 @@ import { addItemToOrder, getMenu, listOrdersWithItems, markOrderPaid, type Order
 import { cardForPhone, cardUrl, loyaltyOf, setOrderPhone } from "@/lib/loyalty";
 import { useOwner } from "@/lib/useOwner";
 import { accessOf, planFor } from "@/lib/plans";
-import { buildBillText, billFileName, generateBillPdf } from "@/lib/bill";
+import { buildBillText } from "@/lib/bill";
+import { buildReceiptPdf, fetchLogo, receiptFileName } from "@/lib/receipt";
+import { billSendNote, sendBillOnWhatsApp } from "@/lib/billWhatsApp";
 import { cleanUpi, isValidUpi, payNote, reviewLinkOf, upiLink } from "@/lib/upi";
 import type { Dish } from "@/lib/types";
 import "../dash.css";
@@ -86,6 +88,30 @@ export default function Orders() {
     setOrders((os) => os.map((o) => (o.id === id ? { ...o, payment_status: "paid", payment_method: method } : o)));
     setBill((b) => (b && b.id === id ? { ...b, payment_status: "paid", payment_method: method } : b));
     showToast(`Bill marked as paid · ${method} ✓`);
+    // Growth / Pro: the receipt goes to the guest's WhatsApp on its own (when they gave a number)
+    if (restaurant && accessOf(restaurant).can("whatsappBill")) {
+      sendBillOnWhatsApp("order", id).then((r) => { const n = billSendNote(r); if (n) setTimeout(() => showToast(n), 1800); });
+    }
+  };
+
+  /** The receipt PDF (80 mm, same design as the WhatsApp bill). */
+  const receiptFor = async (o: OrderWithItems) => {
+    const r = restaurant!;
+    const upiOk = !!r.upi_id && isValidUpi(r.upi_id);
+    return buildReceiptPdf({
+      restaurant: { name: r.name, address: r.address, city: r.city, state: r.state, pincode: r.pincode, phone: r.phone, gstin: r.gstin, fssai: r.fssai },
+      logo: await fetchLogo(r.logo_url),
+      billNo: o.order_no ?? o.id.slice(0, 6),
+      date: o.created_at,
+      table: o.table_number,
+      waiter: o.staff_name,
+      items: aggregate(o.items),
+      subtotal: o.subtotal, tax: o.gst, total: o.total,
+      paid: o.payment_status === "paid",
+      method: o.payment_method,
+      reviewUrl: reviewLinkOf(r),
+      payUrl: upiOk && o.payment_status !== "paid" ? upiLink({ upi: r.upi_id!, name: r.name, amount: o.total, note: payNote(r.name, o.order_no, o.table_number) }) : null,
+    });
   };
 
   const addItem = async (dish: Dish) => {
@@ -107,8 +133,8 @@ export default function Orders() {
     if (!bill || !restaurant) return;
     setPrinting(true);
     try {
-      const doc = await generateBillPdf(restaurant, bill);
-      doc.save(billFileName(restaurant, bill));
+      const doc = await receiptFor(bill);
+      doc.save(receiptFileName(restaurant.name, bill.order_no ?? "order"));
       showToast("Bill PDF downloaded");
     } catch { showToast("Could not make the PDF — try again"); }
     finally { setPrinting(false); }
@@ -117,7 +143,17 @@ export default function Orders() {
   const sendWhatsApp = async (number: string) => {
     if (!bill || !restaurant || !number.replace(/\D/g, "")) { showToast("Enter a valid number"); return; }
     setWaOpen(false);
-    try { const doc = await generateBillPdf(restaurant, bill); doc.save(billFileName(restaurant, bill)); } catch { /* still open chat */ }
+    // A paid bill goes straight from Parosa's WhatsApp: receipt PDF + thank you + Google review button.
+    if (bill.payment_status === "paid" && accessOf(restaurant).can("whatsappBill")) {
+      showToast("Sending the bill on WhatsApp…");
+      const r = await sendBillOnWhatsApp("order", bill.id, number);
+      if (r.ok) {
+        setBill((b) => (b && b.id === bill.id ? { ...b, customer_phone: number } : b));
+        showToast(`Bill sent on WhatsApp to ••••${r.phone_end} ✓`);
+      } else showToast(r.error === "nophone" ? "Enter a 10-digit mobile number" : "Couldn't send the bill — check the number and try again");
+      return;
+    }
+    try { const doc = await receiptFor(bill); doc.save(receiptFileName(restaurant.name, bill.order_no ?? "order")); } catch { /* still open chat */ }
     // The pay link must be https: WhatsApp never makes a upi:// link tappable.
     const payUrl = `${window.location.origin}/pay/${bill.id}`;
     let text = buildBillText(restaurant, bill, { payUrl });
@@ -313,11 +349,13 @@ export default function Orders() {
       <Dialog
         open={waOpen}
         title="Send bill on WhatsApp"
-        message={`Enter the customer's WhatsApp number. We'll download the bill PDF and open their chat with the bill${upiOk && bill?.payment_status === "unpaid" ? ", a tap-to-pay UPI link" : ""}${reviewLinkOf(restaurant) ? " and your Google review link" : ""} — attach the PDF and hit Send.`}
+        message={bill?.payment_status === "paid" && accessOf(restaurant).can("whatsappBill")
+          ? "Enter the guest's WhatsApp number. Parosa sends them the bill PDF with a thank-you note and a Rate us on Google button."
+          : `Enter the customer's WhatsApp number. We'll download the bill PDF and open their chat with the bill${upiOk && bill?.payment_status === "unpaid" ? ", a tap-to-pay UPI link" : ""}${reviewLinkOf(restaurant) ? " and your Google review link" : ""} — attach the PDF and hit Send.`}
         input
         placeholder="e.g. 98765 43210"
         defaultValue={bill?.customer_phone ?? ""}
-        confirmLabel="Open WhatsApp"
+        confirmLabel={bill?.payment_status === "paid" && accessOf(restaurant).can("whatsappBill") ? "Send bill" : "Open WhatsApp"}
         onConfirm={sendWhatsApp}
         onCancel={() => setWaOpen(false)}
       />
