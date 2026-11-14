@@ -61,8 +61,17 @@ async function logWhatsAppAccounts(token: string) {
   try {
     const dbg = await g(`debug_token?input_token=${encodeURIComponent(token)}`);
     const scopes = (dbg?.data?.granular_scopes ?? []) as { scope: string; target_ids?: string[] }[];
-    const wabas = [...new Set(scopes.filter((s) => s.scope.startsWith("whatsapp")).flatMap((s) => s.target_ids ?? []))];
-    console.error("[kitchen-otp] token app", dbg?.data?.application, "whatsapp accounts", JSON.stringify(wabas), dbg?.error?.message ?? "");
+    const fromToken = scopes.filter((s) => s.scope.startsWith("whatsapp")).flatMap((s) => s.target_ids ?? []);
+    // Accounts granted through the business portfolio don't show in the token — ask the portfolio too.
+    const biz = process.env.WHATSAPP_BUSINESS_ID || "1343064217774591";
+    const [owned, client] = await Promise.all([
+      g(`${biz}/owned_whatsapp_business_accounts?fields=id,name`),
+      g(`${biz}/client_whatsapp_business_accounts?fields=id,name`),
+    ]);
+    const fromBiz = [...(owned?.data ?? []), ...(client?.data ?? [])].map((a: { id: string }) => a.id);
+    const wabas = [...new Set([...fromToken, ...fromBiz])];
+    console.error("[kitchen-otp] token app", dbg?.data?.application, "whatsapp accounts", JSON.stringify(wabas),
+      dbg?.error?.message ?? "", owned?.error?.message ?? "", client?.error?.message ?? "");
     for (const w of wabas) {
       const [acc, nums, tpls] = await Promise.all([
         g(`${w}?fields=name`),
