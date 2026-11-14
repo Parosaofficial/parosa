@@ -1,18 +1,19 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
 /*
  * Kitchen sign-in, step 1: Restaurant ID + registered mobile → a 6-digit code.
  *
  * The database checks the pair and makes the code (kitchen_request_otp). The
- * code is then sent on WhatsApp — once these are set on the server (Vercel →
- * Settings → Environment Variables), and not before:
+ * code is sent ONLY on WhatsApp — it is never shown anywhere else. Needs these
+ * on the server (Vercel → Settings → Environment Variables):
  *   WHATSAPP_TOKEN            Meta WhatsApp Cloud API access token
  *   WHATSAPP_PHONE_NUMBER_ID  the sending number's id
  *   WHATSAPP_OTP_TEMPLATE     an approved "authentication" template (default: parosa_kitchen_otp)
  *   WHATSAPP_OTP_LANG         optional: its language code (default: tries en, en_US, en_GB)
  *   SUPABASE_SERVICE_ROLE_KEY to read the code server-side (never sent to a browser)
- * Until then the code shows on the owner's Dashboard → Kitchen display page.
+ * If WhatsApp can't send, the code is deleted (so it doesn't use up the hourly
+ * limit) and the tablet is told to try again.
  */
 
 export const dynamic = "force-dynamic";
@@ -33,18 +34,29 @@ export async function POST(req: Request) {
   const made = data as Made;
   if (!made.ok || !made.otp_id) return Response.json({ ok: false, error: made.error === "toomany" ? "toomany" : "nomatch" });
 
-  const via = (await sendOnWhatsApp(made.otp_id, phone)) ? "whatsapp" : "dashboard";
-  return Response.json({ ok: true, restaurant_name: made.restaurant_name, phone_end: made.phone_end, via });
+  const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!service) {
+    console.error("[kitchen-otp] SUPABASE_SERVICE_ROLE_KEY is not set");
+    return Response.json({ ok: false, error: "notsent" });
+  }
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://cyyyrunhjwnadjnsrtog.supabase.co";
+  const admin = createClient(url, service, { auth: { persistSession: false } });
+
+  if (!(await sendOnWhatsApp(admin, made.otp_id, phone))) {
+    await admin.from("kitchen_otps").delete().eq("id", made.otp_id); // unsent → doesn't count toward the limit
+    return Response.json({ ok: false, error: "notsent" });
+  }
+  return Response.json({ ok: true, restaurant_name: made.restaurant_name, phone_end: made.phone_end });
 }
 
-async function sendOnWhatsApp(otpId: string, phone10: string): Promise<boolean> {
+async function sendOnWhatsApp(admin: SupabaseClient, otpId: string, phone10: string): Promise<boolean> {
   const token = process.env.WHATSAPP_TOKEN;
   const numberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://cyyyrunhjwnadjnsrtog.supabase.co";
-  if (!token || !numberId || !service) return false;
+  if (!token || !numberId) {
+    console.error("[kitchen-otp] WHATSAPP_TOKEN or WHATSAPP_PHONE_NUMBER_ID is not set");
+    return false;
+  }
   try {
-    const admin = createClient(url, service, { auth: { persistSession: false } });
     const { data } = await admin.from("kitchen_otps").select("code").eq("id", otpId).single();
     if (!data?.code) return false;
     const template = process.env.WHATSAPP_OTP_TEMPLATE || "parosa_kitchen_otp";

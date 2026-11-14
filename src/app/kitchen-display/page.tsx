@@ -6,8 +6,8 @@ import { Sidebar } from "@/components/Sidebar";
 import { AppLoading } from "@/components/AppLoading";
 import { getMenu } from "@/lib/db";
 import {
-  kitchenDevices, pendingKitchenOtp, removeKitchenDevice, saveKitchenSettings,
-  type KitchenDevice, type KitchenOtp, type Station,
+  kitchenDevices, removeKitchenDevice, saveKitchenSettings,
+  type KitchenDevice, type Station,
 } from "@/lib/kitchen";
 import { useOwner } from "@/lib/useOwner";
 import { accessOf } from "@/lib/plans";
@@ -17,8 +17,8 @@ import "../dash.css";
 import "./kitchendisplay.css";
 
 /*
- * Owner side of the Kitchen Display: the kitchen link, the Restaurant ID and
- * sign-in code a kitchen tablet needs, the signed-in screens, ticket timer
+ * Owner side of the Kitchen Display: the kitchen link and Restaurant ID a
+ * kitchen tablet needs (its code comes on WhatsApp), the signed-in screens, ticket timer
  * colours, and stations (which menu categories each kitchen screen cooks).
  */
 
@@ -33,15 +33,13 @@ export default function KitchenDisplay() {
   const [toast, setToast] = useState("");
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2200); };
 
-  // kitchen sign-in: the live code (until WhatsApp is connected) + signed-in screens
-  const [otp, setOtp] = useState<KitchenOtp | null>(null);
+  // signed-in kitchen screens (the sign-in code itself only ever goes to WhatsApp)
   const [devices, setDevices] = useState<KitchenDevice[] | null>(null);
   const [tick, setTick] = useState(() => Date.now());
   useEffect(() => {
     if (!restaurant) return;
     let alive = true;
     const load = () => {
-      pendingKitchenOtp(restaurant.id).then((o) => { if (alive) setOtp(o); });
       kitchenDevices(restaurant.id).then((d) => { if (alive) setDevices(d); });
       setTick(Date.now());
     };
@@ -96,7 +94,6 @@ export default function KitchenDisplay() {
     const m = Math.round((tick - new Date(iso).getTime()) / 60000);
     return m < 2 ? "now" : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago`;
   };
-  const otpLeft = otp ? Math.max(0, Math.ceil((new Date(otp.expires_at).getTime() - tick) / 60000)) : 0;
   const unassigned = cats.filter((c) => !list.some((s) => s.categories.includes(c.id)));
 
   return (
@@ -117,18 +114,10 @@ export default function KitchenDisplay() {
               <ol className="kdo-steps">
                 <li>Open the link on any tablet, old phone or TV in the kitchen.</li>
                 <li>Enter the <b>Restaurant ID</b> <b className="kdo-code">{restaurant.slug}</b> and the registered mobile {restaurant.phone ? <b>{restaurant.phone}</b> : <Link href="/settings">— add one in Settings first</Link>}.</li>
-                <li>Enter the 6-digit code, tap <b>Start kitchen screen</b> and leave it open. New orders ring with the Cha-Ching sound.</li>
+                <li>A 6-digit code comes on <b>WhatsApp</b> to that mobile. Enter it, tap <b>Start kitchen screen</b> and leave it open. New orders ring with the Cha-Ching sound.</li>
               </ol>
-              {scrFull && scrLim !== null ? (
+              {scrFull && scrLim !== null && (
                 <PlanNote kind="kitchenScreens" used={devices?.length ?? 0} limit={scrLim} planName={plan.plan.name} />
-              ) : otp ? (
-                <div className="kdo-otp" role="status">
-                  <span>Kitchen sign-in code</span>
-                  <b>{otp.code}</b>
-                  <small>{otp.sent_whatsapp ? "Also sent on WhatsApp · " : ""}Works for {otpLeft} more min. Only give it to your kitchen.</small>
-                </div>
-              ) : (
-                <p className="kdo-muted">When the kitchen asks for a code, it shows up right here (WhatsApp codes are coming soon).</p>
               )}
             </section>
 

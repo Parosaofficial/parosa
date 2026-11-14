@@ -9,8 +9,7 @@ import "./kitchenlogin.css";
 /*
  * Kitchen sign-in — separate from the owner and staff logins.
  * 1. Restaurant ID (the restaurant's web name) + its registered mobile number
- * 2. A 6-digit code on WhatsApp (until WhatsApp is connected, the owner sees
- *    the code on Dashboard → Kitchen display)
+ * 2. A 6-digit code sent on WhatsApp to that mobile (WhatsApp only)
  * The tablet then stays signed in until the owner removes it.
  */
 
@@ -24,7 +23,7 @@ export default function KitchenLogin() {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const [sent, setSent] = useState<{ name: string; end: string; via: "whatsapp" | "dashboard" } | null>(null);
+  const [sent, setSent] = useState<{ name: string; end: string } | null>(null);
   const [wait, setWait] = useState(0);
   const codeRef = useRef<HTMLInputElement>(null);
 
@@ -49,10 +48,11 @@ export default function KitchenLogin() {
     if (!r.ok) {
       setErr(r.error === "toomany" ? "Too many codes asked for. Try again in an hour."
         : r.error === "offline" ? "Couldn't connect. Check the internet and try again."
+        : r.error === "notsent" ? "Couldn't send the code on WhatsApp. Please try again in a minute."
         : "This Restaurant ID and mobile number don't match. Use the number registered with Parosa.");
       return;
     }
-    setSent({ name: r.restaurant_name, end: r.phone_end, via: r.via });
+    setSent({ name: r.restaurant_name, end: r.phone_end });
     setStep("otp"); setCode(""); setWait(RESEND_S);
     setTimeout(() => codeRef.current?.focus(), 50);
   };
@@ -95,14 +95,7 @@ export default function KitchenLogin() {
           </form>
         ) : (
           <form className="kl-form" onSubmit={(e) => { e.preventDefault(); verify(); }}>
-            {sent?.via === "whatsapp" ? (
-              <p>We sent a 6-digit code on WhatsApp to <b>+91 ••••••{sent.end}</b> for <b>{sent.name}</b>.</p>
-            ) : (
-              <div className="kl-note">
-                <b>WhatsApp codes are coming soon</b>
-                <span>For now, the owner of <b>{sent?.name}</b> can see this code in the Parosa dashboard → <b>Kitchen display</b>.</span>
-              </div>
-            )}
+            <p>We sent a 6-digit code on WhatsApp to <b>+91 ••••••{sent?.end}</b> for <b>{sent?.name}</b>.</p>
             <label>6-digit code
               <input ref={codeRef} className="kl-code" value={code} inputMode="numeric" autoComplete="one-time-code" maxLength={6}
                 onChange={(e) => { const c = e.target.value.replace(/\D/g, "").slice(0, 6); setCode(c); if (c.length === 6) verify(c); }}

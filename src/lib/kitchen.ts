@@ -52,10 +52,10 @@ export function clearKitchenSession() {
 }
 
 export type OtpRequest =
-  | { ok: true; restaurant_name: string; phone_end: string; via: "whatsapp" | "dashboard" }
-  | { ok: false; error: "nomatch" | "toomany" | "offline" };
+  | { ok: true; restaurant_name: string; phone_end: string }
+  | { ok: false; error: "nomatch" | "toomany" | "offline" | "notsent" };
 
-/** Step 1 — sends the code (WhatsApp when connected, else it shows on the owner's Kitchen display page). */
+/** Step 1 — sends the code on WhatsApp to the registered mobile (the only place it is shown). */
 export async function requestKitchenOtp(restaurantId: string, phone: string): Promise<OtpRequest> {
   try {
     const r = await fetch("/api/kitchen/otp", {
@@ -129,20 +129,9 @@ export async function saveKitchenSettings(restaurantId: string, p: { kitchen_sta
   if (error) throw error;
 }
 
-/* ---------------- owner: kitchen sign-in codes + signed-in screens ---------------- */
+/* ---------------- owner: signed-in kitchen screens ---------------- */
 
-export type KitchenOtp = { id: string; code: string; created_at: string; expires_at: string; sent_whatsapp: boolean };
 export type KitchenDevice = { id: string; name: string; created_at: string; last_seen: string };
-
-/** The newest unused kitchen sign-in code (shown to the owner until WhatsApp is connected). null when none. */
-export async function pendingKitchenOtp(restaurantId: string): Promise<KitchenOtp | null> {
-  const { data, error } = await supabase.from("kitchen_otps")
-    .select("id, code, created_at, expires_at, sent_whatsapp")
-    .eq("restaurant_id", restaurantId).eq("used", false).gt("expires_at", new Date().toISOString())
-    .order("created_at", { ascending: false }).limit(1);
-  if (error || !data?.length) return null;
-  return data[0] as KitchenOtp;
-}
 
 export async function kitchenDevices(restaurantId: string): Promise<KitchenDevice[] | null> {
   const { data, error } = await supabase.from("kitchen_devices").select("id, name, created_at, last_seen")
