@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
  * on the server (Vercel → Settings → Environment Variables):
  *   WHATSAPP_TOKEN            Meta WhatsApp Cloud API access token
  *   WHATSAPP_PHONE_NUMBER_ID  the sending number's id
- *   WHATSAPP_OTP_TEMPLATE     an approved "authentication" template (default: parosa_kitchen_code)
+ *   WHATSAPP_OTP_TEMPLATE     an approved "authentication" template (default: parosa_kitchen_otp)
  *   WHATSAPP_OTP_LANG         optional: its language code (default: tries en, en_US, en_GB)
  *   SUPABASE_SERVICE_ROLE_KEY to read the code server-side (never sent to a browser)
  * If WhatsApp can't send, the code is deleted (so it doesn't use up the hourly
@@ -98,7 +98,7 @@ async function sendOnWhatsApp(admin: SupabaseClient, otpId: string, phone10: str
   try {
     const { data } = await admin.from("kitchen_otps").select("code").eq("id", otpId).single();
     if (!data?.code) return false;
-    const template = process.env.WHATSAPP_OTP_TEMPLATE || "parosa_kitchen_code";
+    const template = process.env.WHATSAPP_OTP_TEMPLATE || "parosa_kitchen_otp";
     // A template is looked up by name + language. "English" is `en`, "English (US)" is `en_US`
     // and "English (UK)" is `en_GB` in WhatsApp Manager — try each until one exists (error 132001).
     const langs = [...new Set([process.env.WHATSAPP_OTP_LANG || "en", "en_US", "en_GB"])];
