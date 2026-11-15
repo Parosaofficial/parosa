@@ -99,3 +99,18 @@
 .fl-pin{display:grid;gap:2px;margin:0 0 10px;background:#FDECEA;border:1px solid #F3B4AE;color:#7A1A14;border-radius:10px;padding:10px 12px;font-size:14px}
 .fl-pin b{font-size:15px}
 .fl-pin a{color:#7A1A14;font-weight:800}
+/* bill paid → send on WhatsApp */
+.fl-paid{position:fixed;inset:0;z-index:300;background:#1a0a0b8c;display:grid;place-items:center;padding:16px}
+.fl-paidc{width:100%;max-width:380px;background:#fff;border-radius:20px;padding:22px 20px 16px;display:grid;gap:10px;justify-items:center;text-align:center;box-shadow:0 30px 60px -20px #000}
+.fl-paidt{width:56px;height:56px;border-radius:50%;background:#E6F4EC;color:#1F7A45;display:grid;place-items:center;font-size:28px;font-weight:800}
+.fl-paidc h3{margin:0;font-size:20px;color:#24090B}
+.fl-paidc p{margin:0;font-size:14.5px;color:#6E5557}
+.fl-wa{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;border:none;border-radius:14px;background:#1F9D55;color:#fff;font:inherit;font-size:16px;font-weight:800;cursor:pointer}
+.fl-wa:disabled{opacity:.6;cursor:progress}
+.fl-paidok{width:100%;background:#E6F4EC;color:#14532D;border-radius:12px;padding:12px;font-weight:700;font-size:15px}
+.fl-paidin{display:grid;gap:6px;width:100%;text-align:left;font-size:13.5px;font-weight:700;color:#24090B}
+.fl-paidin span{display:flex;align-items:center;border:1.5px solid #E4D3D4;border-radius:12px;overflow:hidden}
+.fl-paidin b{padding:0 4px 0 12px;color:#6E5557}
+.fl-paidin input{flex:1;min-width:0;border:none;outline:none;font:inherit;font-size:17px;padding:11px 10px 11px 4px}
+.fl-paiderr{color:#B4231C!important;font-weight:600}
+.fl-paiddone{border:none;background:none;font:inherit;font-size:15px;font-weight:700;color:#5C0F14;padding:8px;cursor:pointer}

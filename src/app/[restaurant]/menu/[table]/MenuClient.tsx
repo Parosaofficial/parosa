@@ -10,6 +10,7 @@ import { cleanPhone, loyaltyOf, rememberCard, rememberedCard, rewardText, tokenF
 import { MenuStampCard, markStampPending } from "@/components/MenuStamp";
 import { resolveTemplateId, templateStyle } from "@/lib/templates";
 import { SessionGate, useTableSession } from "./SessionGate";
+import { WhatsAppAsk, useSavedWhatsApp, whatsAppNumber } from "./WhatsAppAsk";
 import { PaidStamp, ThankYou } from "./ThankYou";
 import { CustomPanel, GuestNav, LoyaltyPanel, WaiterPanel, type GuestTab } from "./GuestTabs";
 import type { Category, Dish, Restaurant } from "@/lib/types";
@@ -57,6 +58,9 @@ export function MenuClient({
   // digital stamp card: optional phone at checkout → a card link after ordering
   const loy = loyaltyOf(restaurant);
   const [guestPhone, setGuestPhone] = useState("");
+  // the guest's WhatsApp number, asked once per restaurant on this phone (bills go there)
+  const waSaved = useSavedWhatsApp(restaurant.slug);
+  const myPhone = cleanPhone(guestPhone) || whatsAppNumber(waSaved);
   const [myCard, setMyCard] = useState<string | null>(null);
   useEffect(() => { setMyCard(rememberedCard(restaurant.slug)); }, [restaurant.slug]);
   // table session (0015): location check, one shared session per table, closes on payment
@@ -139,13 +143,13 @@ export function MenuClient({
         table,
         subtotal: sub, gst, total: grand,
         items: cartEntries.map(({ d, q }) => ({ dish_id: d.id, name: d.name, qty: q, price: d.price })),
-        phone: loy.loyalty_enabled && cleanPhone(guestPhone) ? cleanPhone(guestPhone) : undefined,
+        phone: myPhone || undefined, // WhatsApp bill + stamp card
         sessionId: ts.sessionId,
         note,
         at: ts.coords, // menus without tables: the checked location (0019)
       });
       setPlaced({ no: order.order_no ?? "", total: order.total, session: ts.sessionId });
-      if (loy.loyalty_enabled && cleanPhone(guestPhone)) {
+      if (loy.loyalty_enabled && myPhone) {
         markStampPending(restaurant.slug);
         tokenForOrder(order.id).then((t) => { if (t) { setMyCard(t); rememberCard(restaurant.slug, t); } });
       }
@@ -389,7 +393,7 @@ export function MenuClient({
           {loy.loyalty_enabled && cartEntries.length > 0 && (
             <label className="pm-stampin">
               <span>★ Collect a stamp · {loy.loyalty_goal} visits = {rewardText(loy.loyalty_reward)}</span>
-              <input type="tel" inputMode="numeric" autoComplete="tel" maxLength={14} placeholder="Your phone number (optional)" value={guestPhone} onChange={(e) => setGuestPhone(e.target.value)} />
+              <input type="tel" inputMode="numeric" autoComplete="tel" maxLength={14} placeholder="Your phone number (optional)" value={guestPhone || whatsAppNumber(waSaved)} onChange={(e) => setGuestPhone(e.target.value)} />
             </label>
           )}
           <button className="pm-place" onClick={placeOrder} disabled={count === 0 || placing}>
@@ -415,6 +419,7 @@ export function MenuClient({
       {ts.phase === "browse" && (
         <div className="pm-viewonly" role="status">Menu only — not at the restaurant? <button onClick={tsUi.allow}>Order here</button></div>
       )}
+      {showNav && ts.phase === "ok" && waSaved === null && <WhatsAppAsk slug={restaurant.slug} restaurantName={restaurant.name} />}
       <SessionGate
         ui={tsUi}
         restaurantName={restaurant.name}

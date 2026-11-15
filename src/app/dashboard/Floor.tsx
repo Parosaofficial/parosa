@@ -49,8 +49,10 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
   const [busy, setBusy] = useState("");
   const [now, setNow] = useState(() => Date.now());
   const [bookings, setBookings] = useState<Reservation[]>([]);
-  const [note, setNoteRaw] = useState("");
-  const setNote = (m: string) => { setNoteRaw(m); setTimeout(() => setNoteRaw(""), 5000); };
+  // "Bill paid" → one-tap WhatsApp bill (set after UPI ✓ / Cash ✓)
+  const [paid, setPaid] = useState<{ sid: string; table: string; total: number; phone: string; via: string } | null>(null);
+  const [paidPhone, setPaidPhone] = useState("");
+  const [paidState, setPaidState] = useState<"" | "sending" | "sent" | "failed">("");
 
   const loadSessions = useCallback(() => {
     listOpenSessions(restaurant.id).then(setSessions).catch(() => {});
@@ -125,14 +127,25 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
   const waiterName = (id: string | null) => staff.find((s) => s.id === id)?.name ?? null;
   const open = rows.find((r) => r.t.id === openId) ?? null;
 
-  // Growth / Pro: the closed table's bill goes to the guest's WhatsApp (when someone gave a number)
-  const sendTableBill = (sessionId: string) => {
-    if (!accessOf(restaurant).can("whatsappBill")) return;
-    sendBillOnWhatsApp("session", sessionId).then((r) => {
-      if (r.ok) setNote(`Bill sent on WhatsApp to ••••${r.phone_end} ✓`);
-      else if (r.error === "notsent" || r.error === "offline") setNote("Couldn't send the bill on WhatsApp — send it again from Orders & Bills");
-    });
+  // After UPI ✓ / Cash ✓: "Bill paid" with a one-tap "Send bill on WhatsApp" (Growth / Pro).
+  // The number is the one the guest gave when they scanned; otherwise the owner types it.
+  const closeTable = async (r: (typeof rows)[number], via: "UPI" | "Cash") => {
+    const sid = r.session!.id;
+    await closeSession(sid, via);
+    setOpenId(null);
+    const phone = r.orders.map((o) => (o.customer_phone ?? "").replace(/\D/g, "").slice(-10)).find((x) => x.length === 10) ?? "";
+    setPaid({ sid, table: tableLabel(r.t), total: r.bill + (r.session?.booking_charge ?? 0), phone, via });
+    setPaidPhone(phone); setPaidState("");
   };
+  const sendPaidBill = async () => {
+    if (!paid) return;
+    const num = paidPhone.replace(/\D/g, "").slice(-10);
+    if (num.length !== 10) { setPaidState("failed"); return; }
+    setPaidState("sending");
+    const r = await sendBillOnWhatsApp("session", paid.sid, num);
+    setPaidState(r.ok ? "sent" : "failed");
+  };
+  const canWhatsApp = accessOf(restaurant).can("whatsappBill");
 
   const act = async (what: string, fn: () => Promise<void>) => {
     setBusy(what);
@@ -173,7 +186,6 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
           )}
         </div>
       </div>
-      {note && <div className="fl-note" role="status">{note}</div>}
       {(restaurant.latitude == null || restaurant.longitude == null) && (
         <div className="fl-pin" role="alert"><b>Pin your restaurant&apos;s location</b><span>Guests can&apos;t open the menu or order by QR until you do — it&apos;s how Parosa checks they&apos;re really at your table.</span><Link href="/settings/location">Pin it now →</Link></div>
       )}
@@ -233,6 +245,38 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
               <span>{r.session ? waiterName(r.session.waiter_id) ?? "No waiter" : ""}</span>
             </button>
           ))}
+        </div>
+      )}
+
+      {/* ---- bill paid → one-tap WhatsApp bill ---- */}
+      {paid && (
+        <div className="fl-paid" role="dialog" aria-modal="true" aria-label="Bill paid">
+          <div className="fl-paidc">
+            <span className="fl-paidt" aria-hidden="true">✓</span>
+            <h3>{paid.table} · bill paid</h3>
+            <p>{rupees(paid.total)} by {paid.via}. The table is free again.</p>
+            {canWhatsApp ? (
+              paidState === "sent" ? (
+                <div className="fl-paidok">Bill sent on WhatsApp to ••••{paidPhone.replace(/\D/g, "").slice(-4)} ✓</div>
+              ) : (
+                <>
+                  {!paid.phone && (
+                    <label className="fl-paidin">Guest&apos;s WhatsApp number
+                      <span><b>+91</b><input type="tel" inputMode="numeric" maxLength={14} placeholder="98765 43210" value={paidPhone} onChange={(e) => { setPaidPhone(e.target.value.replace(/[^\d ]/g, "")); setPaidState(""); }} /></span>
+                    </label>
+                  )}
+                  <button className="fl-wa" onClick={sendPaidBill} disabled={paidState === "sending"}>
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.2-1-.4-1.6-.7-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.3.1.5.1.6-.1l.7-.9c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2Z" /></svg>
+                    {paidState === "sending" ? "Sending…" : paid.phone ? `Send bill on WhatsApp · ••••${paid.phone.slice(-4)}` : "Send bill on WhatsApp"}
+                  </button>
+                  {paidState === "failed" && <p className="fl-paiderr">{paidPhone.replace(/\D/g, "").length < 10 ? "Enter the guest's 10-digit number." : "Couldn't send — check the number and try again."}</p>}
+                </>
+              )
+            ) : (
+              <p className="fl-muted">WhatsApp bills come with the Growth plan. <Link href="/settings/plan">Upgrade</Link></p>
+            )}
+            <button className="fl-paiddone" onClick={() => setPaid(null)}>Done</button>
+          </div>
         </div>
       )}
 
@@ -297,8 +341,8 @@ export function Floor({ restaurant, orders }: { restaurant: Restaurant; orders: 
                   <div className="fl-box">
                     <b className="fl-bt">Payment received</b>
                     <div className="fl-pay">
-                      <button disabled={!!busy || open.orders.length === 0} onClick={() => act("upi", async () => { const sid = open.session!.id; await closeSession(sid, "UPI"); setOpenId(null); sendTableBill(sid); })}>{busy === "upi" ? "Closing…" : "UPI ✓ · close table"}</button>
-                      <button disabled={!!busy || open.orders.length === 0} onClick={() => act("cash", async () => { const sid = open.session!.id; await closeSession(sid, "Cash"); setOpenId(null); sendTableBill(sid); })}>{busy === "cash" ? "Closing…" : "Cash ✓ · close table"}</button>
+                      <button disabled={!!busy || open.orders.length === 0} onClick={() => act("upi", () => closeTable(open, "UPI"))}>{busy === "upi" ? "Closing…" : "UPI ✓ · close table"}</button>
+                      <button disabled={!!busy || open.orders.length === 0} onClick={() => act("cash", () => closeTable(open, "Cash"))}>{busy === "cash" ? "Closing…" : "Cash ✓ · close table"}</button>
                     </div>
                     <p className="fl-muted">Marks every order paid, adds stamp-card ticks, and frees the table for the next guests.</p>
                   </div>

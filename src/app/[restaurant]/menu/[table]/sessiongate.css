@@ -32,3 +32,11 @@
 .pm-credits{display:block;text-align:center;font-size:12px;opacity:.6;color:inherit;margin:-6px 0 24px;text-decoration:underline;text-underline-offset:2px}
 /* before the guest is confirmed at the table: a solid screen, the menu stays hidden */
 .sg-wrap.solid{background:linear-gradient(170deg,#5C0F14,#2A0709);animation:none}
+/* "Get your bill on WhatsApp" (first scan) */
+.sg-ic.wa{background:#E6F4EC;color:#1F7A45}
+.sg-phone{display:flex;align-items:center;width:100%;margin-top:4px;border:1.5px solid #E4D3D4;border-radius:14px;overflow:hidden;background:#fff}
+.sg-phone:focus-within{border-color:#5C0F14;box-shadow:0 0 0 3px #5C0F1422}
+.sg-phone b{padding:0 4px 0 14px;font-size:17px;color:#6E5557}
+.sg-phone input{flex:1;min-width:0;border:none;outline:none;font:inherit;font-size:18px;font-weight:600;color:#24090B;padding:13px 12px 13px 6px;background:transparent}
+.sg-err{margin:0;color:#B4231C;font-size:14px;font-weight:600}
+.sg-fine{margin:2px 0 0;font-size:12px;color:#8B7476;line-height:1.4}
