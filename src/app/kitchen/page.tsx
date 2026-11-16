@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { playChime, primeAudio } from "@/lib/chime";
+import { playChime, primeAudio, soundBlocked } from "@/lib/chime";
 import {
   clearKitchenSession, forStation, kitchenBoard, kitchenItemDone, kitchenSetStatus, kitchenSignOut, orderSource, tableTitle,
   type KitchenBoard, type KitchenOrder, type KitchenStatus, type Station,
@@ -19,6 +19,7 @@ import "./kitchen.css";
  */
 
 const POLL_MS = 5000;
+const REMIND_MS = 60000; // ring again while an order waits in New
 const STATION_KEY = "parosa-kds-station";
 const LANES: { id: Exclude<KitchenStatus, "served">; title: string }[] = [
   { id: "new", title: "New" },
@@ -49,6 +50,7 @@ export default function Kitchen() {
   const [now, setNow] = useState(() => Date.now());
   const seen = useRef<Set<string> | null>(null);
   const soundRef = useRef(soundOn);
+  const [blocked, setBlocked] = useState(false); // the browser muted us — ask for a tap
   useEffect(() => { soundRef.current = soundOn; }, [soundOn]);
 
   const pickStation = (name: string) => {
@@ -82,6 +84,25 @@ export default function Kitchen() {
     document.addEventListener("visibilitychange", onShow);
     return () => { clearTimeout(first); clearInterval(t); clearInterval(tick); document.removeEventListener("visibilitychange", onShow); };
   }, [kit, load]);
+
+  // Sound stays unlocked: any tap on the screen re-unlocks it (tablets mute pages
+  // that sat idle), and a red bar asks for a tap whenever the browser is blocking it.
+  useEffect(() => {
+    if (!started) return;
+    const unlock = () => { primeAudio(); setTimeout(() => setBlocked(soundBlocked()), 300); };
+    document.addEventListener("pointerdown", unlock);
+    const check = setInterval(() => setBlocked(soundRef.current && soundBlocked()), 5000);
+    return () => { document.removeEventListener("pointerdown", unlock); clearInterval(check); };
+  }, [started]);
+
+  // an order still waiting in New rings again every minute until someone starts it
+  useEffect(() => {
+    if (!started) return;
+    const t = setInterval(() => {
+      if (soundRef.current && (board?.orders ?? []).some((o) => o.status === "new")) { primeAudio(); playChime(); }
+    }, REMIND_MS);
+    return () => clearInterval(t);
+  }, [started, board]);
 
   // keep the screen awake while the kitchen is open
   useEffect(() => {
@@ -235,8 +256,15 @@ export default function Kitchen() {
           {stations.map((s) => <button key={s.name} className={st?.name === s.name ? "on" : ""} onClick={() => pickStation(s.name)}>{s.name}</button>)}
         </nav>
         <button className="kd-tool" onClick={() => setSoundOn((v) => !v)} aria-pressed={soundOn}>{soundOn ? "🔊 Sound on" : "🔇 Sound off"}</button>
+        <button className="kd-tool" onClick={() => { primeAudio(); playChime(); setTimeout(() => setBlocked(soundBlocked()), 300); }}>🔔 Test sound</button>
         <button className="kd-tool" onClick={() => setRecallOpen(true)}>↺ Recall</button>
       </header>
+
+      {soundOn && blocked && (
+        <button className="kd-muted" onClick={() => { primeAudio(); playChime(); setTimeout(() => setBlocked(soundBlocked()), 300); }}>
+          🔇 Sound is blocked by the browser — tap here to turn order sounds back on
+        </button>
+      )}
 
       {allDay.length > 0 && (
         <div className="kd-allday" aria-label="Cooking now, all tickets">

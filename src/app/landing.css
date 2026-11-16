@@ -53,7 +53,7 @@
    edge with its wrist faded out. Only the colours changed (maroon ground, lighter arch). */
 .lp-hero{background:var(--m);color:#fff;position:relative;overflow-x:clip;min-height:700px;padding:64px 0 0;
   --sw:min(304px,22vw);           /* stand width */
-  --phw:min(390px,28vw);          /* phone width */
+  --phw:min(340px,26vw);          /* phone width (the image is served for 340px) */
   background-image:radial-gradient(60% 70% at 80% 30%,#7A1A20 0%,transparent 60%),radial-gradient(40% 50% at 8% 95%,#6A1419 0%,transparent 70%)}
 .lp-arch{position:absolute;right:max(20px,calc((100vw - 1200px) / 2 + 28px));top:36px;bottom:0;width:min(430px,34vw);border-radius:220px 220px 0 0;
   background:linear-gradient(180deg,#ffffff1f 0%,#ffffff12 60%,#ffffff00 100%);box-shadow:inset 18px 0 50px -30px #00000040}
@@ -85,7 +85,7 @@
 .lp-chip small{display:block;color:var(--ink2);font-size:12.5px}
 .lp-chip .i{width:30px;height:30px;border-radius:9px;background:var(--blush);color:var(--m);display:grid;place-items:center;font-weight:800;flex:none}
 .lp-chip.c1{left:calc(4% - 20px);top:4%;animation-delay:1s}
-.lp-chip.c2{left:calc(4% + var(--sw) + 60px);top:46%;animation-delay:1.25s}
+.lp-chip.c2{left:calc(4% + var(--sw) + 40px);top:auto;bottom:calc(34px + var(--phw) * 1.486 + 22px);animation-delay:1.25s}
 @keyframes lp-rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
 @keyframes lp-phone-in{from{opacity:0;transform:translate(60px,40px) rotate(4deg)}to{opacity:1;transform:none}}
 @keyframes lp-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-12px) rotate(-1deg)}}

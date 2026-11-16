@@ -5,6 +5,24 @@
 let ctx: AudioContext | null = null;
 let kaching: HTMLAudioElement | null = null;
 const KACHING_SRC = "/sounds/cha-ching.mp3";
+// the Cha-Ching decoded once into the audio engine — plays reliably on phones/tablets once unlocked
+let kachingBuf: AudioBuffer | null = null;
+let kachingLoading = false;
+function loadKaching(c: AudioContext) {
+  if (kachingBuf || kachingLoading) return;
+  kachingLoading = true;
+  fetch(KACHING_SRC)
+    .then((r) => r.arrayBuffer())
+    .then((a) => new Promise<AudioBuffer>((res, rej) => c.decodeAudioData(a, res, rej)))
+    .then((b) => { kachingBuf = b; })
+    .catch(() => { /* the <audio> fallback still works */ })
+    .finally(() => { kachingLoading = false; });
+}
+
+/** true while the browser is blocking sound (needs a tap on the page to unlock). */
+export function soundBlocked(): boolean {
+  return !ctx || ctx.state !== "running";
+}
 
 export function primeAudio(): AudioContext | null {
   try {
@@ -20,6 +38,7 @@ export function primeAudio(): AudioContext | null {
       ctx = new AC();
     }
     if (ctx.state === "suspended") void ctx.resume();
+    loadKaching(ctx);
     return ctx;
   } catch {
     return null;
@@ -45,6 +64,18 @@ function ding(c: AudioContext, freq: number, t: number, gain = 0.5, dur = 0.42) 
 
 /** New order / guest call: the Cha-Ching sound; the synthesized chime if the file can't play. */
 export function playChime() {
+  // 1) through the audio engine (most reliable once a tap unlocked it)
+  try {
+    const c = primeAudio();
+    if (c && kachingBuf && c.state === "running") {
+      const src = c.createBufferSource();
+      src.buffer = kachingBuf;
+      src.connect(c.destination);
+      src.start();
+      return;
+    }
+  } catch { /* fall through to the <audio> element */ }
+  // 2) the plain sound file, 3) the synthesized chime
   try {
     const a = kaching ?? new Audio(KACHING_SRC);
     kaching = a;

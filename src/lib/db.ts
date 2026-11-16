@@ -440,7 +440,8 @@ async function shrinkPhoto(file: File, maxSide: number): Promise<{ blob: Blob; e
 }
 
 export async function uploadPhoto(folder: string, file: File): Promise<string> {
-  const { blob, ext } = await shrinkPhoto(file, folder === "logos" ? 512 : 1200);
+  // menu thumbnails show at ~110px — 800px stays sharp on any phone at half the data of 1200px
+  const { blob, ext } = await shrinkPhoto(file, folder === "logos" ? 512 : 800);
   const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
   // every upload gets a new name, so browsers and the CDN may keep it for a year
   const { error } = await supabase.storage.from("photos").upload(path, blob, { upsert: true, cacheControl: "31536000", contentType: blob.type || file.type });

@@ -5,9 +5,23 @@ const nextConfig: NextConfig = {
   // home directory looking for a lockfile (OneDrive/Desktop nesting).
   turbopack: { root: __dirname },
 
+  // Don't tell the world which framework/version runs the site.
+  poweredByHeader: false,
+  // No source maps in production: the browser gets only minified code.
+  productionBrowserSourceMaps: false,
+  // Landing images: smallest modern format the phone supports, cached for a month.
+  images: { formats: ["image/avif", "image/webp"], minimumCacheTTL: 2592000 },
+
   // Browser security headers on every page and API route.
   async headers() {
-    return [{
+    // dish photos, landing art and sounds: cached on phones for a week (same names
+    // may be replaced, so not "forever"); pages themselves are always fresh
+    const week = { key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" };
+    return [
+      { source: "/dishes/:file*", headers: [week] },
+      { source: "/landing/:file*", headers: [week] },
+      { source: "/sounds/:file*", headers: [week] },
+      {
       source: "/:path*",
       headers: [
         { key: "X-Content-Type-Options", value: "nosniff" },
@@ -31,7 +45,8 @@ const nextConfig: NextConfig = {
           "form-action 'self'",
         ].join("; ") },
       ],
-    }];
+      },
+    ];
   },
 
   // Friendly aliases → the real page.
