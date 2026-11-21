@@ -7,6 +7,7 @@ import { Seal } from "@/components/Logo";
 import { authMessage, getCurrentUserId, requestResetOtp, sendPasswordReset, setNewPassword, signIn, verifyResetOtp } from "@/lib/auth";
 import { getRestaurantByOwner, staffLogin } from "@/lib/db";
 import { saveStaffSession } from "@/lib/useStaff";
+import { Turnstile, turnstileOn } from "@/components/Turnstile";
 import "./login.css";
 
 function MailIcon() {
@@ -55,6 +56,9 @@ export default function AuthScreen() {
   const [siEmail, setSiEmail] = useState("");
   const [siPass, setSiPass] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [captcha, setCaptcha] = useState<string | null>(null); // Turnstile (when switched on)
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const needCheck = () => turnstileOn && !captcha;
 
   // forgot password — WhatsApp code to the registered mobile (or an email link)
   const [rsSent, setRsSent] = useState("");
@@ -116,11 +120,14 @@ export default function AuthScreen() {
   const sendResetCode = async () => {
     setErr("");
     if (rsPhone10.length !== 10) { setErr("Enter your 10-digit registered mobile number."); return; }
+    if (needCheck()) { setErr("Please wait a second for the quick check, then try again."); return; }
     setBusy(true);
-    const r = await requestResetOtp(rsPhone10);
+    const r = await requestResetOtp(rsPhone10, captcha);
     setBusy(false);
+    setCaptchaKey((k) => k + 1); // each check works once
     if (!r.ok) {
       setErr(r.error === "toomany" ? "Too many codes asked for. Please try again in an hour."
+        : r.error === "captcha" ? "Please wait a second for the quick check, then try again."
         : r.error === "phone" ? "Enter your 10-digit registered mobile number."
         : "Couldn't send the code right now. Try again, or use email instead.");
       return;
@@ -149,9 +156,10 @@ export default function AuthScreen() {
   const doReset = async () => {
     setErr("");
     if (!emailOk(siEmail)) { setErr("Enter the email you signed up with."); return; }
+    if (needCheck()) { setErr("Please wait a second for the quick check, then try again."); return; }
     setBusy(true);
-    try { await sendPasswordReset(siEmail); setRsSent(siEmail.trim().toLowerCase()); }
-    catch (e) { setErr(authMessage(e)); }
+    try { await sendPasswordReset(siEmail, captcha); setRsSent(siEmail.trim().toLowerCase()); }
+    catch (e) { setErr(authMessage(e)); setCaptchaKey((k) => k + 1); }
     finally { setBusy(false); }
   };
 
@@ -176,12 +184,13 @@ export default function AuthScreen() {
     setErr("");
     if (!emailOk(siEmail)) { setErr("Enter a valid email address."); return; }
     if (!siPass) { setErr("Enter your password."); return; }
+    if (needCheck()) { setErr("Please wait a second for the quick check, then try again."); return; }
     setBusy(true);
     try {
-      await signIn(siEmail, siPass);
+      await signIn(siEmail, siPass, captcha);
       const uid = await getCurrentUserId();
       router.replace(uid && !(await getRestaurantByOwner(uid)) ? "/signup" : "/dashboard");
-    } catch (e) { setErr(authMessage(e)); setBusy(false); }
+    } catch (e) { setErr(authMessage(e)); setBusy(false); setCaptchaKey((k) => k + 1); }
   };
 
   if (checking) {
@@ -245,6 +254,7 @@ export default function AuthScreen() {
                   <h1 className="lg-welcome">Forgot password?</h1>
                   <p className="lg-sub">We&apos;ll send a code on WhatsApp to your registered mobile</p>
                   <div className="lg-field"><label>Registered mobile number</label><input type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="98765 43210" value={rsPhone} onChange={(e) => setRsPhone(e.target.value.replace(/[^\d +]/g, "").slice(0, 14))} onKeyDown={(e) => e.key === "Enter" && sendResetCode()} /></div>
+                  <Turnstile onToken={setCaptcha} action="reset_wa" resetKey={captchaKey} />
                   {err && <div className="lg-err">{err}</div>}
                   <button className="lg-prime" onClick={sendResetCode} disabled={busy}>{busy ? "Sending…" : "Send code on WhatsApp"}</button>
                 </>
@@ -281,6 +291,7 @@ export default function AuthScreen() {
               ) : (
                 <>
                   <div className="lg-field"><label>Email</label><div className="lg-inp"><MailIcon /><input type="email" autoComplete="email" placeholder="you@restaurant.com" value={siEmail} onChange={(e) => setSiEmail(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doReset()} /></div></div>
+                  <Turnstile onToken={setCaptcha} action="reset_email" resetKey={captchaKey} />
                   {err && <div className="lg-err">{err}</div>}
                   <button className="lg-prime" onClick={doReset} disabled={busy}>{busy ? "Sending…" : "Send reset link"}</button>
                 </>
@@ -294,6 +305,7 @@ export default function AuthScreen() {
               <div className="lg-field"><label>Email</label><div className="lg-inp"><MailIcon /><input type="email" autoComplete="email" placeholder="you@restaurant.com" value={siEmail} onChange={(e) => setSiEmail(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSignin()} /></div></div>
               <div className="lg-field"><label>Password</label><div className="lg-inp"><LockIcon /><input type={showPass ? "text" : "password"} autoComplete="current-password" placeholder="Your password" value={siPass} onChange={(e) => setSiPass(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSignin()} /><button type="button" className="lg-eye" onClick={() => setShowPass((v) => !v)} aria-label={showPass ? "Hide password" : "Show password"}>{showPass ? "Hide" : "Show"}</button></div></div>
               <p className="lg-forgot"><a onClick={toReset}>Forgot password?</a></p>
+              <Turnstile onToken={setCaptcha} action="signin" resetKey={captchaKey} />
               {err && <div className="lg-err">{err}</div>}
               <button className="lg-prime" onClick={doSignin} disabled={busy}>{busy ? "Signing in…" : "Sign in →"}</button>
               <p className="lg-alt">New to Parosa? <a onClick={toCreate}>Create an account</a></p>

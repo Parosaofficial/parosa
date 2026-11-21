@@ -7,6 +7,7 @@ import { TableArt } from "@/components/TableArt";
 import { cleanPhone } from "@/lib/loyalty";
 import { createReservation, dayLabel, floorAt, groupHalls, hallCols, hallRows, slotsFor, timeLabel, type BookingDone, type FloorInfo, type FloorTable } from "@/lib/reserve";
 import type { Restaurant } from "@/lib/types";
+import { Turnstile, turnstileOn } from "@/components/Turnstile";
 import "./book.css";
 
 /*
@@ -34,6 +35,8 @@ export function BookClient({ restaurant }: { restaurant: Restaurant }) {
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [captcha, setCaptcha] = useState<string | null>(null); // Turnstile token (when switched on)
+  const [captchaKey, setCaptchaKey] = useState(0);
   const [err, setErr] = useState("");
   const [done, setDone] = useState<BookingDone | null>(null);
   const [now, setNow] = useState(0); // when the floor was last loaded
@@ -65,12 +68,14 @@ export function BookClient({ restaurant }: { restaurant: Restaurant }) {
     const p = cleanPhone(phone);
     if (name.trim().length < 2) { setErr("Please enter your name."); return; }
     if (!p || p.replace(/\D/g, "").length < 10) { setErr("Please enter a 10-digit mobile number."); return; }
+    if (turnstileOn && !captcha) { setErr("Please wait a second for the quick check, then try again."); return; }
     setBusy(true); setErr("");
     try {
-      const d = await createReservation({ restaurantId: restaurant.id, tableId: picked.id, at, people, name: name.trim(), phone: p, note });
+      const d = await createReservation({ restaurantId: restaurant.id, tableId: picked.id, at, people, name: name.trim(), phone: p, note, captcha });
       setDone(d); setStep("done");
     } catch (e) {
       setErr((e as Error).message || "Couldn't book. Please try again.");
+      setCaptchaKey((k) => k + 1); // each check works once — get a fresh one
       floorAt(restaurant.id, at).then((f) => { if (f) setInfo(f); });
     } finally { setBusy(false); }
   };
@@ -146,6 +151,7 @@ export function BookClient({ restaurant }: { restaurant: Restaurant }) {
           <div className="bk-amt"><span>Booking charge</span><b>{picked.price ? rupees(picked.price) : "Free"}</b></div>
           {picked.price > 0 && <p className="bk-fine">Nothing to pay now — it&apos;s added to your bill at the restaurant.</p>}
           {err && <p className="bk-err" role="alert">{err}</p>}
+          <Turnstile onToken={setCaptcha} action="book" resetKey={captchaKey} />
           <button className="bk-btn" onClick={book} disabled={busy}>{busy ? "Booking…" : `Book ${picked.name}${picked.price ? ` · ${rupees(picked.price)}` : ""}`}</button>
         </div>
       </div>

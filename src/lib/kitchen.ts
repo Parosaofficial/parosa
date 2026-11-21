@@ -53,14 +53,14 @@ export function clearKitchenSession() {
 
 export type OtpRequest =
   | { ok: true; restaurant_name: string; phone_end: string }
-  | { ok: false; error: "nomatch" | "toomany" | "offline" | "notsent" };
+  | { ok: false; error: "nomatch" | "toomany" | "offline" | "notsent" | "captcha" };
 
 /** Step 1 — sends the code on WhatsApp to the registered mobile (the only place it is shown). */
-export async function requestKitchenOtp(restaurantId: string, phone: string): Promise<OtpRequest> {
+export async function requestKitchenOtp(restaurantId: string, phone: string, captcha?: string | null): Promise<OtpRequest> {
   try {
     const r = await fetch("/api/kitchen/otp", {
       method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ id: restaurantId, phone }),
+      body: JSON.stringify({ id: restaurantId, phone, captcha }),
     });
     return (await r.json()) as OtpRequest;
   } catch { return { ok: false, error: "offline" }; }

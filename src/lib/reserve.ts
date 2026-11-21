@@ -120,13 +120,20 @@ export async function floorAt(restaurantId: string, at: Date | null): Promise<Fl
 
 export type BookingDone = { code: string; table_name: string; kind: string; starts_at: string; price: number; people: number };
 
-export async function createReservation(input: { restaurantId: string; tableId: string; at: Date; people: number; name: string; phone: string; note: string }): Promise<BookingDone> {
-  const { data, error } = await supabase.rpc("reservation_create", {
-    p_restaurant: input.restaurantId, p_table: input.tableId, p_at: input.at.toISOString(),
-    p_people: input.people, p_name: input.name, p_phone: input.phone, p_note: input.note || null,
-  });
-  if (error) throw new Error(error.message || "Couldn't book");
-  return data as BookingDone;
+/** Book a table through the website's /api/book route (bot check + rate limit, 0022). */
+export async function createReservation(input: { restaurantId: string; tableId: string; at: Date; people: number; name: string; phone: string; note: string; captcha?: string | null }): Promise<BookingDone> {
+  let r: Response;
+  try {
+    r = await fetch("/api/book", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ restaurantId: input.restaurantId, tableId: input.tableId, at: input.at.toISOString(), people: input.people, name: input.name, phone: input.phone, note: input.note, captcha: input.captcha ?? null }),
+    });
+  } catch { throw new Error("Couldn't connect. Check the internet and try again."); }
+  const d = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string; booking?: BookingDone };
+  if (r.status === 429 || d.error === "toomany") throw new Error("Too many tries. Please wait a minute and try again.");
+  if (d.error === "captcha") throw new Error("Please complete the quick check below and try again.");
+  if (!d.ok || !d.booking) throw new Error(d.error || "Couldn't book");
+  return d.booking;
 }
 
 /* ---------------- time slots ---------------- */

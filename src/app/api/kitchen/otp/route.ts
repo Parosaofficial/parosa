@@ -1,5 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { rateLimit, tooMany } from "@/lib/rateLimit";
+import { failedCheck, verifyTurnstile } from "@/lib/turnstile";
 
 /*
  * Kitchen sign-in, step 1: Restaurant ID + registered mobile → a 6-digit code.
@@ -21,13 +23,16 @@ export const dynamic = "force-dynamic";
 type Made = { ok: boolean; error?: string; otp_id?: string; restaurant_name?: string; phone_end?: string };
 
 export async function POST(req: Request) {
-  let id = "", phone = "";
+  if (!(await rateLimit(req, "kitchen-otp", 10))) return tooMany(); // per visitor (0022)
+  let id = "", phone = "", captcha = "";
   try {
-    const b = (await req.json()) as { id?: unknown; phone?: unknown };
+    const b = (await req.json()) as { id?: unknown; phone?: unknown; captcha?: unknown };
+    captcha = String(b.captcha ?? "");
     id = String(b.id ?? "").trim().slice(0, 80);
     phone = String(b.phone ?? "").replace(/\D/g, "").slice(-10);
   } catch { /* fall through */ }
   if (!id || phone.length !== 10) return Response.json({ ok: false, error: "nomatch" });
+  if (!(await verifyTurnstile(captcha, req))) return failedCheck(); // bot check (when switched on)
 
   const { data, error } = await supabase.rpc("kitchen_request_otp", { p_slug: id, p_phone: phone });
   if (error || !data) return Response.json({ ok: false, error: "offline" });

@@ -8,6 +8,7 @@ import { authMessage, getCurrentUser, signUpOwner } from "@/lib/auth";
 import { createRestaurant, generateUniqueSlug, getRestaurantByOwner, updateRestaurant, uploadPhoto } from "@/lib/db";
 import { geoMessage, pinCurrentAddress } from "@/lib/geo";
 import type { Restaurant } from "@/lib/types";
+import { Turnstile, turnstileOn } from "@/components/Turnstile";
 import "./signup.css";
 
 /*
@@ -66,6 +67,8 @@ export default function SignupFlow() {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [captcha, setCaptcha] = useState<string | null>(null); // Turnstile (when switched on)
+  const [captchaKey, setCaptchaKey] = useState(0);
   // screen 2 — address + logo
   const [locating, setLocating] = useState(false);
   const [geoErr, setGeoErr] = useState("");
@@ -125,12 +128,13 @@ export default function SignupFlow() {
     if (!account) {
       if (!emailOk(email)) return setErr("Enter a valid email address.");
       if (pass.length < 8) return setErr("Password must be at least 8 characters.");
+      if (turnstileOn && !captcha) return setErr("Please wait a second for the quick check, then try again.");
     }
     setBusy(true);
     try {
       let acc = account;
       if (!acc) {
-        const { hasSession } = await signUpOwner(email, pass);
+        const { hasSession } = await signUpOwner(email, pass, captcha);
         if (!hasSession) { setBusy(false); setConfirmSent(email.trim().toLowerCase()); return; }
         acc = await getCurrentUser();
         if (!acc) throw new Error("Session lost");
@@ -148,6 +152,7 @@ export default function SignupFlow() {
     } catch (e) {
       setBusy(false);
       setErr(authMessage(e));
+      setCaptchaKey((k) => k + 1); // each check works once
     }
   };
 
@@ -261,6 +266,7 @@ export default function SignupFlow() {
               </>
             )}
 
+            {!account && <Turnstile onToken={setCaptcha} action="signup" resetKey={captchaKey} />}
             {err && <div className="su-err" role="alert">{err}</div>}
             <button className="su-prime" type="submit" disabled={busy}>{busy ? "Creating your account…" : <>Create account <Arrow /></>}</button>
             <p className="su-fine">By creating an account you agree to our <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</p>

@@ -2,6 +2,8 @@ import { createHash, randomInt } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL } from "@/lib/supabase";
 import { sendOtpOnWhatsApp } from "@/lib/whatsappOtp";
+import { rateLimit, tooMany } from "@/lib/rateLimit";
+import { failedCheck, verifyTurnstile } from "@/lib/turnstile";
 
 /*
  * Owner "Forgot password?" by WhatsApp (0019 owner_otps).
@@ -28,7 +30,8 @@ function admin() {
 }
 
 export async function POST(req: Request) {
-  let body: { step?: string; phone?: string; code?: string } = {};
+  if (!(await rateLimit(req, "auth-otp", 10))) return tooMany(); // per visitor (0022)
+  let body: { step?: string; phone?: string; code?: string; captcha?: string } = {};
   try { body = await req.json(); } catch { /* empty */ }
   const phone = p10(body.phone);
   if (phone.length !== 10) return Response.json({ ok: false, error: "phone" });
@@ -36,6 +39,7 @@ export async function POST(req: Request) {
   if (!db) { console.error("[owner-otp] SUPABASE_SERVICE_ROLE_KEY is not set"); return Response.json({ ok: false, error: "notsent" }); }
 
   if (body.step === "send") {
+    if (!(await verifyTurnstile(body.captcha, req))) return failedCheck(); // bot check (when switched on)
     const { count } = await db.from("owner_otps").select("id", { count: "exact", head: true })
       .eq("phone", phone).gt("created_at", new Date(Date.now() - 3600_000).toISOString());
     if ((count ?? 0) >= 5) return Response.json({ ok: false, error: "toomany" });

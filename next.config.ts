@@ -29,16 +29,16 @@ const nextConfig: NextConfig = {
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "Permissions-Policy", value: "camera=(), microphone=(), payment=(), geolocation=(self)" },
         { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
-        // Report-only for now: lists what pages may load and logs anything else in the
-        // browser console. Switch to "Content-Security-Policy" once nothing is reported.
-        { key: "Content-Security-Policy-Report-Only", value: [
+        // Enforced on the live site (tested Nov 2026: no page needs anything outside this list).
+        // Development keeps report-only, because the dev server needs eval for hot reload.
+        { key: process.env.NODE_ENV === "production" ? "Content-Security-Policy" : "Content-Security-Policy-Report-Only", value: [
           "default-src 'self'",
           "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
           "font-src 'self' data: https://fonts.gstatic.com",
           "img-src 'self' data: blob: https:",
           "media-src 'self' data: blob:",
-          "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+          "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://img.parosa.food https://challenges.cloudflare.com",
           "frame-src https://www.youtube-nocookie.com https://challenges.cloudflare.com",
           "frame-ancestors 'none'",
           "base-uri 'self'",

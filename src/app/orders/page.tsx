@@ -11,8 +11,7 @@ import { addItemToOrder, getMenu, listOrdersWithItems, markOrderPaid, type Order
 import { cardForPhone, cardUrl, loyaltyOf, setOrderPhone } from "@/lib/loyalty";
 import { useOwner } from "@/lib/useOwner";
 import { accessOf, planFor } from "@/lib/plans";
-import { buildBillText } from "@/lib/bill";
-import { buildReceiptPdf, fetchLogo, receiptFileName } from "@/lib/receipt";
+// the PDF library (jsPDF, ~300 KB) loads only when a bill is printed or sent — see receiptFor / sendWhatsApp
 import { sendBillOnWhatsApp } from "@/lib/billWhatsApp";
 import { cleanUpi, isValidUpi, payNote, reviewLinkOf, upiLink } from "@/lib/upi";
 import type { Dish } from "@/lib/types";
@@ -94,6 +93,7 @@ export default function Orders() {
   const receiptFor = async (o: OrderWithItems) => {
     const r = restaurant!;
     const upiOk = !!r.upi_id && isValidUpi(r.upi_id);
+    const { buildReceiptPdf, fetchLogo } = await import("@/lib/receipt");
     return buildReceiptPdf({
       restaurant: { name: r.name, address: r.address, city: r.city, state: r.state, pincode: r.pincode, phone: r.phone, gstin: r.gstin, fssai: r.fssai },
       logo: await fetchLogo(r.logo_url),
@@ -130,6 +130,7 @@ export default function Orders() {
     setPrinting(true);
     try {
       const doc = await receiptFor(bill);
+      const { receiptFileName } = await import("@/lib/receipt");
       doc.save(receiptFileName(restaurant.name, bill.order_no ?? "order"));
       showToast("Bill PDF downloaded");
     } catch { showToast("Could not make the PDF — try again"); }
@@ -149,9 +150,10 @@ export default function Orders() {
       } else showToast(r.error === "nophone" ? "Enter a 10-digit mobile number" : "Couldn't send the bill — check the number and try again");
       return;
     }
-    try { const doc = await receiptFor(bill); doc.save(receiptFileName(restaurant.name, bill.order_no ?? "order")); } catch { /* still open chat */ }
+    try { const doc = await receiptFor(bill); const { receiptFileName } = await import("@/lib/receipt"); doc.save(receiptFileName(restaurant.name, bill.order_no ?? "order")); } catch { /* still open chat */ }
     // The pay link must be https: WhatsApp never makes a upi:// link tappable.
     const payUrl = `${window.location.origin}/pay/${bill.id}`;
+    const { buildBillText } = await import("@/lib/bill");
     let text = buildBillText(restaurant, bill, { payUrl });
     // stamp card: save the number on the order (the database stamps it once paid) and send the card link
     const loy = loyaltyOf(restaurant);

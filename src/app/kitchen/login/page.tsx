@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { loadKitchenSession, requestKitchenOtp, saveKitchenSession, verifyKitchenOtp } from "@/lib/kitchen";
+import { Turnstile, turnstileOn } from "@/components/Turnstile";
 import "../kitchen.css";
 import "./kitchenlogin.css";
 
@@ -25,6 +26,8 @@ export default function KitchenLogin() {
   const [err, setErr] = useState("");
   const [sent, setSent] = useState<{ name: string; end: string } | null>(null);
   const [wait, setWait] = useState(0);
+  const [captcha, setCaptcha] = useState<string | null>(null); // Turnstile (when switched on)
+  const [captchaKey, setCaptchaKey] = useState(0);
   const codeRef = useRef<HTMLInputElement>(null);
 
   // already signed in on this tablet → straight to the kitchen
@@ -42,11 +45,14 @@ export default function KitchenLogin() {
     if (busy) return;
     if (!rid.trim()) { setErr("Enter your Restaurant ID"); return; }
     if (phone10.length !== 10) { setErr("Enter the 10-digit mobile number"); return; }
+    if (turnstileOn && !captcha) { setErr("Please wait a second for the quick check, then try again."); return; }
     setBusy(true); setErr("");
-    const r = await requestKitchenOtp(rid.trim(), phone10);
+    const r = await requestKitchenOtp(rid.trim(), phone10, captcha);
+    setCaptchaKey((k) => k + 1); // each check works once
     setBusy(false);
     if (!r.ok) {
       setErr(r.error === "toomany" ? "Too many codes asked for. Try again in an hour."
+        : r.error === "captcha" ? "Please wait a second for the quick check, then try again."
         : r.error === "offline" ? "Couldn't connect. Check the internet and try again."
         : r.error === "notsent" ? "Couldn't send the code on WhatsApp. Please try again in a minute."
         : "This Restaurant ID and mobile number don't match. Use the number registered with Parosa.");
@@ -90,6 +96,7 @@ export default function KitchenLogin() {
                   inputMode="numeric" autoComplete="tel-national" placeholder="98765 43210" />
               </span>
             </label>
+            <Turnstile onToken={setCaptcha} action="kitchen" resetKey={captchaKey} />
             {err && <p className="kl-err" role="alert">{err}</p>}
             <button className="kd-btn" type="submit" disabled={busy}>{busy ? "Sending…" : "Send code"}</button>
             <small>Your Restaurant ID is on the owner&apos;s Dashboard → Kitchen display.</small>
