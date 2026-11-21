@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { playChime, primeAudio, soundBlocked } from "@/lib/chime";
+import { listenLive } from "@/lib/live";
 import {
   clearKitchenSession, forStation, kitchenBoard, kitchenItemDone, kitchenSetStatus, kitchenSignOut, orderSource, tableTitle,
   type KitchenBoard, type KitchenOrder, type KitchenStatus, type Station,
@@ -18,7 +19,8 @@ import "./kitchen.css";
  * the expo. Marking Ready tells the waiter's phone and the guest.
  */
 
-const POLL_MS = 5000;
+const POLL_MS = 5000;     // without live updates
+const POLL_LIVE_MS = 30000; // safety net while live updates are connected
 const REMIND_MS = 60000; // ring again while an order waits in New
 const STATION_KEY = "parosa-kds-station";
 const LANES: { id: Exclude<KitchenStatus, "served">; title: string }[] = [
@@ -51,6 +53,7 @@ export default function Kitchen() {
   const seen = useRef<Set<string> | null>(null);
   const soundRef = useRef(soundOn);
   const [blocked, setBlocked] = useState(false); // the browser muted us — ask for a tap
+  const [live, setLive] = useState(false);       // live updates connected (0021)
   useEffect(() => { soundRef.current = soundOn; }, [soundOn]);
 
   const pickStation = (name: string) => {
@@ -78,12 +81,19 @@ export default function Kitchen() {
   useEffect(() => {
     if (!kit) return;
     const first = setTimeout(load, 0);
-    const t = setInterval(load, POLL_MS);
+    const t = setInterval(load, live ? POLL_LIVE_MS : POLL_MS);
     const tick = setInterval(() => setNow(Date.now()), 1000);
     const onShow = () => { if (document.visibilityState === "visible") load(); };
     document.addEventListener("visibilitychange", onShow);
     return () => { clearTimeout(first); clearInterval(t); clearInterval(tick); document.removeEventListener("visibilitychange", onShow); };
-  }, [kit, load]);
+  }, [kit, load, live]);
+
+  // live updates: the database signals the moment an order changes → refresh now
+  const liveKey = board?.live ?? null;
+  useEffect(() => {
+    if (!kit || !liveKey) return;
+    return listenLive(`live:${liveKey}`, load, setLive);
+  }, [kit, liveKey, load]);
 
   // Sound stays unlocked: any tap on the screen re-unlocks it (tablets mute pages
   // that sat idle), and a red bar asks for a tap whenever the browser is blocking it.

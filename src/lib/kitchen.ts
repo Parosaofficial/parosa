@@ -33,7 +33,7 @@ export type KitchenOrder = {
 /** A kitchen station: the menu categories it cooks. */
 export type Station = { name: string; categories: string[] };
 
-export type KitchenBoard = { orders: KitchenOrder[]; recent: KitchenOrder[]; stations: Station[]; amber_min: number; red_min: number };
+export type KitchenBoard = { orders: KitchenOrder[]; recent: KitchenOrder[]; stations: Station[]; amber_min: number; red_min: number; live?: string | null };
 
 /* ---------------- kitchen sign-in (separate from staff) ---------------- */
 
@@ -92,7 +92,7 @@ export async function kitchenBoard(s: KitchenSession): Promise<KitchenBoard | nu
   const { data, error } = await supabase.rpc("kitchen_orders", args(s));
   if (error || !data) return null;
   const b = data as KitchenBoard;
-  return { orders: b.orders ?? [], recent: b.recent ?? [], stations: b.stations ?? [], amber_min: b.amber_min || 10, red_min: b.red_min || 20 };
+  return { orders: b.orders ?? [], recent: b.recent ?? [], stations: b.stations ?? [], amber_min: b.amber_min || 10, red_min: b.red_min || 20, live: b.live ?? null };
 }
 
 export async function kitchenSetStatus(s: KitchenSession, orderId: string, status: KitchenStatus) {

@@ -5,6 +5,7 @@ import { playChime, primeAudio } from "@/lib/chime";
 import { staffReady, staffServed, type ReadyFood } from "@/lib/kitchen";
 import { staffAcceptSession, staffCallSeen, staffCalls, staffPendingTables, type PendingTable, type StaffCall } from "@/lib/tables";
 import type { StaffSession } from "@/lib/types";
+import { listenLive, staffLiveKey } from "@/lib/live";
 import "./waitercalls.css";
 
 /*
@@ -17,13 +18,15 @@ import "./waitercalls.css";
  * 0019) show as "T5 new guests — Accept".
  */
 
-const POLL_MS = 7000;
+const POLL_MS = 7000;       // without live updates
+const POLL_LIVE_MS = 30000; // safety net while live updates are connected (0021)
 const mins = (iso: string) => Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
 
 export function WaiterCalls({ staff }: { staff: StaffSession }) {
   const [calls, setCalls] = useState<StaffCall[]>([]);
   const [food, setFood] = useState<ReadyFood[]>([]);
   const [pending, setPending] = useState<PendingTable[]>([]);
+  const [live, setLive] = useState(false);
   const [busy, setBusy] = useState("");
   const seen = useRef<Set<string> | null>(null);
 
@@ -47,11 +50,21 @@ export function WaiterCalls({ staff }: { staff: StaffSession }) {
   useEffect(() => {
     // the first check runs on the next tick so state isn't set during the effect
     const first = setTimeout(load, 0);
-    const t = setInterval(load, POLL_MS);
+    const t = setInterval(load, live ? POLL_LIVE_MS : POLL_MS);
     const onShow = () => { if (document.visibilityState === "visible") load(); };
     document.addEventListener("visibilitychange", onShow);
     return () => { clearTimeout(first); clearInterval(t); document.removeEventListener("visibilitychange", onShow); };
-  }, [load]);
+  }, [load, live]);
+
+  // live updates: calls, food ready and new tables arrive the moment they happen
+  useEffect(() => {
+    let stop: (() => void) | null = null;
+    let gone = false;
+    staffLiveKey(staff.restaurant_id, staff.code, staff.staff_id).then((key) => {
+      if (key && !gone) stop = listenLive(`live:${key}`, load, setLive);
+    });
+    return () => { gone = true; stop?.(); };
+  }, [staff, load]);
 
   if (calls.length === 0 && food.length === 0 && pending.length === 0) return null;
 

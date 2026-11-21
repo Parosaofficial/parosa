@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { StampStrip } from "@/components/MenuStamp";
 import { getPublicCard } from "@/lib/loyalty";
 import { sessionBill, type SessionBill } from "@/lib/tables";
+import { listenLive } from "@/lib/live";
 import "./thankyou.css";
 
 /*
@@ -32,6 +33,14 @@ export function ThankYou({ restaurantName, tableTitle, sessionId, sessionCode, o
   const [busy, setBusy] = useState("");
   const [err, setErr] = useState("");
 
+  // live updates for this table (0021): kitchen status and bill refresh the moment they change
+  const [live, setLive] = useState(false);
+  const [ping, setPing] = useState(0);
+  useEffect(() => {
+    if (!sessionId) return;
+    return listenLive(`session:${sessionId}`, () => setPing((n) => n + 1), setLive);
+  }, [sessionId]);
+
   // where the order is in the kitchen: received → cooking → ready (on the thank-you view)
   const [kitchen, setKitchen] = useState<string | null>(null);
   useEffect(() => {
@@ -42,9 +51,9 @@ export function ThankYou({ restaurantName, tableTitle, sessionId, sessionCode, o
       if (alive && o) setKitchen(o.status);
     });
     load();
-    const t = setInterval(load, 10000);
+    const t = setInterval(load, live ? 60000 : 10000);
     return () => { alive = false; clearInterval(t); };
-  }, [view, sessionId, order.no]);
+  }, [view, sessionId, order.no, ping, live]);
 
   // keep the bill fresh while it's open (another phone at the table may order)
   useEffect(() => {
@@ -52,9 +61,9 @@ export function ThankYou({ restaurantName, tableTitle, sessionId, sessionCode, o
     let alive = true;
     const load = () => sessionBill(sessionId).then((b) => { if (alive && b) setBill(b); });
     load();
-    const t = setInterval(load, 15000);
+    const t = setInterval(load, live ? 60000 : 15000);
     return () => { alive = false; clearInterval(t); };
-  }, [view, sessionId]);
+  }, [view, sessionId, ping, live]);
 
   const ask = async (kind: "waiter" | "bill") => {
     if (!onRequest || busy) return;

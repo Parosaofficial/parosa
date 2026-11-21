@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { currentLocation, joinSession, rememberSession, rememberedSession, requestHelp, restaurantHere, sessionStatus, tableLabel, type HereResult, type JoinResult } from "@/lib/tables";
+import { listenLive } from "@/lib/live";
 import "./sessiongate.css";
 
 /*
@@ -50,6 +51,7 @@ export type TableSessionState = {
 
 const POLL_MS = 30000;
 const POLL_WAIT_MS = 5000; // waiting for the staff to accept the table
+const POLL_LIVE_MS = 60000; // safety net while live updates are connected (0021)
 const POLL_BILL_MS = 8000; // waiting for the owner to close the bill
 
 export function useTableSession({ restaurantId, slug, table, enabled }: { restaurantId: string; slug: string; table: string; enabled: boolean }) {
@@ -64,6 +66,8 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
   const [denied, setDenied] = useState("");
   const [noTables, setNoTables] = useState(false);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [live, setLive] = useState(false);   // live updates for this table session
+  const [ping, setPing] = useState(0);       // bumps when the database signals a change
   const alive = useRef(true);
   // set back to true on (re)mount — React's dev double-mount runs the cleanup once first
   useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
@@ -128,12 +132,20 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
     }
   }, [restaurantId, slug, table, apply, applyHere, noTables]);
 
-  // waiting for the staff to accept this table → check every few seconds
+  // live updates for this table: bill closed, waiter assigned, table accepted… → check now
+  useEffect(() => {
+    if (!sessionId) return;
+    return listenLive(`session:${sessionId}`, () => setPing((n) => n + 1), setLive);
+  }, [sessionId]);
+
+  // waiting for the staff to accept this table → check now on a signal, else every few seconds
   useEffect(() => {
     if (phase !== "waiting" || !sessionId) return;
-    const t = setInterval(() => { joinSession(restaurantId, table, null, sessionId).then(apply); }, POLL_WAIT_MS);
+    const check = () => { joinSession(restaurantId, table, null, sessionId).then(apply); };
+    if (ping) check();
+    const t = setInterval(check, live ? POLL_LIVE_MS : POLL_WAIT_MS);
     return () => clearInterval(t);
-  }, [phase, sessionId, restaurantId, table, apply]);
+  }, [phase, sessionId, restaurantId, table, apply, ping, live]);
 
   const reset = useCallback(() => {
     rememberSession(slug, table, null);
@@ -147,7 +159,7 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
   // the owner closes the session after payment → thank the guest and start fresh next time
   useEffect(() => {
     if (!sessionId || (phase !== "ok" && phase !== "joined")) return;
-    const t = setInterval(async () => {
+    const check = async () => {
       const s = await sessionStatus(sessionId);
       if (!alive.current || !s) return;
       if (s.status !== "closed") { if (s.bill_asked) setBillAsked(true); setWaiterName(s.waiter_name ?? null); return; }
@@ -156,9 +168,11 @@ export function useTableSession({ restaurantId, slug, table, enabled }: { restau
       setBillAsked(false);
       if (s.close_reason === "paid") setPhase("paid");
       else { setPhase("checking"); start(true); }
-    }, billAsked ? POLL_BILL_MS : POLL_MS);
+    };
+    if (ping) void check();
+    const t = setInterval(check, live ? POLL_LIVE_MS : billAsked ? POLL_BILL_MS : POLL_MS);
     return () => clearInterval(t);
-  }, [sessionId, phase, slug, table, start, billAsked]);
+  }, [sessionId, phase, slug, table, start, billAsked, ping, live]);
 
   // the waiter's name as soon as the table is confirmed (the poll above keeps it fresh)
   useEffect(() => {
